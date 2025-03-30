@@ -41,7 +41,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    color: rgb(228, 70, 70);
+    color: #616dad;
 }
 ul{
     display: flex;
@@ -57,10 +57,11 @@ li{
     border-radius: 5px;
 }
 li:hover{
-    background: rgb(195, 38, 38);
+    background: #232e6f;
+    color: white;
 }
 a{
-    color: rgb(224, 41, 41);
+    color: #616dad;
     text-decoration: none;
     font-size: 40px;
 
