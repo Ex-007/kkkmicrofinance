@@ -3,207 +3,178 @@
         <!-- Error/Success Messages -->
         <div v-if="store.error" class="error-message">{{ store.error }}</div>
         <h5 v-if="noInput" class="error-message">{{ errorMessage }}</h5>
-        
+
         <!-- Form Section - Shown before submission -->
         <form v-if="!formSubmitted" @submit.prevent="submitRegistration" class="page">
             <p>
-                Note: This Page is for Students who has paid the form fee and seeking admission.
+                Please fill the membership form correctly.
             </p>
-            
+
             <div class="stepA">
                 <h1>Personal Information</h1>
 
                 <div class="stepA">
                     <h3>Please upload your passport</h3>
                     <label for="passport"><i class="fa fa-file" style="font-size: 40px; cursor: pointer;"></i></label>
-                    <input type="file" id="passport" style="display: none;" @change="handlePassportPhoto" accept="image/*" required>
+                    <input type="file" id="passport" style="display: none;" @change="handlePassportPhoto"
+                        accept="image/*" required>
                     <div v-if="passportPreviewUrl" class="preview">
                         <img :src="passportPreviewUrl" alt="Passport Preview" width="100" />
                     </div>
-                 </div>
-                
+                </div>
+
                 <!-- SURNAME -->
                 <label for="surnanme">Surname:</label>
-                <input type="text" id="surname" class="contactInput" v-model="store.studentData.surname" required>
-    
+                <input type="text" id="surname" class="contactInput" v-model="store.registrationData.surname" required>
+
                 <!-- FIRSTNAME -->
                 <label for="firstname">Firstname:</label>
-                <input type="text" id="firstname" class="contactInput" v-model="store.studentData.firstname" required>
-    
+                <input type="text" id="firstname" class="contactInput" v-model="store.registrationData.firstname" required>
+
                 <!-- MIDDLENAME -->
                 <label for="middlename">Middlename:</label>
-                <input type="text" id="middlename" class="contactInput" v-model="store.studentData.middlename" required>
-    
+                <input type="text" id="middlename" class="contactInput" v-model="store.registrationData.middlename" required>
+
+                <!-- OCCUPATION -->
+                <label for="occupation">Occupation:</label>
+                <input type="text" id="occupation" class="contactInput" v-model="store.registrationData.occupation" required>
+
                 <!-- DATE OF BIRTH -->
                 <label for="dateOfBirth">Date of Birth:</label>
-                <input type="date" id="dateOfBirth" class="contactInput" v-model="store.studentData.dateOfBirth" required>
-    
+                <input type="date" id="dateOfBirth" class="contactInput" v-model="store.registrationData.dateOfBirth"
+                    required>
+
                 <!-- GENDER -->
                 <label for="gender">Gender:</label>
-                <select id="gender" class="contactInput" v-model="store.studentData.gender" required>
+                <select id="gender" class="contactInput" v-model="store.registrationData.gender" required>
                     <option>Male</option>
                     <option>Female</option>
                 </select>
-    
-                <!-- RELIGION -->
-                <label for="religion">Religion:</label>
-                <select id="religion" class="contactInput" v-model="store.studentData.religion" required>
-                    <option>Christian</option>
-                    <option>Muslim</option>
-                    <option>Others</option>
+
+                <!-- STATES -->
+                <label for="state">State of Origin:</label>
+                <select v-model="selectedState" id="state" class="contactInput">
+                    <option value="" disabled>Select a state</option>
+                    <option v-for="(lgas, state) in statesAndLgas" :key="state" :value="state">
+                        {{ state }}
+                    </option>
                 </select>
-    
-                <!-- LGV -->
+
+                <!-- LOCAL GOVERNMENTS -->
                 <label for="lgvt">Local Government:</label>
-                <input type="text" id="lgvt" class="contactInput" v-model="store.studentData.localGovernment" required>
-    
-                <!-- CURRENT HOME ADDRESS -->
-                <label for="homeAddress">Current Home Address:</label>
-                <input type="text" id="homeAddress" class="contactInput" v-model="store.studentData.homeAddress" required>
-    
-                <!-- PARENT OR GUARDIAN NAME -->
-                <label for="parentG">Parent or Guardian Name:</label>
-                <input type="text" id="parentG" class="contactInput" v-model="store.studentData.guardian" required>
-    
-                <!-- ADDREDD -->
-                <label for="pAdd">Permanent Address:</label>
-                <input type="text" id="pAdd" class="contactInput" v-model="store.studentData.permanentAddress" required>
-    
-                <!-- SEC.SCHOOL -->
-                <label for="secschool">Secondary School Attended:</label>
-                <input type="text" id="secschool" class="contactInput" v-model="store.studentData.secondarySchool" required>
-    
-                <!-- EXTRA CURRICULA ACTIVITIES -->
-                <label for="extracurriculla">Extra Curricula activities:</label>
-                <input type="text" id="extracurriculla" class="contactInput" v-model="store.studentData.extraCurricula" required>
-    
-                <!-- Disabilities -->
-                <label for="disa">Physical Disabilities?</label>
-                <select id="disa" class="contactInput" v-model="store.studentData.disability" required>
-                    <option>No</option>
-                    <option>Yes</option>
+                <select v-model="selectedLGA" id="lga" :disabled="!selectedState" class="contactInput">
+                    <option value="" disabled>Select a Local Government</option>
+                    <option v-for="lga in localGovernments" :key="lga" :value="lga">
+                        {{ lga }}
+                    </option>
                 </select>
-    
-                <!-- IF YES -->
-                <label for="disab">If Yes, State the Nature:</label>
-                <input type="text" id="disab" class="contactInput" v-model="store.studentData.disableContent" :required="store.studentData.disability === 'Yes'" :disabled="store.studentData.disability === 'No'">
-    
+
+                <!-- CURRENT HOME ADDRESS -->
+                <label for="homeAddress">Residential Address:</label>
+                <input type="text" id="homeAddress" class="contactInput" v-model="store.registrationData.homeAddress"
+                    required>
+
+                <!-- PARENT OR GUARDIAN NAME -->
+                <label for="homeTown">Home Town:</label>
+                <input type="text" id="homeTown" class="contactInput" v-model="store.registrationData.homeTown" required>
+
+                <!-- MARITAL STATUS -->
+                <label for="maritalStat">Marital Status:</label>
+                <select id="maritalStat" class="contactInput" v-model="store.registrationData.maritalStat">
+                    <option>Single</option>
+                    <option>Married</option>
+                    <option>Divorced</option>
+                    <option>Complicated</option>
+                </select>
+
+                <!-- EDUCATIONAL QUALIFICATION -->
+                <label for="maritalStat">Educational Qualification:</label>
+                <select id="maritalStat" class="contactInput" v-model="store.registrationData.eduQualify">
+                    <option>Primary School Leaving Certificate</option>
+                    <option>O'Level</option>
+                    <option>OND</option>
+                    <option>HND</option>
+                    <option>B. Sc</option>
+                    <option>M. Sc</option>
+                    <option>Ph. D</option>
+                </select>
+
+                <!-- EMAIL ADDRESS -->
+                <label for="emailAddress">Email Address:</label>
+                <input type="email" id="emailAddress" class="contactInput" v-model="store.registrationData.email"
+                    required>
+
                 <!-- PHONE NUMBER -->
                 <label for="phone">Phone Number:</label>
-                <input type="text" id="phone" class="contactInput" v-model="store.studentData.phone" required>
-    
-                <!-- Email -->
-                <label for="emaill">Email:</label>
-                <input type="email" id="emaill" class="contactInput" v-model="store.studentData.email" required>
-    
-                <!-- EMERGENCY CONTACTS -->
-                 <div class="stepA emergencyy">
-                    <h1 class="personTo">Person to be Notified during Emergency</h1>
+                <input type="text" id="phone" class="contactInput" v-model="store.registrationData.phone" required>
 
-                    <!-- FULLNAME -->
-                    <label for="fullname">Fullname:</label>
-                    <input type="text" id="fullname" class="contactInput" v-model="store.studentData.E_fullname" required>
+                <!-- EMPLOYER'S NAME -->
+                <label for="employersName">Employer's name/Business:</label>
+                <input type="email" id="employersName" class="contactInput" v-model="store.registrationData.employerName" required>
 
-                    <!-- ADDRESS -->
-                    <label for="adddre">Address:</label>
-                    <input type="text" id="adddre" class="contactInput" v-model="store.studentData.E_address" required>
+                    <!--  EMPLOYER'S ADDRESS/BUSIMESS -->
+                    <label for="employersAddress">Employer's Address/Business:</label>
+                    <input type="text" id="employersAddress" class="contactInput" v-model="store.registrationData.employerAddress"
+                        required>
 
-                    <!-- PHONE NUMBER -->
-                    <label for="emergencyPhone">Phone Number:</label>
-                    <input type="text" id="emergencyPhone" class="contactInput" v-model="store.studentData.E_phone" required>
+                    <!--  EMPLOYER'S LOCATION/BUSIMESS -->
+                    <label for="employersLocation">Employer's Location/Business:</label>
+                    <input type="text" id="employersLocation" class="contactInput" v-model="store.registrationData.employerLocation"
+                        required>
+            </div>
 
-                    <!-- EMAIL -->
-                    <label for="eee">Email:</label>
-                    <input type="text" id="eee" class="contactInput" v-model="store.studentData.E_email" required>
-                 </div>
-              </div>
-            
-        
-              <div class="stepA">
-                <h1>Program to Enroll For</h1>
-                
-                <!-- FIRST CHOICE -->
-                <label for="firstChoice">First Choice:</label>
-                <select id="firstChoice" class="contactInput" v-model="store.studentData.firstChoice" required>
-                    <option>Environmental Health Technology</option>
-                    <option>Community Health Extension Worker (CHEW) Junior</option>
-                    <option>Community Health Extension Worker (CHEW) Senior</option>
-                    <option>Dental Therapy</option>
-                    <option>Pharmacy Technician</option>
-                    <option>Opticianry Dispensar</option>
-                    <option>Public Health Technology</option>
-                    <option>Health Assistant Medical</option>
-                    <option>Health Technician</option>
-                    <option>Computer Science Technology</option>
-                    <option>Nutrition and Dietetics</option>
-                    <option>Medical Laboratory Technician</option>
-                    <option>Orthopedic Plaster Card</option>
-                </select>
-    
-                <!-- SECOND CHOISE -->
-                <label for="secondChoice">Second Choice:</label>
-                <select id="secondChoice" class="contactInput" v-model="store.studentData.secondChoice" required>
-                    <option>Environmental Health Technology</option>
-                    <option>Community Health Extension Worker (CHEW) Junior</option>
-                    <option>Community Health Extension Worker (CHEW) Senior</option>
-                    <option>Dental Therapy</option>
-                    <option>Pharmacy Technician</option>
-                    <option>Opticianry Dispensar</option>
-                    <option>Public Health Technology</option>
-                    <option>Health Assistant Medical</option>
-                    <option>Health Technician</option>
-                    <option>Computer Science Technology</option>
-                    <option>Nutrition and Dietetics</option>
-                    <option>Medical Laboratory Technician</option>
-                    <option>Orthopedic Plaster Card</option>
-                </select>
-    
-                <!-- EDUCATIONAL BACKGROUND -->
-                 <div class="stepA eduBack">
-                    <p>List all the schools attended in chronological order</p>
-                    <input type="text" class="contactInput" placeholder="School Name" v-model="store.studentData.schoolAttended" required>
-                    <select class="contactInput" placeholder="Result Awarded" v-model="store.studentData.resultAwarded" required>
-                        <option>WAEC</option>
-                        <option>NECO</option>
-                        <option>NABTEB</option>
-                    </select>
-                 </div>
 
-                 <div class="stepA academi">
-                    <h3>Please upload your O'level result</h3>
-                    <label for="olevel"><i class="fa fa-file" style="font-size: 40px; cursor: pointer;"></i></label>
-                    <input type="file" id="olevel" style="display: none;" @change="handleCertificate" accept=".pdf, .jpg, .jpeg, .png" required>
-                    <div v-if="certificateFileName" class="file-name">
-                        Selected: {{ certificateFileName }}
-                    </div>
-                 </div>    
-               
-              </div>
-            
-            
-              <div class="stepA">
-                    <h1 class="personTo">Sponsor</h1>
+            <div class="stepA">
+                <h1>First Next Of Kin</h1>
 
-                    <!-- FULLNAME -->
-                    <label for="financialName">Fullname:</label>
-                    <input type="text" id="financialName" class="contactInput" v-model="store.studentData.S_fullname" required>
+                <!-- SURNAME -->
+                <label for="surnameNextOne">Surname:</label>
+                <input type="text" id="surnameNextOne" class="contactInput" v-model="store.registrationData.nextKinOneSurname"
+                    required>
 
-                    <!-- ADDRESS -->
-                    <label for="financialAddress">Address:</label>
-                    <input type="text" id="financialAddress" class="contactInput" v-model="store.studentData.S_address" required>
+                <!-- FIRSTNAME -->
+                <label for="firstnameNextOne">Firstname:</label>
+                <input type="text" id="firstnameNextOne" class="contactInput" v-model="store.registrationData.nextKinOneFirstname"
+                    required>
 
-                    <!-- PHONE NUMBER -->
-                    <label for="financialPhone">Phone Number:</label>
-                    <input type="text" id="financialPhone" class="contactInput" v-model="store.studentData.S_phone" required>
+                <!-- RELATIONSHIP -->
+                <label for="relationshipNextOne">Relationship:</label>
+                <input type="text" id="relationshipNextOne" class="contactInput" v-model="store.registrationData.nextKinOneRelationship"
+                    required>
 
-                    <!--    RELATIONSHIP -->
-                    <label for="financialRelat">Relationship:</label>
-                    <input type="text" id="financialRelat" class="contactInput" v-model="store.studentData.S_relationship" required>
-                 </div>
-            
+                <!-- PHONE NUMBER -->
+                <label for="phoneNextOne">Phone Number:</label>
+                <input type="text" id="phoneNextOne" class="contactInput" v-model="store.registrationData.nextKinOnePhone"
+                    required>
+
+                    <!-- SECOND NEXT OF KIN -->
+
+                    <h1>Second Next of Kin</h1>
+                <!-- SURNAME -->
+                <label for="surnameNextTwo">Surname:</label>
+                <input type="text" id="surnameNextTwo" class="contactInput" v-model="store.registrationData.nextKinTwoSurname"
+                    required>
+
+                <!-- FIRSTNAME -->
+                <label for="firstnameNextTwo">Firstname:</label>
+                <input type="text" id="firstnameNextTwo" class="contactInput" v-model="store.registrationData.nextKinTwoFirstname"
+                    required>
+
+                <!-- RELATIONSHIP -->
+                <label for="relationshipNextTwo">Relationship:</label>
+                <input type="text" id="relationshipNextTwo" class="contactInput" v-model="store.registrationData.nextKinTwoRelationship"
+                    required>
+
+                <!-- PHONE NUMBER -->
+                <label for="phoneNextTwo">Phone Number:</label>
+                <input type="text" id="phoneNextTwo" class="contactInput" v-model="store.registrationData.nextKinTwoPhone"
+                    required>
+            </div>
+
             <div class="stepA buttonSign">
                 <h5 v-if="noInput" class="error-message">{{ errorMessage }}</h5>
-                <button type="submit" :disabled="store.isLoading">{{ store.isLoading ? 'Registering...' : 'Register' }}</button>
+                <button type="submit" :disabled="store.isLoading">{{ store.isLoading ? 'Registering...' : 'Register'
+                    }}</button>
             </div>
         </form>
 
@@ -221,7 +192,7 @@
             <!-- Printable Form Section (hidden until print is clicked) -->
             <div id="printable-form" class="printable-form">
                 <div class="print-header">
-                    <h1>Student Registration Form</h1>
+                    <h1>Membership Registration Form</h1>
                     <p>Registration ID: {{ registrationId }}</p>
                     <p>Date: {{ formattedDate }}</p>
                 </div>
@@ -229,130 +200,109 @@
                 <div class="print-section">
                     <h2>Personal Information</h2>
                     <div class="passport-photo">
-                        <img :src="store.studentData.passportUrl" alt="Passport Photo" width="150" />
+                        <img :src="store.registrationData.passportUrl" alt="Passport Photo" width="150" />
                     </div>
                     <div class="info-grid">
                         <div class="info-row">
                             <div class="info-label">Full Name:</div>
-                            <div class="info-value">{{ store.studentData.surname }} {{ store.studentData.firstname }} {{ store.studentData.middlename }}</div>
+                            <div class="info-value">{{ store.registrationData.surname }} {{ store.registrationData.firstname }} {{
+                                store.registrationData.middlename }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Occupation:</div>
+                            <div class="info-value">{{ store.registrationData.occupation }}</div>
                         </div>
                         <div class="info-row">
                             <div class="info-label">Date of Birth:</div>
-                            <div class="info-value">{{ formatDate(store.studentData.dateOfBirth) }}</div>
+                            <div class="info-value">{{ formatDate(store.registrationData.dateOfBirth) }}</div>
                         </div>
                         <div class="info-row">
                             <div class="info-label">Gender:</div>
-                            <div class="info-value">{{ store.studentData.gender }}</div>
+                            <div class="info-value">{{ store.registrationData.gender }}</div>
                         </div>
                         <div class="info-row">
-                            <div class="info-label">Religion:</div>
-                            <div class="info-value">{{ store.studentData.religion }}</div>
+                            <div class="info-label">Home Address:</div>
+                            <div class="info-value">{{ store.registrationData.homeAddress }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Home Town:</div>
+                            <div class="info-value">{{ store.registrationData.homeTown }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Marital Status:</div>
+                            <div class="info-value">{{ store.registrationData.maritalStat }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Educational Qualification:</div>
+                            <div class="info-value">{{ store.registrationData.eduQualify }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Phone Number:</div>
+                            <div class="info-value">{{ store.registrationData.phone }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Email Address:</div>
+                            <div class="info-value">{{ store.registrationData.email }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Employer's Name/Business:</div>
+                            <div class="info-value">{{ store.registrationData.employerName }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Employer's Address/Business:</div>
+                            <div class="info-value">{{ store.registrationData.employerAddress }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Employer's Location/Business:</div>
+                            <div class="info-value">{{ store.registrationData.employerLocation }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">State of Origin:</div>
+                            <div class="info-value">{{ store.registrationData.state }}</div>
                         </div>
                         <div class="info-row">
                             <div class="info-label">Local Government:</div>
-                            <div class="info-value">{{ store.studentData.localGovernment }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Current Home Address:</div>
-                            <div class="info-value">{{ store.studentData.homeAddress }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Parent/Guardian:</div>
-                            <div class="info-value">{{ store.studentData.guardian }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Permanent Address:</div>
-                            <div class="info-value">{{ store.studentData.permanentAddress }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Secondary School:</div>
-                            <div class="info-value">{{ store.studentData.secondarySchool }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Extra Curricular Activities:</div>
-                            <div class="info-value">{{ store.studentData.extraCurricula }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Physical Disabilities:</div>
-                            <div class="info-value">{{ store.studentData.disability }}</div>
-                        </div>
-                        <div v-if="store.studentData.disability === 'Yes'" class="info-row">
-                            <div class="info-label">Nature of Disability:</div>
-                            <div class="info-value">{{ store.studentData.disableContent }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Phone Number:</div>
-                            <div class="info-value">{{ store.studentData.phone }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Email:</div>
-                            <div class="info-value">{{ store.studentData.email }}</div>
+                            <div class="info-value">{{ store.registrationData.localGvt }}</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="print-section">
-                    <h2>Emergency Contact</h2>
+                    <h2>Next of Kin</h2>
                     <div class="info-grid">
                         <div class="info-row">
-                            <div class="info-label">Full Name:</div>
-                            <div class="info-value">{{ store.studentData.E_fullname }}</div>
+                            <div class="info-label">Surname:</div>
+                            <div class="info-value">{{ store.registrationData.nextKinOneSurname }}</div>
                         </div>
                         <div class="info-row">
-                            <div class="info-label">Address:</div>
-                            <div class="info-value">{{ store.studentData.E_address }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Phone Number:</div>
-                            <div class="info-value">{{ store.studentData.E_phone }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Email:</div>
-                            <div class="info-value">{{ store.studentData.E_email }}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="print-section">
-                    <h2>Program Information</h2>
-                    <div class="info-grid">
-                        <div class="info-row">
-                            <div class="info-label">First Choice:</div>
-                            <div class="info-value">{{ store.studentData.firstChoice }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Second Choice:</div>
-                            <div class="info-value">{{ store.studentData.secondChoice }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">School Attended:</div>
-                            <div class="info-value">{{ store.studentData.schoolAttended }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Result Awarded:</div>
-                            <div class="info-value">{{ store.studentData.resultAwarded }}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="print-section">
-                    <h2>Sponsor Information</h2>
-                    <div class="info-grid">
-                        <div class="info-row">
-                            <div class="info-label">Full Name:</div>
-                            <div class="info-value">{{ store.studentData.S_fullname }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Address:</div>
-                            <div class="info-value">{{ store.studentData.S_address }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Phone Number:</div>
-                            <div class="info-value">{{ store.studentData.S_phone }}</div>
+                            <div class="info-label">Firstname:</div>
+                            <div class="info-value">{{ store.registrationData.nextKinOneFirstname }}</div>
                         </div>
                         <div class="info-row">
                             <div class="info-label">Relationship:</div>
-                            <div class="info-value">{{ store.studentData.S_relationship }}</div>
+                            <div class="info-value">{{ store.registrationData.nextKinOneRelationship }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Phone Number:</div>
+                            <div class="info-value">{{ store.registrationData.nextKinOnePhone }}</div>
+                        </div>
+
+                        <h2>Next of Kin Two</h2>
+                        <div class="info-row">
+                            <div class="info-label">Surname:</div>
+                            <div class="info-value">{{ store.registrationData.nextKinTwoSurname }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Firstname:</div>
+                            <div class="info-value">{{ store.registrationData.nextKinTwoFirstname }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Relationship:</div>
+                            <div class="info-value">{{ store.registrationData.nextKinTwoRelationship }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Phone Number:</div>
+                            <div class="info-value">{{ store.registrationData.nextKinTwoPhone }}</div>
                         </div>
                     </div>
                 </div>
@@ -361,7 +311,7 @@
                     <div class="signature-section">
                         <div class="signature-box">
                             <p>_______________________</p>
-                            <p>Student's Signature</p>
+                            <p>Member's Signature</p>
                         </div>
                         <div class="signature-box">
                             <p>_______________________</p>
@@ -379,6 +329,7 @@
     import {ref, watch, computed } from 'vue'
     import {useRouter, useRoute} from 'vue-router'
     import {useFormStore} from '@/stores/formcollection'
+    import {statesAndLgas} from '@/Data/states.js'
 
     const store = useFormStore()
     const router = useRouter()
@@ -386,21 +337,33 @@
     const noInput = ref(false)
     const errorMessage = ref('')
 
-    const paymentId = route.params.id
+    const registrationId = route.params.id
     const passportPreviewUrl = ref('')
-    const certificateFileName = ref('')
     const successMessage = ref('')
     const validationErrors = ref([])
     const showValidationErrors = ref(false)
     const formSubmitted = ref(false)
-    const registrationId = ref('')
+    // const registrationId = ref('')
+
+    // POPULATE THE STATE AND LOCAL GOVERNMENTS
+    const selectedState = ref('')
+    const selectedLGA = ref('')
+    const localGovernments = ref([])
+
+    // WATCH AND POPULATE LGA FOR SELECTED STATES
+    watch(selectedState, (newState) => {
+        if (newState) {
+            localGovernments.value = statesAndLgas[newState] || [];
+            selectedLGA.value = ""; 
+        }
+    });
 
 // Generate a random registration ID
-const generateRegistrationId = () => {
-    const timestamp = new Date().getTime().toString().slice(-6)
-    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0')
-    return `REG-${timestamp}-${random}`
-}
+// const generateRegistrationId = () => {
+//     const timestamp = new Date().getTime().toString().slice(-6)
+//     const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0')
+//     return `REG-${timestamp}-${random}`
+// }
 
 // Format date for display
 const formatDate = (dateString) => {
@@ -422,55 +385,41 @@ const formattedDate = computed(() => {
     })
 })
 
-    // Handle passport uploads
-    const handlePassportPhoto = (event) => {
-        const file = event.target.files[0]
-        if (file) {
-            store.setPassportPhoto(file)
-            passportPreviewUrl.value = URL.createObjectURL(file)
-        }
+// Handle passport uploads
+const handlePassportPhoto = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+        store.setPassportPhoto(file)
+        passportPreviewUrl.value = URL.createObjectURL(file)
     }
-    // UPLOADING THE CERTIFICATE
-    const handleCertificate = (event) => {
-        const filez = event.target.files[0]
-        if (filez) {
-            store.setCertificate(filez)
-            certificateFileName.value = filez.name
-        }
+}
+    // NO TRANSACTION ID FOUND
+watch(() => store.noTransactionId, (newVal) => {
+    if (newVal) {
+        noInput.value = true
+        errorMessage.value = 'Registration ID not found'
     }
+});
+    
+// ALREADY REGISTERED
+watch(() => store.alreadyRegistered, (newVal) => {
+    if (newVal) {
+        noInput.value = true
+        errorMessage.value = 'You are already a member!!!'
+    }
+});
 
-    // WATCHING THE DISABILITY SECTION
-    watch(() => store.studentData.disability, (newValue) => {
-        if (newValue === "No") {
-            store.studentData.disableContent = ""
-        }
-    })
+    // SUCCESSFUL
+watch(() => store.canProceed, (newVal) => {
+    if (newVal) {
+        successMessage.value = 'Student registration successful!'
+        formSubmitted.value = true
+        registrationId.value = generateRegistrationId()
+        // router.push('/Formsubmitted')
+    }
+});
 
-        // NO TRANSACTION ID FOUND
-    watch(() => store.noTransactionId, (newVal) => {
-        if (newVal) {
-            noInput.value = true
-            errorMessage.value = 'Transaction ID not found'
-        }
-    });
-        // ALREADY REGISTERED
-    watch(() => store.alreadyRegistered, (newVal) => {
-        if (newVal) {
-            noInput.value = true
-            errorMessage.value = 'You have already Registered'
-        }
-    });
-        // SUCCESSFUL
-    watch(() => store.canProceed, (newVal) => {
-        if (newVal) {
-            successMessage.value = 'Student registration successful!'
-            formSubmitted.value = true
-            registrationId.value = generateRegistrationId()
-            // router.push('/Formsubmitted')
-        }
-    });
-
-    // Form validation function
+    // VALIDATE FORM INPUT
 const validateForm = () => {
   const errors = []
   
@@ -483,72 +432,57 @@ const validateForm = () => {
   if (!store.studentData.surname) errors.push("Surname is required")
   if (!store.studentData.firstname) errors.push("Firstname is required")
   if (!store.studentData.middlename) errors.push("Middlename is required")
+  if (!store.studentData.occupation) errors.push("Occupation is required")
   if (!store.studentData.dateOfBirth) errors.push("Date of birth is required")
   if (!store.studentData.gender) errors.push("Gender is required")
-  if (!store.studentData.religion) errors.push("Religion is required")
-  if (!store.studentData.localGovernment) errors.push("Local government is required")
   if (!store.studentData.homeAddress) errors.push("Current home address is required")
-  if (!store.studentData.guardian) errors.push("Parent or guardian name is required")
-  if (!store.studentData.permanentAddress) errors.push("Permanent address is required")
-  if (!store.studentData.secondarySchool) errors.push("Secondary school attended is required")
-  if (!store.studentData.extraCurricula) errors.push("Extra curricula activities is required")
-  if (!store.studentData.disability) errors.push("Physical disabilities field is required")
-  
-  // Check disability content field if disability is "Yes"
-  if (store.studentData.disability === "Yes" && !store.studentData.disableContent) {
-    errors.push("Please state the nature of your disability")
-  }
-  
-  if (!store.studentData.phone) errors.push("Phone number is required")
-  if (!store.studentData.email) errors.push("Email is required")
-  
-  // Check emergency contact fields
-  if (!store.studentData.E_fullname) errors.push("Emergency contact fullname is required")
-  if (!store.studentData.E_address) errors.push("Emergency contact address is required")
-  if (!store.studentData.E_phone) errors.push("Emergency contact phone number is required")
-  if (!store.studentData.E_email) errors.push("Emergency contact email is required")
-  
-  // Check program fields
-  if (!store.studentData.firstChoice) errors.push("First choice program is required")
-  if (!store.studentData.secondChoice) errors.push("Second choice program is required")
-  
-  // Check certificate upload
-  if (!store.studentData.certificate) {
-    errors.push("Please upload your O'level result")
-  }
-  
-  // Check sponsor fields
-  if (!store.studentData.S_fullname) errors.push("Sponsor fullname is required")
-  if (!store.studentData.S_address) errors.push("Sponsor address is required")
-  if (!store.studentData.S_phone) errors.push("Sponsor phone number is required")
-  if (!store.studentData.S_relationship) errors.push("Sponsor relationship is required")
-  
+  if (!store.studentData.homeTown) errors.push("Home Town is required")
+  if (!store.studentData.maritalStat) errors.push("Marital Status is required")
+  if (!store.studentData.eduQualify) errors.push("Educational Qualification is required")
+  if (!store.studentData.phone) errors.push("Phone Number is required")
+  if (!store.studentData.email) errors.push("Email Address is required")
+  if (!store.studentData.employerName) errors.push("Employer's Name is required")
+  if (!store.studentData.employerAddress) errors.push("Employer's Address is required")
+  if (!store.studentData.employerLocation) errors.push("Employer's Location is required")  
+  if (!store.studentData.nextKinOneSurname) errors.push("Next of Kin Surname is required")
+  if (!store.studentData.nextKinOneFirstname) errors.push("Next of Kin Firstname is required")
+  if (!store.studentData.nextKinOneRelationship) errors.push("Next of Kin Relationship is required")
+  if (!store.studentData.nextKinOnePhone) errors.push("Next of Kin Phone Number is required")
+  if (!store.studentData.nextKinTwoSurname) errors.push("Next of Kin Surname is required")
+  if (!store.studentData.nextKinTwoFirstname) errors.push("Next of Kin Firstname is required")
+  if (!store.studentData.nextKinTwoRelationship) errors.push("Next of Kin Relationship is required")
+  if (!store.studentData.nextKinTwoPhone) errors.push("Next of Kin Phone Number is required")
+  if (!selectedState.value) errors.push("State of Origin is required")
+  if (!selectedLGA.value) errors.push("Local Government is required")
+
   validationErrors.value = errors
   return errors.length === 0
 }
 
+// SUBMIT FORM DETAILS
+const submitRegistration = async () => {
+    showValidationErrors.value = true
+    store.studentData.paymentId = registrationId
+    store.studentData.state = selectedState.value
+    store.studentData.localGvt = selectedLGA.value
 
-    // Submit form
-    const submitRegistration = async () => {
-        showValidationErrors.value = true
-        store.studentData.paymentId = paymentId
-
-        if(!validateForm()){
-            window.scrollTo({top:0, behavior: 'smooth'})
-            return
-        }
-
-        try {
-            await store.checkId()
-
-        } catch (error) {
-            console.error('Registration failed:', error)
-        }
+    if(!validateForm()){
+        window.scrollTo({top:0, behavior: 'smooth'})
+        return
     }
-// resend api
-// re_itnGjHW7_LvdQrT1G4Cf4b7v9DgY9vxhv
 
-// Print the form
+    // const chosenState = selectedState.value
+    // const chosenLGA = selectedLGA.value
+
+    try {
+        await store.checkId()
+
+    } catch (error) {
+        console.error('Registration failed:', error)
+    }
+}
+
+// PRINTING THE FORM
 const printForm = () => {
         const printContents = document.getElementById('printable-form').innerHTML
         const originalContents = document.body.innerHTML
@@ -558,7 +492,7 @@ const printForm = () => {
         printWindow.document.write(`
             <html>
                 <head>
-                    <title>Angel's Registration Form</title>
+                    <title>kkk Toluwalase Membership Form</title>
                     <style>
                         body {
                             font-family: Arial, sans-serif;
@@ -624,6 +558,12 @@ const printForm = () => {
                             text-align: right;
                             font-size: 12px;
                         }
+                        .nameWithLogo{
+                            display: flex;
+                            justify-content: center;
+                            align-item: center;
+                            gap: 10px
+                        }
                         .numberes{
                             display: flex;
                             gap: 10px;
@@ -638,11 +578,14 @@ const printForm = () => {
                 </head>
                 <body>
                     <div class="headerWithDet">
-                        <h1>ANGELS HEIGHT</h1>
-                        <p>...Healthcare Training Per Excellence is Our Concern</p>
+                        <div class='nameWithLogo'>
+                            <img src='/img/kkklogo.png' alt='logo' width='80'>
+                            <h1>KKK TOLUWALASE</h1>
+                        </div>
+                        <p>Multipurpose Co-operative Society</p>
+                        <p>Email: toluwalasecooperative2021@gmail.com</p>
                         <div class="numberes">
-                            <p>09032327228</p>
-                            <p>08107812435</p>
+                            <p>08162556563</p>
                         </div>
                     </div>
                     ${printContents}

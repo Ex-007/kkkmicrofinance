@@ -2,16 +2,13 @@
     <div>
         <div class="page">
             <div class="payMake">
-                <h3>Please Contact The School's management for Payment process</h3>
-                <p>You can reach them on <a href="tel:09032327228">09032327228</a> or <a href="tel:08107812435">08107812435</a></p>
-                <p>For Enquiries <a href="mailto:info@angelsheight.org">info@angelsheight.org</a></p>
+                <h3>Thank You for proceeding to Join us...</h3>
+                <p>Please input your Reg. Id below to continue with your registration if you have paid for the form fee.</p>
+                <p>If You haven't paid, please reach the management through <a href="mailto:tolorunlasecooperative2021@gmail.com">kkk microfinance</a></p>
             </div>
-            <p>
-                Note: Confirm Your Form Purchase if you've already made payment.
-            </p>
             <h5 v-if="noInput">{{ errorMessage }}</h5>
             <h5 class="successful" v-if="successfully">Welcome {{ successMessage }}, waiting for redirect...</h5>
-            <input type="text" class="contactInput" placeholder="Please input your payment ID" v-model="paymentId">
+            <input type="text" class="contactInput" placeholder="Please Input your Registration ID" v-model="paymentId">
             <button @click="confirmPay" :disabled="idStore.isLoading">{{ idStore.isLoading ? 'Confirming...' : 'Confirm Payment' }}</button>
         </div>
     </div>
@@ -32,7 +29,7 @@
 
     // SEO METADATA
     const seoData = ref({
-        title: 'Angels Height College of Health Technology | Accredited Health Courses | Join Us',
+        title: 'KKK microfinance Bank | Join Us',
         description : 'Angels Height college of health technology offers top rated courses like Environmental Health Technology, Community Health Extension Worker (CHEW) Junior, Community Health Extension Worker (CHEW) Senior, Dental Therapy, Pharmacy Technician, Opticianry Dispensary, Public Health Technology, Health Assistant Medical, Health Technician, Computer Science Technology, Nutrition and Dietetics, Medical Laboratory Technician, Orthopedic Plaster Card. Join us for a rewarding career in healthcare.',
         url : 'https://angelsheight.org',
         image : '/img/angelsImage.jpg',
@@ -110,16 +107,6 @@
         }
         noInput.value = false
         await idStore.checkId(paymentId.value)
-        // if(!idStore.incoming){
-        //     noInput.value = true
-        //     errorMessage.value = 'Transaction ID not found'
-        //     return
-        // }
-        // successfully.value = true
-        // successMessage.value = idStore.incoming?.name
-        // setTimeout(() => {
-        //     router.push('/Register')
-        // }, 2000);
     }
 
     // WATCH FOR REQUIREMENTS MET
@@ -137,7 +124,7 @@
     watch(() => idStore.noTransactionId, (newVal) => {
         if (newVal) {
             noInput.value = true
-            errorMessage.value = 'Transaction ID not found'
+            errorMessage.value = 'Registration ID not found'
         }
     });
 
@@ -167,7 +154,7 @@
     }
 .page p{
     text-align: center;
-    color: white;
+    color: #616dad;
     font-size: 25;
 }
 .contactInput{
@@ -184,7 +171,7 @@
 }
 h5{
     font-size: 20px;
-    color: rgba(179, 20, 20, 0.996);
+    color: #616dad;
     text-align: center;
 }
 h3{
@@ -194,7 +181,7 @@ h3{
 button{
     width: 150px;
     background-color: white;
-    color: rgb(84, 8, 112);
+    color: #616dad;
     padding: 10px;
     border-radius: 20px;
     cursor: pointer;
@@ -204,13 +191,13 @@ button{
     text-align: center;
 }
 .payMake{
-    background-color: red;
-    color: white;
+    background-color: rgb(255, 255, 255);
+    color: #616dad;
     padding: 10px;
     border-radius: 20px;
 }
 a{
-    color: white;
+    color: #616dad;
 }
 
 @media (max-width: 768px){

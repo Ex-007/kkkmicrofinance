@@ -9,7 +9,7 @@ export const useConfirmIdStore = defineStore('confirmStore', () => {
     const canProceed = ref(false)
 
 
-    // CHECK THE TRANSACTON IDENTITY
+    // CHECK THE REGISTRATION IDENTITY IF IT EXISTS IN THE DATABASE
     const checkId = async (paymentId) => {
         isLoading.value = true
         error.value = null
@@ -19,14 +19,14 @@ export const useConfirmIdStore = defineStore('confirmStore', () => {
 
         try {
             const {data:checkData, error:checkError} = await client
-            .from('TRANSACTIONID')
+            .from('REGISTRATIONID')
             .select('*')
-            .eq('pay_identity', paymentId)
+            .eq('reg_identity', paymentId)
             .single()
             
             if(checkError){
                 if (checkError.code === 'PGRST116') {
-                    error.value = 'You\'re not admitted yet'
+                    error.value = 'Registration ID not found'
                     noTransactionId.value = true
                     isLoading.value = false
                     return
@@ -42,7 +42,7 @@ export const useConfirmIdStore = defineStore('confirmStore', () => {
         }
     }
 
-    // CHECK REGISTRATION STORE IF STUDENT ALREADY REGISTERED
+    // CHECK REGISTRATION STORE IF CUSTOMER ALREADY REGISTERED
     const checkReg = async (paymentId) => {
         isLoading.value = true
         error.value = false
@@ -51,9 +51,9 @@ export const useConfirmIdStore = defineStore('confirmStore', () => {
         const client = useSupabaseClient()
         try {
             const {data:emailData, error:emailError} = await client
-            .from('studentform')
+            .from('REGISTEREDUSERS')
             .select('*')
-            .eq('paymentId', paymentId)
+            .eq('reg_identity', paymentId)
             .single()
 
             if(emailError){

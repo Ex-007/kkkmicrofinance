@@ -34,7 +34,7 @@ const userPage =  () => {
 
 // REgister page
 const accountPage =  () => {
-    router.push('/ConfirmId')
+    router.push('/Join-us')
 }
 
 
