@@ -19,7 +19,7 @@
              <!-- DEPOSIT AND LOAN REQUESTS -->
               <div class="depositAndLoanReq">
                 <button>Deposit</button>
-                <button>Request Loan</button>
+                <button @click='requestLoan'>Request Loan</button>
               </div>
 
               <!-- LOAN INFORMATION -->
@@ -106,9 +106,15 @@
 </template>
 
 <script setup>
+import {useRoute, useRouter} from 'vue-router'
+const router = useRouter()
     definePageMeta({
         layout: 'custom'
     })
+
+    const requestLoan = () => {
+        router.push('/loan-application')
+    }
 </script>
 
 

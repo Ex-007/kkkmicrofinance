@@ -144,7 +144,7 @@ const checkReg = async () => {
     }
 }
 
-    // REGISTER THE STUDENT
+    // REGISTER THE MEMBER
     const registerUser = async () => {
         isLoading.value = true
         error.value = null

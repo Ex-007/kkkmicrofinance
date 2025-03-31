@@ -1,214 +1,617 @@
-import {defineStore} from 'pinia'
+<template>
+    <div>
+        <!-- Error/Success Messages -->
+        <div v-if="loan.error" class="error-message">{{ loan.error }}</div>
+        <h5 v-if="noInput" class="error-message">{{ errorMessage }}</h5>
 
-export const useFormStore = defineStore ('form', () => {
+        <!-- Form Section - Shown before submission -->
+        <form v-if="!formSubmitted" @submit.prevent="processLoan" class="page">
+            <p>
+                Please fill the loan form correctly.
+            </p>
 
-    // SETTING REACTIVE STATE
-    const registrationData = reactive({
-        // SECTION A
-        passportPhoto: null,
-        passportUrl: '',
+            <div class="stepA">
+                <h1>Personal Information</h1>
+
+                <!-- SURNAME -->
+                <label for="surnanme">Surname:</label>
+                <input type="text" id="surname" class="contactInput" v-model="loanDetails.surname" required>
+
+                <!-- FIRSTNAME -->
+                <label for="firstname">Firstname:</label>
+                <input type="text" id="firstname" class="contactInput" v-model="loanDetails.firstname" required>
+
+                <!-- MIDDLENAME -->
+                <label for="middlename">Middlename:</label>
+                <input type="text" id="middlename" class="contactInput" v-model="loanDetails.middlename" required>
+
+                <!-- ADDRESS -->
+                <label for="address">Address:</label>
+                <input type="text" id="address" class="contactInput" v-model="loanDetails.address" required>
+
+                <!-- EMAIL -->
+                <label for="email">Email:</label>
+                <input type="email" id="email" class="contactInput" v-model="loanDetails.email"
+                    required>
+
+                <!-- OCCUPATION -->
+                <label for="occupation">Occupation:</label>
+                <input type="text" id="occupation" class="contactInput" v-model="loanDetails.occupation" required>
+
+                <!-- POSITION -->
+                <label for="position">Position:</label>
+                <input type="email" id="position" class="contactInput" v-model="loanDetails.position"
+                    required>
+
+                <!-- PHONE NUMBER -->
+                <label for="phone">Phone Number:</label>
+                <input type="text" id="phone" class="contactInput" v-model="loanDetails.phone" required>
+
+                <!-- EMPLOYER'S NAME -->
+                <label for="employersName">Employer's name/Business:</label>
+                <input type="text" id="employersName" class="contactInput" v-model="loanDetails.employerName" required>
+
+                <!--  EMPLOYER'S ADDRESS/BUSIMESS -->
+                <label for="employersAddress">Employer's Address/Business:</label>
+                <input type="text" id="employersAddress" class="contactInput" v-model="loanDetails.employerAddress"
+                    required>
+
+                <!--  EMPLOYER'S PHONE NUMBER -->
+                <label for="employersPhone">Employer's Phone Number:</label>
+                <input type="text" id="employersPhone" class="contactInput" v-model="loanDetails.employerPhone"
+                    required>
+
+                <!--  LOAN AMOUNT -->
+                <label for="loanAmount">Loan Amount:</label>
+                <input type="text" id="loanAmount" class="contactInput" v-model="loanDetails.loanAmount"
+                    required>
+
+                <!--  LOAN PERIOD -->
+                <label for="loanPeriod">Loan Period:</label>
+                <select id="loanPeriod" class="contactInput" v-model="loanDetails.loanPeriod" required>
+                    <option>3 Months</option>
+                    <option>6 Months</option>
+                    <option>9 Months</option>
+                </select>
+
+                <!--  AMOUNT IN WORDS -->
+                <label for="amountInWords">Amount in Words:</label>
+                <input type="text" id="amountInWords" class="contactInput" v-model="loanDetails.amountInWords"
+                    required>
+
+                    
+                <!--  LOAN PURPOSE -->
+                <label for="loanPurpose">Loan Purpose:</label>
+                <select id="loanPurpose" class="contactInput" v-model="loanDetails.loanPurpose" required>
+                    <option>To Start a Business</option>
+                    <option>School Fees</option>
+                    <option>Rent Payment</option>
+                    <option>Business Development</option>
+                    <option>Others</option>
+                </select>
+
+                <!-- GUARANTOR'S SECTION -->
+                <!-- FIRST GUARANTOR -->
+                 <div class="guarantors">
+                    <h2>Guarantor's Details</h2>
+                    <h3>First Guarantor</h3><br>
+                    <label>Guarantor's Name</label>
+                    <p>________________________________________________</p><br>
+                    <label>Guarantor's Address</label>
+                    <p>________________________________________________</p><br>
+                    <label>Guarantor's Phone Number</label>
+                    <p>________________________________________________</p><br>
+                    <label>Guarantor's Signature & Date</label>
+                    <p>________________________________________________</p><br>
+                    <br><br>
+                    <h3>Second Guarantor</h3>
+                    <label>Guarantor's Name</label>
+                    <p>________________________________________________</p><br>
+                    <label>Guarantor's Address</label>
+                    <p>________________________________________________</p><br>
+                    <label>Guarantor's Phone Number</label>
+                    <p>________________________________________________</p><br>
+                    <label>Guarantor's Signature & Date</label>
+                    <p>________________________________________________</p>
+                 </div>
+            </div>
+
+
+            
+
+            <div class="stepA buttonSign">
+                <h5 v-if="noInput" class="error-message">{{ errorMessage }}</h5>
+                <button type="submit" :disabled="loan.isLoading">{{ loan.isLoading ? 'Registering...' : 'Register'
+                    }}</button>
+            </div>
+        </form>
+
+        <!-- Print/Success Section - Shown after submission -->
+        <div v-if="formSubmitted" class="success-container">
+            <div class="success-message">
+                <h2>Registration Successful!</h2>
+                <p>Your form has been successfully submitted and saved to our database.</p>
+                <div class="print-actions">
+                    <button @click="printForm" class="print-button">Print Registration Form</button>
+                    <button @click="goToHome" class="home-button">Profile</button>
+                </div>
+            </div>
+
+            <!-- Printable Form Section (hidden until print is clicked) -->
+            <div id="printable-form" class="printable-form">
+                <div class="print-header">
+                    <h1>Membership Registration Form</h1>
+                    <p>Registration ID: {{ registrationId }}</p>
+                    <p>Date: {{ formattedDate }}</p>
+                </div>
+
+                <div class="print-section">
+                    <h2>Personal Information</h2> 
+                    <div class="info-grid">
+                        <div class="info-row">
+                            <div class="info-label">Full Name:</div>
+                            <div class="info-value">{{ loanDetails.surname }} {{ loanDetails.firstname }} {{
+                                loanDetails.middlename }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Address:</div>
+                            <div class="info-value">{{ loanDetails.address }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Occupation:</div>
+                            <div class="info-value">{{ loanDetails.occupation }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Email:</div>
+                            <div class="info-value">{{ loanDetails.email }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Position:</div>
+                            <div class="info-value">{{ loanDetails.position }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Phone Number:</div>
+                            <div class="info-value">{{ loanDetails.phone }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Employer's name/Business:</div>
+                            <div class="info-value">{{ loanDetails.employerName }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Employer's Address/Business:</div>
+                            <div class="info-value">{{ loanDetails.employerAddress }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Employer's Phone Number:</div>
+                            <div class="info-value">{{ loanDetails.employerAddress }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Employer's Phone Number:</div>
+                            <div class="info-value">{{ loanDetails.employerPhone }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Loan Amount:</div>
+                            <div class="info-value">{{ loanDetails.loanAmount }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Loan Period:</div>
+                            <div class="info-value">{{ loanDetails.loanPeriod }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Amount in ords:</div>
+                            <div class="info-value">{{ loanDetails.amountInWords }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Loan Purpose:</div>
+                            <div class="info-value">{{ loanDetails.loanPurpose }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="print-section">
+                    <h2>Guarantors</h2>
+                    <div class="info-grid">
+                        <div class="info-row">
+                            <div class="info-label">Guarantor's Name:</div>
+                            <div class="info-value">________________________________________________</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Guarantor's Address:</div>
+                            <div class="info-value">________________________________________________</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Guarantor's Phone Number:</div>
+                            <div class="info-value">________________________________________________</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Signature & Date:</div>
+                            <div class="info-value">________________________________________________</div>
+                        </div>
+
+                        <h2>Second Guarantor</h2>
+                        <div class="info-row">
+                            <div class="info-label">Guarantor's Name:</div>
+                            <div class="info-value">________________________________________________</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Guarantor's Address:</div>
+                            <div class="info-value">________________________________________________</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Guarantor's Phone Number:</div>
+                            <div class="info-value">________________________________________________</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Signature & Date:</div>
+                            <div class="info-value">________________________________________________</div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <div class="print-footer">
+                    <h2>For Official Use</h2>
+                    <div class="signature-section">
+                        <div class="signature-box">
+                            <p>_______________________</p>
+                            <p>Chairman's Sign&Date</p>
+                        </div>
+                        <div class="signature-box">
+                            <p>_______________________</p>
+                            <p>Secretary Sign&Date</p>
+                        </div>
+                        <div class="signature-box">
+                            <p>_______________________</p>
+                            <p>Treasurer Sign&Date</p>
+                        </div>
+                    </div>
+                    <p class="print-date">Printed on: {{ formattedDate }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script setup>
+    import {ref, watch, computed } from 'vue'
+    import {useRouter, useRoute} from 'vue-router'
+    import {useLoanStore} from '@/stores/loanApp'
+
+    const loan = useLoanStore()
+    const router = useRouter()
+    const route = useRoute()
+    const noInput = ref(false)
+    const errorMessage = ref('')
+
+    const registrationId = route.params.id
+    const successMessage = ref('')
+    const formSubmitted = ref(false)
+    // const registrationId = ref('')
+
+    // FETCH SIGNED IN USER DETAILS
+    const loanDetails = ref({
         surname : '',
         firstname: '',
         middlename: '',
-        occupation: '',
-        dateOfBirth: '',
-        gender: '',
-        homeAddress: '',
-        homeTown: '',
-        maritalStat: '',
-        eduQualify: '',
-        phone: '',
+        address: '',
         email: '',
-        paymentId: '',
+        occupation: '',
+        position: '',
+        phone: '',
+        businessAddress: '',
         employerName: '',
-        employerAddress: '',
-        employerLocation: '',
-        state: '',
-        localGvt: '',
-
-        // NEXT OF KIN
-        nextKinOneSurname : '',
-        nextKinOneFirstname: '',
-        nextKinOneRelationship: '',
-        nextKinOnePhone: '',
-        nextKinTwoSurname: '',
-        nextKinTwoFirstname: '',
-        nextKinTwoRelationship: '',
-        nextKinTwoPhone: ''
+        employerPhone: '',
+        loanAmount: '',
+        loanPeriod: '',
+        amountInWords: '',
+        loanPurpose: '',
     })
 
-    const isLoading = ref(false)
-    const error = ref(null)
-    const alreadyRegistered = ref(false)
-    const canProceed = ref(false)
-    const noTransactionId = ref(false)
-
-    // SETTING THE FILES
-    function setPassportPhoto(file){
-        registrationData.passportPhoto = file
+    // FETCH SIGNED IN USER DETAILS AND ATTACH TO THE FORM
+    const attachDetails = () => {
+        console.log(loan.userDetails)
+        loanDetails.value.surname = loan.userDetails.surname
+        loanDetails.value.firstname = loan.userDetails.firstname
+        loanDetails.value.middlename = loan.userDetails.middlename
+        loanDetails.value.email = loan.userDetails.email
+        loanDetails.value.address = loan.userDetails.homeAddress
+        loanDetails.value.occupation = loan.userDetails.occupation
+        loanDetails.value.businessAddress = loan.userDetails.employerAddress
+        loanDetails.value.employerName = loan.userDetails.employerName
+        loanDetails.value.phone = loan.userDetails.phone
     }
 
-    // UPLOADING THE PASSPORT
-    const uploadFiles = async() => {
-        isLoading.value = true
-        error.value = null
-        const client = useSupabaseClient()
-
-        try {
-            const passportPhotoPath = `CUSTOMER-PASSPORT/${Date.now()}-${registrationData.passportPhoto.name}`
-            
-            // UPLOAD THE PASSPORT
-            const {data:passportData, error:passportError} = await client.storage
-            .from('members_passport')
-            .upload(passportPhotoPath, registrationData.passportPhoto)
-            if(passportError) throw passportError
-
-            // GET THE DOWNLOADURL FOR THE FILES
-            const passportUrll = client.storage
-            .from('members_passport')
-            .getPublicUrl(passportPhotoPath).data.publicUrl
-
-            // SAVE URLs TO REACTIVE STORE
-            studentData.passportUrl = passportUrll
-
-            return{passportUrll, certificateUrll}
-
-        } catch (err) {
-            error.value = err.message
-            console.log(err.message)
-            throw error
-        } finally{
-            isLoading.value = false
+    // PROCESS LOAN
+    const processLoan = async () => {
+        if(loanDetails.value.surname || loanDetails.value.firstname || loanDetails.value.middlename || loanDetails.value.address || loanDetails.value.email || loanDetails.value.occupation || loanDetails.value.position || loanDetails.value.phone || loanDetails.value.businessAddress || loanDetails.value.employerName || loanDetails.value.employerPhone || loanDetails.value.loanAmount || loanDetails.value.loanPeriod || loanDetails.value.amountInWords || loanDetails.value.loanPurpose == ''){
+            noInput.value = true
+            errorMessage.value = 'Please Fill all Details'
+            return
         }
+        noInput.value = false
+        errorMessage.value = ''
+        await loan.processLoan(loanDetails.value)
     }
 
-    // CHECK TO AVOID IF THE TRANSACTION ID ALREADY EXISTS TRULY AND RETURN IF IT DOES
- const checkId = async () => {
-    isLoading.value = true
-    error.value = null
-    alreadyRegistered.value = false
-    noTransactionId.value = false
-    const client = useSupabaseClient()
-
-    try {
-        const {data:checkData, error:checkError} = await client
-        .from('REGISTRATIONID')
-        .select('*')
-        .eq('reg_identity', registrationData.paymentId)
-        .single()
-        
-        if(checkError){
-            if (checkError.code === 'PGRST116') {
-                error.value = 'Registration ID not found'
-                noTransactionId.value = true
-                isLoading.value = false
-                return
-            }
-            throw checkError
-        }
-        await checkReg()
-    } catch (err) {
-        error.value = err.message
-    } finally{
-        isLoading.value = false
-    }
-}
-
-// CHECK REGISTRATION STORE IF STUDENT ALREADY REGISTERED
-const checkReg = async () => {
-    isLoading.value = true
-    error.value = false
-    alreadyRegistered.value = false
-    const client = useSupabaseClient()
-    try {
-        const {data:emailData, error:emailError} = await client
-        .from('REGISTEREDUSERS')
-        .select('*')
-        .eq('reg_identity', registrationData.paymentId)
-        .single()
 
 
-        if(emailError){
-            if (emailError.code === 'PGRST116') {
-                await registerUser()
-                return
-            }
-            throw emailError
-        }
-        alreadyRegistered.value = true
-    } catch (err) {
-        error.value = err.message
-        console.log(err.message)
-    } finally{
-        isLoading.value = false
-    }
-}
 
-    // REGISTER THE STUDENT
-    const registerUser = async () => {
-        isLoading.value = true
-        error.value = null
-        canProceed.value = false
-        const client = useSupabaseClient()
-        try {
-            // UPLOADING THE FILES
-            await uploadFiles()
 
-            // UPLOADING THE OTHER DETAILS
-            const {data:saveDate, error:saveError} = await client
-            .from('studentform')
-            .insert({
-                passportUrl: registrationData.passportUrl,
-                surname: registrationData.surname,
-                firstname: registrationData.firstname,
-                middlename: registrationData.middlename,
-                occupation: registrationData.occupation,
-                dateOfBirth: registrationData.dateOfBirth,
-                gender: registrationData.gender,
-                homeAddress: registrationData.homeAddress,
-                homeTown: registrationData.homeTown,
-                maritalStat: registrationData.maritalStat,
-                eduQualify: registrationData.eduQualify,
-                phone: registrationData.phone,
-                email: registrationData.email,
-                reg_identity: registrationData.paymentId,
-                employerName: registrationData.employerName,
-                employerAddress: registrationData.employerAddress,
-                employerLocation: registrationData.employerLocation,
-                state: registrationData.state,
-                localGvt: registrationData.localGvt,
-                nextKinOneSurname: registrationData.nextKinOneSurname,
-                nextKinOneFirstname: registrationData.nextKinOneFirstname,
-                nextKinOneRelationship: registrationData.nextKinOneRelationship,
-                nextKinOnePhone: registrationData.nextKinOnePhone,
-                nextKinTwoSurname: registrationData.nextKinTwoSurname,
-                nextKinTwoFirstname: registrationData.nextKinTwoFirstname,
-                nextKinTwoRelationship: registrationData.nextKinTwoRelationship,
-                nextKinTwoPhone: registrationData.nextKinTwoPhone,
-            })
-            .select()
 
-            if(saveError) throw saveError
-            canProceed.value = true
-            return saveDate
-        } catch (err) {
-            error.value = err.message
-            console.log(err.message)
-            throw error
-        } finally{
-            isLoading.value = false
-        }
-    }
 
-    return{
-        registrationData,
-        isLoading,
-        error,
-        setPassportPhoto,
-        alreadyRegistered,
-        noTransactionId,
-        checkId,
-        canProceed
-    }
-
+// Get today's date formatted
+const formattedDate = computed(() => {
+    return new Date().toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+    })
 })
+
+
+    // SUCCESSFUL
+watch(() => loan.canProceed, (newVal) => {
+    if (newVal) {
+        successMessage.value = 'Loan Application submission successful, Please Print the Form to fill Guarantor details!'
+        formSubmitted.value = true
+    }
+});
+
+// PRINTING THE FORM
+const printForm = () => {
+        const printContents = document.getElementById('printable-form').innerHTML
+        const originalContents = document.body.innerHTML
+        
+        // Create a new window with only the form content
+        const printWindow = window.open('', '_blank')
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>kkk Toluwalase Membership Form</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            line-height: 1.6;
+                            padding: 20px;
+                        }
+                        .headerWithDet{
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            align-items: center;
+                            margin-bottom: 10px;
+                        }
+                        .print-header {
+                            text-align: center;
+                            margin-bottom: 20px;
+                            border-bottom: 2px solid #000;
+                            padding-bottom: 10px;
+                        }
+                        .print-section {
+                            margin-bottom: 20px;
+                            page-break-inside: avoid;
+                        }
+                        .print-section h2 {
+                            border-bottom: 1px solid #ccc;
+                            padding-bottom: 5px;
+                        }
+                        .info-grid {
+                            display: grid;
+                            grid-template-columns: 1fr;
+                            gap: 8px;
+                        }
+                        .info-row {
+                            display: flex;
+                        }
+                        .info-label {
+                            font-weight: bold;
+                            width: 200px;
+                        }
+                        .info-value {
+                            flex: 1;
+                        }
+                        .passport-photo {
+                            text-align: center;
+                            margin-bottom: 20px;
+                        }
+                        .signature-section {
+                            display: flex;
+                            justify-content: space-between;
+                            margin-top: 50px;
+                        }
+                        .signature-box {
+                            text-align: center;
+                            width: 200px;
+                        }
+                        .print-footer {
+                            margin-top: 30px;
+                            text-align: center;
+                            font-size: 12px;
+                        }
+                        .print-date {
+                            margin-top: 30px;
+                            text-align: right;
+                            font-size: 12px;
+                        }
+                        .nameWithLogo{
+                            display: flex;
+                            justify-content: center;
+                            align-item: center;
+                            gap: 10px
+                        }
+                        .numberes{
+                            display: flex;
+                            gap: 10px;
+                        }
+                        @media print {
+                            body {
+                                margin: 0;
+                                padding: 15mm;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="headerWithDet">
+                        <div class='nameWithLogo'>
+                            <img src='/img/kkklogo.png' alt='logo' width='80'>
+                            <h1>KKK TOLUWALASE</h1>
+                        </div>
+                        <p>Multipurpose Co-operative Society</p>
+                        <p>Email: toluwalasecooperative2021@gmail.com</p>
+                        <div class="numberes">
+                            <p>08162556563</p>
+                        </div>
+                    </div>
+                    ${printContents}
+                </body>
+            </html>
+        `)
+        
+        printWindow.document.close()
+        printWindow.focus()
+        
+        // Print after images have loaded
+        setTimeout(() => {
+            printWindow.print()
+        }, 500)
+    }
+
+    // Navigate back to home
+    const goToHome = () => {
+        router.push('/userdash')
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+<style scoped>
+    h2, h3{
+        text-align: center;
+    }
+    .validation-errors {
+        background-color: #fff3cd;
+        color: #856404;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        border-left: 5px solid #ffeeba;
+    }
+    .preview {
+        margin-top: 10px;
+        border: 1px solid #ddd;
+        padding: 5px;
+        display: inline-block;
+        border-radius: 4px;
+    }
+
+    .validation-errors h3 {
+        margin-top: 0;
+        font-size: 16px;
+    }
+
+    .validation-errors ul {
+        margin-bottom: 0;
+        padding-left: 20px;
+    }
+    .page{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 10px;
+        background-color: #6897a7;
+        margin: 10px;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: inset 10px 6px 50px rgb(26, 49, 195);
+    }
+.page p{
+    text-align: center;
+    color: white;
+    font-size: 25;
+}
+.contactInput{
+    width: 300px;
+    border-radius: 10px;
+    height: 35px;
+    border: none;
+    outline: none;
+    padding: 10px;
+    box-shadow: inset 10px 6px 50px rgb(192, 192, 196);
+}
+.buttons{
+    display: flex;
+}
+h5{
+    font-size: 20px;
+    color: rgba(179, 20, 20, 0.996);
+}
+.error-message{
+    align-items: center;
+    text-align: center;
+    font-size: 25px;
+    color: rgba(248, 45, 45, 0.996);
+}
+button{
+    width: 150px;
+    background-color: white;
+    color: rgb(84, 8, 112);
+    padding: 10px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+.stepA{
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+}
+label{
+    color: white;
+    text-align: center;
+    text-align-last: center;
+}
+.personTo, h3{
+    color: white;
+    background: none;
+}
+h1{
+    background-color: white;
+    color: #6897a7;
+    text-align: center;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 20px;
+}
+h5{
+    text-align: center;
+}
+
+@media (max-width: 768px){
+    h1{
+        font-size: 19px;
+    }
+}
+</style>
