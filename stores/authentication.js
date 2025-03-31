@@ -1,32 +1,31 @@
 import {defineStore} from 'pinia'
 
-export const useStudentStore = defineStore('studentauth', () => {
+export const useMemberauthStore = defineStore('membersauth', () => {
     const isLoading = ref(false)
     const error = ref(null)
     const userData = ref(null)
     const canProceed = ref(false)
     const incoming = ref(null)
     const adminRedirect = ref(false)
-    const lecturerRedirect = ref(false)
-    const studentRedirect = ref(false)
+    const memberRedirect = ref(false)
     const canReset = ref(false)
 
-    // CHECK IF THE REGISTERER IS AN ADMITTED STUDENT BEFORE REGISTRATION
+    // CHECK IF THE REGISTERER IS A REGISTERED MEMBER BEFORE REGISTRATION
     const checkAdmission = async (RegisterDetails) => {
         isLoading.value = true
         error.value = null
         const client = useSupabaseClient()
         try {
             const {data: queryData, error: queryError} = await client
-            .from('ADMITTEDSTUDENTS')
+            .from('REGISTEREDUSERS')
             .select('*')
             .eq('email', RegisterDetails.email)
             .single()
 
-            // CHECK IF THE REGISTERER EXISTS IN THE ADMITTED STUDENTS PAGE
+            // CHECK IF THE REGISTERER EXISTS IN THE REGISTERED PAGE
             if (queryError) {
                 if (queryError.code === 'PGRST116') {
-                    error.value = 'You\'re not admitted yet'
+                    error.value = 'You are not a registered member. Please contact the admin for registration'
                     isLoading.value = false
                     return
                 }
@@ -34,7 +33,7 @@ export const useStudentStore = defineStore('studentauth', () => {
             }
 
             incoming.value = queryData
-            // IF THE EMAIL IS FOUND, REGISTER THE STUDENT
+            // IF THE EMAIL IS FOUND, REGISTER THE MEMBER
             await registration(RegisterDetails)
             canProceed.value = true
         } catch (err) {
@@ -44,7 +43,7 @@ export const useStudentStore = defineStore('studentauth', () => {
         }
     }
 
-    // REGISTER STUDENTS
+    // REGISTER MEMBERS
     const registration = async(RegisterDetails) => {
         console.log(RegisterDetails)
         isLoading.value = true
@@ -60,14 +59,13 @@ export const useStudentStore = defineStore('studentauth', () => {
                     data:{
                         Phone: RegisterDetails.phone,
                         Email: RegisterDetails.email,
-                        role:'student'
+                        role:'member'
                     }
                 }
             })
             if(signUpError) throw signUpError
             const regID = authData.user.id
             userData.value = authData.user
-        //    await  saveOtherDetails(regID, RegisterDetails)
         } catch (err) {
             error.value = err.message
             console.log(err.message)
@@ -76,40 +74,12 @@ export const useStudentStore = defineStore('studentauth', () => {
         }
     }
 
-    // FUNCTION TO SAVE OTHER DETAILS TO THE DATABASE
-    // const saveOtherDetails = async (regID, RegisterDetails) => {
-    //     isLoading.value = true
-    //     error.value = null
-    //     const client = useSupabaseClient()
-    //     try {
-    //         const {data:otherDetailsData, error:otherDetailsError} = await client
-    //         .from('STUDENTDETAILS')
-    //         .insert([
-    //             {
-    //                 matricNo : null,
-    //                 studentUID : regID,
-    //                 email : RegisterDetails.email,
-    //                 lastname : RegisterDetails.lastname,
-    //                 firstname : RegisterDetails.firstname,
-    //                 middlename : RegisterDetails.middlename,
-    //                 faculty : null,
-    //                 department : null
-    //             }
-    //         ])
-    //         if(otherDetailsError) throw otherDetailsError
-    //     } catch (err) {
-    //         error.value = err.message
-    //     } finally{
-    //         isLoading.value = false
-    //     }
-    // }
-
     // LOGIN ADMIN OR STUDENT
     const loginUser = async(loginDetails) => {
         isLoading.value = true
         error.value = null
         adminRedirect.value = false
-        studentRedirect.value = false
+        memberRedirect.value = false
         lecturerRedirect.value = false
         const client = useSupabaseClient()
         
@@ -123,20 +93,13 @@ export const useStudentStore = defineStore('studentauth', () => {
             userData.value = data.user
             // Check the user's role for redirection
             const userRole = data.user.user_metadata.role
-            console.log(userRole)
 
             if(userRole === 'admin') {
                 adminRedirect.value = true
-                studentRedirect.value = false
-                lecturerRedirect.value = false
-            } else if(userRole === 'lecturer') {
-                lecturerRedirect.value = true
+                memberRedirect.value = false
+            } else{
+                memberRedirect.value = true
                 adminRedirect.value = false
-                studentRedirect.value = false
-            }else{
-                studentRedirect.value = true
-                adminRedirect.value = false
-                lecturerRedirect.value = false
             }
             
         } catch (err) {
@@ -169,8 +132,7 @@ export const useStudentStore = defineStore('studentauth', () => {
         checkAdmission,
         canProceed,
         loginUser,
-        studentRedirect,
-        lecturerRedirect,
+        memberRedirect,
         adminRedirect,
         resetPassword,
         canReset

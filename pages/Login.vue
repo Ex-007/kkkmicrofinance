@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="firstHead">
-            <h3>Only for Admitted Students</h3>
+            <h3>This Page is for Members</h3>
         </div>
 
         <div class="errorDiv" v-if="auth.error">
@@ -55,8 +55,8 @@
 <script setup>
     import {ref, watch} from 'vue'
     import {useRouter} from 'vue-router'
-    import {useStudentStore} from '@/stores/registerStudent'
-    const auth = useStudentStore()
+    import {useMemberauthStore} from '~/stores/authentication'
+    const auth = useMemberauthStore()
     const router = useRouter()
     const resetEmail = ref('')
     const nameError = ref('')
@@ -147,32 +147,22 @@
         await auth.checkAdmission(RegisterDetails.value)
     }
 
-    // WATCH FOR SIGN IN BY LECTURERS
-    watch(() => auth.lecturerRedirect, (newVal) => {
-        if (newVal) {
-            router.push('/lecturer-direct')
-        }
-    });
-
-    // WATCH FOR SIGN IN BY STUDENTS
+    // WATCH FOR SIGN IN BY MEMBERS
     watch(() => auth.studentRedirect, (newVal) => {
         if (newVal) {
-
-            router.push('/Student-profile')
+            router.push('/dashboard')
         }
     });
 
     // WATCH FOR SIGN IN BY ADMINS
     watch(() => auth.adminRedirect, (newVal) => {
         if (newVal) {
-
             router.push('/admin-dash')
         }
     });
     // WATCH FOR PASSWORD RESET
     watch(() => auth.canProceed, (newVal) => {
         if (newVal) {
-
             router.push('/confirm-email')
         }
     });
@@ -190,7 +180,6 @@
             forgotErrorAlert.value = 'Field Cannot be empty'
             return
         }
-
         auth.resetPassword(resetEmail.value)
     }
 
@@ -212,9 +201,6 @@
         await auth.loginUser(LoginDetails.value)
     }
 
-
-
-
     const passwordVisible = ref(false)
     const togglePasswordVisibility = () => {
         passwordVisible.value = !passwordVisible.value
@@ -222,7 +208,7 @@
 
     // SEO METADATA
     const seoData = ref({
-        title: 'Angels Height College of Health Technology | Accredited Health Courses | Register with us',
+        title: 'KKK Toluwalase | Microfinance Bank | Register with us',
         description : 'Angels Height college of health technology offers top rated courses like Environmental Health Technology, Community Health Extension Worker (CHEW) Junior, Community Health Extension Worker (CHEW) Senior, Dental Therapy, Pharmacy Technician, Opticianry Dispensary, Public Health Technology, Health Assistant Medical, Health Technician, Computer Science Technology, Nutrition and Dietetics, Medical Laboratory Technician, Orthopedic Plaster Card. Join us for a rewarding career in healthcare.',
         url : 'https://angelsheight.org',
         image : '/img/angelsImage.jpg',
