@@ -114,7 +114,7 @@ export const useFormStore = defineStore ('form', () => {
     }
 }
 
-// CHECK REGISTRATION STORE IF STUDENT ALREADY REGISTERED
+// CHECK REGISTRATION STORE IF MEMBER ALREADY REGISTERED
 const checkReg = async () => {
     isLoading.value = true
     error.value = false
@@ -156,7 +156,7 @@ const checkReg = async () => {
 
             // UPLOADING THE OTHER DETAILS
             const {data:saveDate, error:saveError} = await client
-            .from('studentform')
+            .from('REGISTEREDUSERS')
             .insert({
                 passportUrl: registrationData.passportUrl,
                 surname: registrationData.surname,

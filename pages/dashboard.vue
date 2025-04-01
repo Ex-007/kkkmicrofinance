@@ -17,8 +17,9 @@
              </div>
 
              <!-- DEPOSIT AND LOAN REQUESTS -->
+             <p class="notEligible" v-if="noteligible">{{ ineligible }}</p>
               <div class="depositAndLoanReq">
-                <button>Deposit</button>
+                  <button>Deposit</button>
                 <button @click='requestLoan'>Request Loan</button>
               </div>
 
@@ -112,9 +113,30 @@ const router = useRouter()
         layout: 'custom'
     })
 
+    const ineligible = ref('')
+    const noteligible = ref(false)
+    const createdAt = ref('2025-02-01');
+// CHECKING LOAN ELIGIBILITY
     const requestLoan = () => {
-        router.push('/loan-application')
+        let registrationDate = new Date(createdAt.value);
+        let currentDate = new Date();
+        let differenceInMs = currentDate - registrationDate;
+        let differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
+        let requiredDays = 90;
+
+        if (differenceInDays >= requiredDays) {
+            router.push('/loan-application')
+        } else {
+            let daysRemaining = Math.ceil(requiredDays - differenceInDays);
+            noteligible.value = true
+            ineligible.value = `Not yet eligible. ${daysRemaining} days remaining.`;
+            setTimeout(() => {
+                noteligible.value = false
+            }, 2000);
+        }
     }
+
+
 </script>
 
 
@@ -215,6 +237,14 @@ const router = useRouter()
         font-size: 25px;
         font-weight: bolder;
         color: rgb(0, 60, 255);
+    }
+    .notEligible{
+    align-items: center;
+        text-align: center;
+        color: white;
+        background-color: red;
+        height: 30px;
+        text-align-last: center;
     }
 
       /* Media Query for Mobile */
