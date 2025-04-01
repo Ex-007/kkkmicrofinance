@@ -2,7 +2,9 @@ import {defineStore} from 'pinia'
 
 export const useAdminStore = defineStore('admin', () => {
     const isLoading = ref(false)
+    const noMemberFound = ref(false)
     const error = ref(null)
+    const searchingData = ref(null)
 
 
     // FETCH THE SIGNED IN USER
@@ -61,6 +63,60 @@ export const useAdminStore = defineStore('admin', () => {
     }
 
     // REGISTER NEW MEMBERS
+    const registerNewMember = async (customerRegInfo) => {
+        isLoading.value = true
+        error.value = null
+        const client = useSupabaseClient()
+        try {
+            const {data:regData, error:regError} = await client
+            .from('REGISTRATIONID')
+            .insert({
+                reg_identity: customerRegInfo.registrationID,
+                firstname: customerRegInfo.firstname,
+                lastname: customerRegInfo.lastname,
+                email: customerRegInfo.email,
+                phone: customerRegInfo.phoneNumber,
+            })
+            .single()
+            if(regError) throw regError
+        } catch (err) {
+            error.value = err.message
+            console.log(err.message)
+        } finally{
+            isLoading.value = false
+        }
+    }
+
+    // SEARCH MEMBER
+    const searchMember = async(searchMemBar) => {
+        isLoading.value = true
+        noMemberFound.value = false
+        error.value = null
+        const client = useSupabaseClient()
+        try {
+            const {data:searchData, error:searchError} = await client
+            .from('REGISTEREDUSERS')
+            .select('*')
+            .eq('reg_identity', searchMemBar)
+            .single()
+            
+            if(searchError){
+                if (searchError.code === 'PGRST116') {
+                    error.value = 'Registration ID not found'
+                    noMemberFound.value = true
+                    isLoading.value = false
+                    return
+                }
+                throw searchError
+            }
+            searchingData.value = searchData
+        } catch (err) {
+            error.value = err.message
+            console.log(err.message)
+        } finally{
+            isLoading.value = false
+        }
+    }
 
     // FETCH REGISTERED MEMBERS
 
@@ -73,6 +129,9 @@ export const useAdminStore = defineStore('admin', () => {
 
     return{
         isLoading,
-        isFetching,
+        error,
+        registerNewMember,
+        noMemberFound,
+        searchMember
     }
 })

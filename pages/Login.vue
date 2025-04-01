@@ -55,7 +55,7 @@
 <script setup>
     import {ref, watch} from 'vue'
     import {useRouter} from 'vue-router'
-    import {useMemberauthStore} from '~/stores/authentication'
+    import {useMemberauthStore} from '@/stores/authentication'
     const auth = useMemberauthStore()
     const router = useRouter()
     const resetEmail = ref('')

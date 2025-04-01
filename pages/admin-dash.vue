@@ -8,6 +8,7 @@
         <ul>
           <li @click="activeTab = 'home'" :class="{ active: activeTab === 'home' }">🏠 Home</li>
           <li @click="activeTab = 'newMember'" :class="{ active: activeTab === 'newMember' }">🏠 New Member Reg.</li>
+          <li @click="activeTab = 'searchMember'" :class="{ active: activeTab === 'searchMember' }">🏠 Search Member</li>
           <li @click="activeTab = 'registeredMember'" :class="{ active: activeTab === 'registeredMember' }">📩 Registered Members</li>
           <li @click="activeTab = 'loanRequests'" :class="{ active: activeTab === 'loanRequests' }">👤 Loan Requests</li>
           <li @click="activeTab = 'accountUpdate'" :class="{ active: activeTab === 'accountUpdate' }">💎 Account Update</li>
@@ -33,6 +34,33 @@
                 <p v-if="showCopied">{{ copied }}</p>
                 <button class="copyId" @click="copyContent">Copy</button>
               </div>
+            </div>
+            <div class="logRegistrationId">
+              <h1>Save Registration ID</h1>
+              <label for="regId">Registration ID</label>
+              <input type="text" class="contactInput" id="regId" placeholder="Enter Registration ID" v-model="customerRegInfo.registrationID">
+              <label for="firstname">Firstname</label>
+              <input type="text" class="contactInput" id="firstname" placeholder="Enter Firstname" v-model="customerRegInfo.firstname">
+              <label for="lastname">Lastname</label>
+              <input type="text" class="contactInput" id="lastname" placeholder="Enter Lastname" v-model="customerRegInfo.lastname">
+              <label for="email">Email</label>
+              <input type="email" class="contactInput" id="email" placeholder="Enter Email" v-model="customerRegInfo.email">
+              <label for="phoneNumber">Phone Number</label>
+              <input type="text" class="contactInput" id="phoneNumber" placeholder="Enter Phone Number" v-model="customerRegInfo.phoneNumber">
+              <p class="messageShow" v-if="customerRegD.display">{{ customerRegD.message }}</p>
+              <button @click="saveReg" :disabled="admin.isLoading">{{admin.isLoading ? 'Saving...' : 'Save'}}</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- SEARCH MEMBERS -->
+        <section v-if="activeTab === 'searchMember'">
+          <div class="transactionDet">
+            <h1>Search Members</h1>
+            <div class="logRegistrationId">
+              <input type="text" class="contactInput" placeholder="Enter Registration ID" v-model="searchMemBar">
+              <p class="messageShow" v-if="customerRegD.display">{{ customerRegD.message }}</p>
+              <button @click="searchMember" :disabled="admin.isLoading">{{ admin.isLoading ? 'Searching...' : 'Search' }}</button>
             </div>
           </div>
         </section>
@@ -60,6 +88,8 @@
   
   <script setup>
   import { ref, watch, onMounted  } from 'vue';
+  import {useAdminStore} from '@/stores/administration'
+  const admin = useAdminStore()
   
   definePageMeta({
         layout: 'nofoot'
@@ -69,7 +99,7 @@
     // definePageMeta({
     //   middleware: [auth]
     // })
-    const activeTab = ref('newMember');
+    const activeTab = ref('searchMember');
     // const activeTab = ref('home');
     
     // GENERATE REGISTRATION ID
@@ -101,6 +131,61 @@
         showCopied.value = false
       }, 500);
     }
+
+    const customerRegInfo = ref({
+      registrationID: '',
+      firstname: '',
+      lastname: '',
+      email: '',
+      phoneNumber: ''
+    })
+    const customerRegD = ref({
+      display: false,
+      message: ''
+    })
+    // SAVE REG ID
+    const saveReg = async () => {
+      if(customerRegInfo.value.registrationID == '' || customerRegInfo.value.firstname == '' || customerRegInfo.value.lastname == '' || customerRegInfo.value.email == '' || customerRegInfo.value.phoneNumber == ''){
+        customerRegD.value.display = true
+        customerRegD.value.message = 'No box should be left empty'
+        return
+      }
+      customerRegD.value.display = false
+      await admin.registerNewMember(customerRegInfo.value)
+
+      customerRegD.value.display = true
+      customerRegD.value.message = 'Upload Successful'
+
+      clearcustomerRegInfo()
+    }
+
+    const clearcustomerRegInfo = () => {
+      customerRegInfo.value.registrationID = ''
+      customerRegInfo.value.firstname = ''
+      customerRegInfo.value.lastname = ''
+      customerRegInfo.value.email = ''
+      customerRegInfo.value.phoneNumber = ''
+    }
+
+    // SEARCH MEMBER
+    const searchMemBar = ref('')
+    const searchMember = async () => {
+      if(searchMemBar.value == ''){
+        customerRegD.value.display = true
+        customerRegD.value.message = 'Fill All Empty Spaces'
+        return
+      }
+      customerRegD.value.display = false
+      await admin.searchMember(searchMemBar.value)
+    }
+
+    // Watch the Member Not found
+    watch(() => admin.noMemberFound, (newVal) => {
+        if (newVal) {
+            customerRegD.value.display = true
+            customerRegD.value.message = 'Member Not Found'
+        }
+    });
 
 
 
@@ -196,7 +281,48 @@
     color: white;
   }
 
+  .logRegistrationId{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 10px;
+        background-color: #6897a7;
+        margin: 10px;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: inset 10px 6px 50px rgb(26, 49, 195);
+    }
+    .logRegistrationId button{
+      height: 30px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      width: 100px;
+    }
 
-  </style>
+    .contactInput{
+      width: 300px;
+      border-radius: 10px;
+      height: 35px;
+      border: none;
+      outline: none;
+      padding: 10px;
+      box-shadow: inset 10px 6px 50px rgb(192, 192, 196);
+  }
+
+  .logRegistrationId h1, label{
+    color: white;
+  }
+  .transactionDet h1{
+    text-align: center;
+    color: white;
+  }
+  .messageShow{
+    color: white;
+  }
+
+</style>
   
 
