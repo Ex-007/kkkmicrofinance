@@ -65,7 +65,7 @@ export const useFormStore = defineStore ('form', () => {
 
             // GET THE DOWNLOADURL FOR THE FILES
             const passportUrll = client.storage
-            .from('members_passport')
+            .from('memberspassport')
             .getPublicUrl(passportPhotoPath).data.publicUrl
 
             // SAVE URLs TO REACTIVE STORE

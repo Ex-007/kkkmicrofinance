@@ -62,6 +62,40 @@
               <p class="messageShow" v-if="customerRegD.display">{{ customerRegD.message }}</p>
               <button @click="searchMember" :disabled="admin.isLoading">{{ admin.isLoading ? 'Searching...' : 'Search' }}</button>
             </div>
+            <div class="displayResult" v-if="admin.searchingData">
+              
+              <div class="classical">
+                <h1>Member Details</h1>
+                <img :src="searchView.passportUrl" alt="Passport" class="profilePicture" />
+                <p>Registration ID: {{ searchView.reg_identity }}</p>
+                <p>Surname: {{ searchView.surname }}</p>
+                <p>Firstname: {{ searchView.firstname }}</p>
+                <p>Middlename: {{ searchView.middlename }}</p>
+                <p>Occupation: {{ searchView.occupation }}</p>
+                <p>Date of Birth: {{ searchView.dateOfBirth }}</p>
+                <p>Gender: {{ searchView.gender }}</p>
+                <p>Home Address: {{ searchView.homeAddress }}</p>
+                <p>Home Town: {{ searchView.homeTown }}</p>
+                <p>Marital Status: {{ searchView.maritalStat }}</p>
+                <p>Education: {{ searchView.eduQualify }}</p>
+                <p>Phone Number: {{ searchView.phone }}</p>
+                <p>Email: {{ searchView.email }}</p>
+                <p>Employer's Name: {{ searchView.employerName }}</p>
+                <p>Employer's Address: {{ searchView.employerAddress }}</p>
+                <p>Employer's Location: {{ searchView.employerLocation }}</p>
+                <p>State: {{ searchView.state }}</p>
+                <p>Local Government: {{ searchView.localGvt }}</p>
+                <h3>Next of Kin</h3>
+                <p>NoK-1 Surname: {{ searchView.nextKinOneSurname }}</p>
+                <p>NoK-1 Firstname: {{ searchView.nextKinOneFirstname }}</p>
+                <p>NoK-1 Relationship: {{ searchView.nextKinOneRelationship }}</p>
+                <p>NoK-1 Phone Number: {{ searchView.nextKinOnePhone }}</p>
+                <p>NoK-2 Surname: {{ searchView.nextKinTwoSurname }}</p>
+                <p>NoK-2 Firstname: {{ searchView.nextKinTwoFirstname }}</p>
+                <p>NoK-2 Relationship: {{ searchView.nextKinTwoRelationship }}</p>
+                <p>NoK-2 Phone Number: {{ searchView.nextKinTwoPhone }}</p>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -179,6 +213,7 @@
       }
       customerRegD.value.display = false
       await admin.searchMember(searchMemBar.value)
+      await attachSearchDetails()
     }
 
     // Watch the Member Not found
@@ -188,6 +223,75 @@
             customerRegD.value.message = 'Member Not Found'
         }
     });
+
+    // DISPLAY SEARCH RESULT
+    const searchView = ref({
+      passportUrl: '',
+      surname: '',
+      firstname: '',
+      reg_identity: '',
+      middlename: '',
+      occupation: '',
+      dateOfBirth: '',
+      gender: '',
+      homeAddress: '',
+      homeTown: '',
+      maritalStat: '',
+      eduQualify: '',
+      phone: '',
+      email: '',
+      employerName: '',
+      employerAddress: '',
+      employerLocation: '',
+      state: '',
+      localGvt: '',
+      nextKinOneSurname: '',
+      nextKinOneFirstname: '',
+      nextKinOneRelationship: '',
+      nextKinOnePhone: '',
+      nextKinTwoSurname: '',
+      nextKinTwoFirstname: '',
+      nextKinTwoRelationship: '',
+      nextKinTwoPhone: '',
+      transactionHistory: '',
+      loansRecord: ''
+    })
+    const showVal = ref(false)
+
+    const attachSearchDetails = async () => {
+      // console.log(admin.searchingData)
+      // showVal.value = true
+      searchView.value.passportUrl = admin.searchingData.passportUrl
+      searchView.value.surname = admin.searchingData.surname
+      searchView.value.firstname = admin.searchingData.firstname
+      searchView.value.reg_identity = admin.searchingData.reg_identity
+      searchView.value.middlename = admin.searchingData.middlename
+      searchView.value.occupation = admin.searchingData.occupation
+      searchView.value.dateOfBirth = admin.searchingData.dateOfBirth
+      searchView.value.gender = admin.searchingData.gender
+      searchView.value.homeAddress = admin.searchingData.homeAddress
+      searchView.value.homeTown = admin.searchingData.homeTown
+      searchView.value.maritalStat = admin.searchingData.maritalStat
+      searchView.value.eduQualify = admin.searchingData.eduQualify
+      searchView.value.phone = admin.searchingData.phone
+      searchView.value.email = admin.searchingData.email
+      searchView.value.employerName = admin.searchingData.employerName
+      searchView.value.employerAddress = admin.searchingData.employerAddress
+      searchView.value.employerLocation = admin.searchingData.employerLocation
+      searchView.value.state = admin.searchingData.state
+      searchView.value.localGvt = admin.searchingData.localGvt
+      searchView.value.nextKinOneSurname = admin.searchingData.nextKinOneSurname
+      searchView.value.nextKinOneFirstname = admin.searchingData.nextKinOneFirstname
+      searchView.value.nextKinOneRelationship = admin.searchingData.nextKinOneRelationship
+      searchView.value.nextKinOnePhone = admin.searchingData.nextKinOnePhone
+      searchView.value.nextKinTwoSurname = admin.searchingData.nextKinTwoSurname
+      searchView.value.nextKinTwoFirstname = admin.searchingData.nextKinTwoFirstname
+      searchView.value.nextKinTwoRelationship = admin.searchingData.nextKinTwoRelationship
+      searchView.value.nextKinTwoPhone = admin.searchingData.nextKinTwoPhone
+      searchView.value.transactionHistory = admin.searchingData.transactionHistory
+      searchView.value.loansRecord = admin.searchingData.loansRecord
+
+    }
 
 
 
@@ -323,6 +427,14 @@
   }
   .messageShow{
     color: white;
+  }
+  .classical{
+    background-color: #6897a7;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: inset 10px 6px 50px rgb(26, 49, 195);
+    color: white;
+    line-height: 30px;
   }
 
 </style>

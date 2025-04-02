@@ -110,6 +110,7 @@ export const useAdminStore = defineStore('admin', () => {
                 throw searchError
             }
             searchingData.value = searchData
+            console.log(searchData)
         } catch (err) {
             error.value = err.message
             console.log(err.message)
@@ -132,6 +133,7 @@ export const useAdminStore = defineStore('admin', () => {
         error,
         registerNewMember,
         noMemberFound,
-        searchMember
+        searchMember,
+        searchingData
     }
 })
