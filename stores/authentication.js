@@ -45,7 +45,6 @@ export const useMemberauthStore = defineStore('membersauth', () => {
 
     // REGISTER MEMBERS
     const registration = async(RegisterDetails) => {
-        console.log(RegisterDetails)
         isLoading.value = true
         error.value = null
         canProceed.value = false
@@ -59,6 +58,9 @@ export const useMemberauthStore = defineStore('membersauth', () => {
                     data:{
                         Phone: RegisterDetails.phone,
                         Email: RegisterDetails.email,
+                        Lastname: RegisterDetails.lastname,
+                        Firstname: RegisterDetails.firstname,
+                        Middlename: RegisterDetails.middlename,
                         role:'member'
                     }
                 }
@@ -80,7 +82,6 @@ export const useMemberauthStore = defineStore('membersauth', () => {
         error.value = null
         adminRedirect.value = false
         memberRedirect.value = false
-        lecturerRedirect.value = false
         const client = useSupabaseClient()
         
         try {

@@ -4,8 +4,8 @@
             <!-- NAME, PICTURE AND LOGOUT -->
             <div class="namePicture">
                 <div class="imageName">
-                    <img src="/img/profilepicture.jpeg" alt="">
-                    <h2>John Doe</h2>
+                    <img :src='cusInfo.passportUrl || "/img/profilepicture.jpeg"' alt="">
+                    <h2>{{ cusInfo.surname + ' ' + cusInfo.firstname }}</h2>
                 </div>
                 <button>Logout</button>
             </div>
@@ -13,7 +13,7 @@
             <!-- ACCOUNT BALANCE -->
              <div class="accountBalance">
                 <h2>Account Balance</h2>
-                <h3>$ 1000</h3>
+                <h3>{{ formatCurrency(cusInfo.accountBalance) }}</h3>
              </div>
 
              <!-- DEPOSIT AND LOAN REQUESTS -->
@@ -107,35 +107,168 @@
 </template>
 
 <script setup>
+import{ref, watch, onMounted} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
+import{useCustomerStore} from '@/stores/customerProfile'
+const customer = useCustomerStore()
 const router = useRouter()
-    definePageMeta({
-        layout: 'custom'
-    })
 
-    const ineligible = ref('')
-    const noteligible = ref(false)
-    const createdAt = ref('2025-02-01');
+// DEFINE THE PAGE META
+definePageMeta({
+    layout: 'custom'
+})
+
+
+// CUSTOMER INFORMATION
+const cusInfo = ref({
+    passportUrl: '',
+    surname: '',
+    firstname: '',
+    reg_identity: '',
+    middlename: '',
+    occupation: '',
+    dateOfBirth: '',
+    gender: '',
+    homeAddress: '',
+    homeTown: '',
+    maritalStat: '',
+    eduQualify: '',
+    phone: '',
+    email: '',
+    employerName: '',
+    employerAddress: '',
+    employerLocation: '',
+    state: '',
+    localGvt: '',
+    nextKinOneSurname: '',
+    nextKinOneFirstname: '',
+    nextKinOneRelationship: '',
+    nextKinOnePhone: '',
+    nextKinTwoSurname: '',
+    nextKinTwoFirstname: '',
+    nextKinTwoRelationship: '',
+    nextKinTwoPhone: '',
+    transactionHistory: '',
+    loansRecord: '',
+    accountBalance: '',
+    createdAt: ''
+})
+// ATTACH CUSTOMER'S INFORMATION TO THE PAGE
+const attachSearchDetails = async () => {
+    cusInfo.value.passportUrl = customer.user.passportUrl
+    cusInfo.value.surname = customer.user.surname
+    cusInfo.value.firstname = customer.user.firstname
+    cusInfo.value.reg_identity = customer.user.reg_identity
+    cusInfo.value.middlename = customer.user.middlename
+    cusInfo.value.occupation = customer.user.occupation
+    cusInfo.value.dateOfBirth = customer.user.dateOfBirth
+    cusInfo.value.gender = customer.user.gender
+    cusInfo.value.homeAddress = customer.user.homeAddress
+    cusInfo.value.homeTown = customer.user.homeTown
+    cusInfo.value.maritalStat = customer.user.maritalStat
+    cusInfo.value.eduQualify = customer.user.eduQualify
+    cusInfo.value.phone = customer.user.phone
+    cusInfo.value.email = customer.user.email
+    cusInfo.value.employerName = customer.user.employerName
+    cusInfo.value.employerAddress = customer.user.employerAddress
+    cusInfo.value.employerLocation = customer.user.employerLocation
+    cusInfo.value.state = customer.user.state
+    cusInfo.value.localGvt = customer.user.localGvt
+    cusInfo.value.nextKinOneSurname = customer.user.nextKinOneSurname
+    cusInfo.value.nextKinOneFirstname = customer.user.nextKinOneFirstname
+    cusInfo.value.nextKinOneRelationship = customer.user.nextKinOneRelationship
+    cusInfo.value.nextKinOnePhone = customer.user.nextKinOnePhone
+    cusInfo.value.nextKinTwoSurname = customer.user.nextKinTwoSurname
+    cusInfo.value.nextKinTwoFirstname = customer.user.nextKinTwoFirstname
+    cusInfo.value.nextKinTwoRelationship = customer.user.nextKinTwoRelationship
+    cusInfo.value.nextKinTwoPhone = customer.user.nextKinTwoPhone
+    cusInfo.value.transactionHistory = customer.user.transactionHistory
+    cusInfo.value.loansRecord = customer.user.loansRecord
+    cusInfo.value.createdAt = customer.user.created_at
+    cusInfo.value.createdAt = customer.user.accountBalance
+
+}
+
+// FORMAT THE ACCOUNT BALANCE TO NIGERIAN NAIRA
+const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'NGN',
+    }).format(amount);
+};
+
+const ineligible = ref('')
+const noteligible = ref(false)
+const createdAt = ref('2025-03-01')
 // CHECKING LOAN ELIGIBILITY
-    const requestLoan = () => {
-        let registrationDate = new Date(createdAt.value);
-        let currentDate = new Date();
-        let differenceInMs = currentDate - registrationDate;
-        let differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
-        let requiredDays = 90;
+const requestLoan = () => {
+    let registrationDate = new Date(createdAt.value); // Ensure correct Date conversion
+    let currentDate = new Date();
+    let differenceInMs = currentDate - registrationDate;
+    let differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
+    let requiredDays = 90;
 
-        if (differenceInDays >= requiredDays) {
-            router.push('/loan-application')
-        } else {
-            let daysRemaining = Math.ceil(requiredDays - differenceInDays);
-            noteligible.value = true
-            ineligible.value = `Not yet eligible. ${daysRemaining} days remaining.`;
-            setTimeout(() => {
-                noteligible.value = false
-            }, 2000);
-        }
+    if (differenceInDays >= requiredDays) {
+        router.push('/loan-application')
+    } else {
+        let daysRemaining = Math.ceil(requiredDays - differenceInDays);
+        noteligible.value = true
+        ineligible.value = `Not yet eligible. ${daysRemaining} days remaining.`;
+        setTimeout(() => {
+            noteligible.value = false
+        }, 2000);
     }
+}
 
+// const requestLoan = () => {
+//     let registrationDate = new Date(cusInfo.value.createdAt);
+//     let currentDate = new Date();
+    
+//     if (isNaN(registrationDate)) {
+//         ineligible.value = "Invalid registration date.";
+//         return;
+//     }
+
+//     let differenceInMs = currentDate - registrationDate;
+//     let differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
+//     let requiredDays = 90;
+
+//     if (differenceInDays >= requiredDays) {
+//         router.push('/loan-application');
+//     } else {
+//         let daysRemaining = Math.ceil(requiredDays - differenceInDays);
+//         noteligible.value = true;
+//         ineligible.value = `Not yet eligible. ${daysRemaining} days remaining.`;
+//         setTimeout(() => {
+//             noteligible.value = false;
+//         }, 2000);
+//     }
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ONMOUNTED FUNCTION
+
+
+
+
+
+// ON MOUNTED FUNCTIONS
+onMounted(async () => {
+    await customer.signinUser()
+    await attachSearchDetails()
+})
 
 </script>
 
@@ -239,12 +372,15 @@ const router = useRouter()
         color: rgb(0, 60, 255);
     }
     .notEligible{
-    align-items: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         text-align: center;
         color: white;
         background-color: red;
         height: 30px;
         text-align-last: center;
+        margin: 5px;
     }
 
       /* Media Query for Mobile */

@@ -148,7 +148,7 @@
     }
 
     // WATCH FOR SIGN IN BY MEMBERS
-    watch(() => auth.studentRedirect, (newVal) => {
+    watch(() => auth.memberRedirect, (newVal) => {
         if (newVal) {
             router.push('/dashboard')
         }

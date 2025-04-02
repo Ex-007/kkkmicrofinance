@@ -225,7 +225,7 @@
   <script setup>
   import { ref, watch, onMounted  } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
-  import{useStudentstoreStore} from '@/stores/studentprofile'
+  import{useStudentstoreStore} from '~/stores/customerProfile'
   const student = useStudentstoreStore()
   const router = useRouter();
   const route = useRoute()
