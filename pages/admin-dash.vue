@@ -101,7 +101,55 @@
 
         <!-- REGISTERED MEMBERS -->
         <section v-if="activeTab === 'registeredMember'">
-          <div class="transactionDet">
+          <div class="newly">
+              <!-- <h1>Registered Students</h1> -->
+              <div class="left listFormStudents">
+                <ul>
+                  <li
+                  v-for="users in admin.registeredCustomers" :key="users.id"
+                  @click="fetchMainForm(users.id)"
+                  class="user-item"
+                  :class="{active:admin.selectedUser?.id === users.id}">
+                  <span>{{ users.surname + " " + users.firstname + " " + users.middlename }}</span>
+                  <small>{{ new Date(users.created_at).toLocaleDateString() }}</small>
+                </li>
+                </ul>
+              </div>
+              <div class="right user-details" v-if="admin.selectedUser">
+                <ul>
+                    <h1>Member Details</h1>
+                    <div class="imagePassport">
+                      <img :src="admin.selectedUser.passportUrl" alt="Passport" class="profilePicture" />
+                    </div>
+                    <li>Registration ID: {{ admin.selectedUser.reg_identity }}</li>
+                    <li>Surname: {{ admin.selectedUser.surname }}</li>
+                    <li>Firstname: {{ admin.selectedUser.firstname }}</li>
+                    <li>Middlename: {{ admin.selectedUser.middlename }}</li>
+                    <li>Occupation: {{ admin.selectedUser.occupation }}</li>
+                    <li>Date of Birth: {{ admin.selectedUser.dateOfBirth }}</li>
+                    <li>Gender: {{ admin.selectedUser.gender }}</li>
+                    <li>Home Address: {{ admin.selectedUser.homeAddress }}</li>
+                    <li>Home Town: {{ admin.selectedUser.homeTown }}</li>
+                    <li>Marital Status: {{ admin.selectedUser.maritalStat }}</li>
+                    <li>Education: {{ admin.selectedUser.eduQualify }}</li>
+                    <li>Phone Number: {{ admin.selectedUser.phone }}</li>
+                    <li>Email: {{ admin.selectedUser.email }}</li>
+                    <li>Employer's Name: {{ admin.selectedUser.employerName }}</li>
+                    <li>Employer's Address: {{ admin.selectedUser.employerAddress }}</li>
+                    <li>Employer's Location: {{ admin.selectedUser.employerLocation }}</li>
+                    <li>State: {{ admin.selectedUser.state }}</li>
+                    <li>Local Government: {{ admin.selectedUser.localGvt }}</li>
+                    <h3>Next of Kin</h3>
+                    <li>NoK-1 Surname: {{ admin.selectedUser.nextKinOneSurname }}</li>
+                    <li>NoK-1 Firstname: {{ admin.selectedUser.nextKinOneFirstname }}</li>
+                    <li>NoK-1 Relationship: {{ admin.selectedUser.nextKinOneRelationship }}</li>
+                    <li>NoK-1 Phone Number: {{ admin.selectedUser.nextKinOnePhone }}</li>
+                    <li>NoK-2 Surname: {{ admin.selectedUser.nextKinTwoSurname }}</li>
+                    <li>NoK-2 Firstname: {{ admin.selectedUser.nextKinTwoFirstname }}</li>
+                    <li>NoK-2 Relationship: {{ admin.selectedUser.nextKinTwoRelationship }}</li>
+                    <li>NoK-2 Phone Number: {{ admin.selectedUser.nextKinTwoPhone }}</li>
+                </ul>
+              </div>
           </div>
         </section>
 
@@ -130,12 +178,13 @@
     })
 
     // KKK-djGzG6yQJi65m22
+    // KKK-3DwxWw8sUluZH7D
 
     // ROUTE GUARD
     // definePageMeta({
     //   middleware: [auth]
     // })
-    const activeTab = ref('searchMember');
+    const activeTab = ref('registeredMember');
     // const activeTab = ref('home');
     
     // GENERATE REGISTRATION ID
@@ -203,7 +252,9 @@
       customerRegInfo.value.phoneNumber = ''
     }
 
-    // SEARCH MEMBER
+
+    
+    // SEARCH REGISTERED MEMBER
     const searchMemBar = ref('')
     const searchMember = async () => {
       if(searchMemBar.value == ''){
@@ -256,7 +307,6 @@
       transactionHistory: '',
       loansRecord: ''
     })
-    const showVal = ref(false)
 
     const attachSearchDetails = async () => {
       // console.log(admin.searchingData)
@@ -294,6 +344,19 @@
     }
 
 
+
+    // LIST AND FETCH INDIVIDUAL FORM REGISTERED By MEMBERS
+  const fetchMainForm = async (formId) => {
+    if(formId === null || formId === undefined) return
+    admin.selectUser(formId)
+  }
+
+
+
+
+onMounted(async () => {
+  await admin.fetchRegistered()
+})
 
 
   </script>
@@ -436,6 +499,113 @@
     color: white;
     line-height: 30px;
   }
+  .classical h3{
+    text-align: center;
+    font-size: 22px;
+    font-weight: bolder;
+    color: rgb(98, 41, 21);
+  }
+
+
+  /* LIST REGISTERED MEMBERS */
+  .newly {
+    display: flex;
+    height: calc(100vh - 500px); 
+    max-height: 800px; 
+    overflow: none; 
+    margin-bottom: 30px;
+  }
+
+.left {
+  flex: 0 0 40%; 
+  overflow-y: auto; 
+  border-right: 1px solid #ddd;
+  padding-right: 5px;
+  height: 100%; 
+  scrollbar-width: thin;
+  -ms-overflow-style: none;
+}
+
+.right {
+  flex: 0 0 60%; 
+  overflow-y: auto; 
+  padding-left: 5px;
+  height: 100%; 
+  scrollbar-width: thin;
+  -ms-overflow-style: none;
+}
+
+.left::-webkit-scrollbar, .right::-webkit-scrollbar {
+  display: none;
+}
+
+.left, .right {
+  -ms-overflow-style: none; 
+  scrollbar-width: none;  
+}
+
+.listFormStudents ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.user-item {
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 5px;
+  color: white;
+}
+
+.user-item.active {
+  background-color: #0c3084;
+  color: white;
+}
+
+.user-details ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.user-details li {
+  padding: 8px 0;
+  font-size: 19px;
+  color: white;
+}
+
+.imagePassport {
+  text-align: center;
+  margin: 15px 0;
+}
+
+.imagePassport img {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 8px;
+}
+
+.user-details h1 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  color: rgb(173, 18, 18);
+  text-align: center;
+  font-size: 25px;
+}
+
+.user-details h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  color: rgb(173, 18, 18);
+  text-align: center;
+  font-size: 25px;
+}
+
 
 </style>
   

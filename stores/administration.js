@@ -5,6 +5,8 @@ export const useAdminStore = defineStore('admin', () => {
     const noMemberFound = ref(false)
     const error = ref(null)
     const searchingData = ref(null)
+    const selectedUser = ref(null)
+    const registeredCustomers = ref([])
 
 
     // FETCH THE SIGNED IN USER
@@ -120,7 +122,49 @@ export const useAdminStore = defineStore('admin', () => {
     }
 
     // FETCH REGISTERED MEMBERS
+    const fetchRegistered = async() => {
+        isLoading.value = false
+        error.value = null
+        const client = useSupabaseClient()
+        try {
+            const {data:fetchData, error:fetchError} = await client
+            .from('REGISTEREDUSERS')
+            .select('id, firstname, middlename, surname, created_at')
+            .order('created_at', {
+                ascending: false
+            })
 
+            if(fetchError) throw fetchError
+            registeredCustomers.value = fetchData
+        } catch (err) {
+            error.value = err.message
+        }finally{
+            isLoading.value = false
+        }
+    }
+
+    //SEARCH SELECTED USERS
+    const selectUser = async(userId) => {
+        const client = useSupabaseClient()
+        try {
+            
+            if(selectedUser.value && selectedUser.value?.id === 'userId'){
+                selectedUser.value = null
+                return
+            }
+            const {data:formData, error:formError} = await client
+            .from('REGISTEREDUSERS')
+            .select('*')
+            .eq('id', userId)
+            .single()
+
+            if(formError) throw formError
+            selectedUser.value = formData
+
+        } catch (err) {
+            error.value = err.message
+        }
+     }
     // LOAN REQUESTS
 
     // ACCOUNT UPDATE
@@ -134,6 +178,10 @@ export const useAdminStore = defineStore('admin', () => {
         registerNewMember,
         noMemberFound,
         searchMember,
-        searchingData
+        searchingData,
+        registeredCustomers,
+        selectedUser,
+        selectUser,
+        fetchRegistered
     }
 })
