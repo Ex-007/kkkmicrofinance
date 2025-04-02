@@ -159,9 +159,47 @@
           </div>
         </section>
 
-        <!-- LOAN REQUESTS -->
+        <!-- UPDATE USERS/CUSTOMERS ACCOUNT BALANCE -->
         <section v-if="activeTab === 'accountUpdate'">
           <div class="transactionDet">
+            <h1>UPDATE CUSTOMER'S ACCOUNT BALANCE</h1>
+            <div class="logRegistrationId">
+              <input type="text" class="contactInput" placeholder="Enter Registration ID" v-model="searchMemBar">
+              <p class="messageShow" v-if="customerRegD.display">{{ customerRegD.message }}</p>
+              <button @click="searchMember" :disabled="admin.isLoading">{{ admin.isLoading ? 'Searching...' : 'Search' }}</button>
+            </div>
+            <div class="displayResult" v-if="showVal">
+            <!-- <div class="displayResult" v-if="admin.searchingData"> -->
+              
+              <div class="classical">
+                <h1>Member Details</h1>
+                <p>Registration ID: {{ searchView.reg_identity }}</p>
+                <p>Fullname: {{ searchView.surname + ' ' + searchView.firstname + ' ' +  searchView.middlename}}</p>
+                <p>Phone Number: {{ searchView.phone }}</p>
+                <h3>Account Balance</h3>
+                <p class="accBal">{{ formatCurrency(searchView.accountBalance) }}</p>
+                <div class="depWith">
+                  <button @click="openDeposit">Deposit</button>
+                  <button @click="openWithdraw">Withdraw</button>
+                </div>
+              </div>
+
+              <!-- DEPOSIT CASH -->
+              <div class="logRegistrationId" v-if="depositBox">
+                <h3>Deposit Money</h3>
+                <input type="number" class="contactInput" placeholder="Enter Amount to Deposit" min="0" oninput="this.value = Math.abs(this.value)" v-model="depositAmount">
+                <p v-if="depositV.pop">{{ depositV.message }}</p>
+                <button @click="makeDeposit" :disabled="admin.isLoading">{{admin.isLoading ? 'Depositing...' : 'Deposit'}}</button>
+              </div>
+
+              <!-- WITHDRAW CASH -->
+              <div class="logRegistrationId" v-if="withdrawBox">
+                <h3>Withdraw Money</h3>
+                <input type="number" class="contactInput" placeholder="Enter Amount to Withdraw" min="0" oninput="this.value = Math.abs(this.value)" v-model="withdrawAmount">
+                <p v-if="withdrawV.pop">{{ withrawV.message }}</p>
+                <button @click="makeWithdraw">Withdraw</button>
+              </div>
+            </div>
           </div>
         </section>
       </main>
@@ -184,7 +222,7 @@
     // definePageMeta({
     //   middleware: [auth]
     // })
-    const activeTab = ref('registeredMember');
+    const activeTab = ref('accountUpdate');
     // const activeTab = ref('home');
     
     // GENERATE REGISTRATION ID
@@ -253,7 +291,7 @@
     }
 
 
-    
+
     // SEARCH REGISTERED MEMBER
     const searchMemBar = ref('')
     const searchMember = async () => {
@@ -267,11 +305,13 @@
       await attachSearchDetails()
     }
 
+    const showVal = ref(false)
     // Watch the Member Not found
     watch(() => admin.noMemberFound, (newVal) => {
         if (newVal) {
             customerRegD.value.display = true
             customerRegD.value.message = 'Member Not Found'
+            showVal.value = false
         }
     });
 
@@ -305,12 +345,14 @@
       nextKinTwoRelationship: '',
       nextKinTwoPhone: '',
       transactionHistory: '',
-      loansRecord: ''
+      loansRecord: '',
+      accountBalance: ''
     })
+
 
     const attachSearchDetails = async () => {
       // console.log(admin.searchingData)
-      // showVal.value = true
+      showVal.value = true
       searchView.value.passportUrl = admin.searchingData.passportUrl
       searchView.value.surname = admin.searchingData.surname
       searchView.value.firstname = admin.searchingData.firstname
@@ -340,6 +382,7 @@
       searchView.value.nextKinTwoPhone = admin.searchingData.nextKinTwoPhone
       searchView.value.transactionHistory = admin.searchingData.transactionHistory
       searchView.value.loansRecord = admin.searchingData.loansRecord
+      searchView.value.accountBalance = admin.searchingData.accountBalance
 
     }
 
@@ -350,6 +393,86 @@
     if(formId === null || formId === undefined) return
     admin.selectUser(formId)
   }
+
+
+  // CUSTOMER'S ACCOUNT UPDATE
+  // FORMAT THE ACCOUNT BALANCE TO NIGERIAN NAIRA
+const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'NGN',
+    }).format(amount);
+};
+// DEPOSIT AND WITHDRAW BOX
+const depositBox = ref(false)
+const withdrawBox = ref(false)
+
+const openDeposit = () => {
+  depositBox.value = true
+  withdrawBox.value = false
+}
+
+const openWithdraw = () => {
+  depositBox.value = false
+  withdrawBox.value = true
+}
+
+// DEPOSITING AND WITHDRAWING FUNCTION
+// MAKE DEPOSIT
+const depositAmount = ref('')
+const depositV = ref({
+  pop: false,
+  message: ''
+})
+const makeDeposit = async () => {
+  if(depositAmount.value == '' || depositAmount.value == 0){
+    depositV.value.pop = true
+    depositV.value.message = 'Amount cannot be lower than 0'
+    return
+  }
+  const type = 'deposit'
+  depositV.value.pop = false
+  await admin.depositMoney(searchView.value.reg_identity, searchView.value.accountBalance, depositAmount.value, type)
+  depositV.value.pop = true
+  depositV.value.message = `Deposit of ${formatCurrency(depositAmount.value)} Successfully Made`
+  depositAmount.value = ''
+  setTimeout(() => {
+    depositV.value.pop = false
+  }, 2000);
+}
+
+// MAKE WITHDRAW
+const withdrawAmount = ref('')
+const withdrawV = ref({
+  pop: false,
+  message: ''
+})
+const makeWithdraw = async () => {
+  if(withdrawAmount.value == '' || withdrawAmount.value == 0){
+    withdrawV.value.pop = true
+    withdrawV.value.message = 'Amount cannot be lower than 0'
+    return
+  }
+  withdrawV.value.pop = false
+
+  console.log('Withdrawing...', withdrawAmount.value)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -480,6 +603,11 @@ onMounted(async () => {
       padding: 10px;
       box-shadow: inset 10px 6px 50px rgb(192, 192, 196);
   }
+  .logRegistrationId p{
+    color: white;
+    text-align: center;
+    text-align-last: center;
+  }
 
   .logRegistrationId h1, label{
     color: white;
@@ -606,6 +734,41 @@ onMounted(async () => {
   font-size: 25px;
 }
 
+/* ACCOUNT BALANCE */
+.accBal{
+  text-align: center;
+  font-size: 25px;
+}
+
+/* ACCOUNT UPDATE */
+.depWith{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.depWith button{
+  height: 30px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  width: 100px;
+}
+.logRegistrationId h3{
+  color: white;
+}
+
+/* REMOVE THE ARROW UP AND DOWN FROM THE NUMBER INPUT BUTTON */
+input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button{
+  -webkit-appearance: none;
+  margin: 0;
+} 
+input[type="number"]{
+  -moz-appearance: textfield;
+
+}
 
 </style>
   
