@@ -110,7 +110,7 @@
 
                 <!-- EMPLOYER'S NAME -->
                 <label for="employersName">Employer's name/Business:</label>
-                <input type="email" id="employersName" class="contactInput" v-model="store.registrationData.employerName" required>
+                <input type="text" id="employersName" class="contactInput" v-model="store.registrationData.employerName" required>
 
                     <!--  EMPLOYER'S ADDRESS/BUSIMESS -->
                     <label for="employersAddress">Employer's Address/Business:</label>
@@ -414,7 +414,6 @@ watch(() => store.canProceed, (newVal) => {
     if (newVal) {
         successMessage.value = 'Student registration successful!'
         formSubmitted.value = true
-        registrationId.value = generateRegistrationId()
         // router.push('/Formsubmitted')
     }
 });
@@ -424,34 +423,34 @@ const validateForm = () => {
   const errors = []
   
   // Check if passport photo is uploaded
-  if (!store.studentData.passportPhoto) {
+  if (!store.registrationData.passportPhoto) {
     errors.push("Please upload your passport photograph")
   }
   
   // Check personal information fields
-  if (!store.studentData.surname) errors.push("Surname is required")
-  if (!store.studentData.firstname) errors.push("Firstname is required")
-  if (!store.studentData.middlename) errors.push("Middlename is required")
-  if (!store.studentData.occupation) errors.push("Occupation is required")
-  if (!store.studentData.dateOfBirth) errors.push("Date of birth is required")
-  if (!store.studentData.gender) errors.push("Gender is required")
-  if (!store.studentData.homeAddress) errors.push("Current home address is required")
-  if (!store.studentData.homeTown) errors.push("Home Town is required")
-  if (!store.studentData.maritalStat) errors.push("Marital Status is required")
-  if (!store.studentData.eduQualify) errors.push("Educational Qualification is required")
-  if (!store.studentData.phone) errors.push("Phone Number is required")
-  if (!store.studentData.email) errors.push("Email Address is required")
-  if (!store.studentData.employerName) errors.push("Employer's Name is required")
-  if (!store.studentData.employerAddress) errors.push("Employer's Address is required")
-  if (!store.studentData.employerLocation) errors.push("Employer's Location is required")  
-  if (!store.studentData.nextKinOneSurname) errors.push("Next of Kin Surname is required")
-  if (!store.studentData.nextKinOneFirstname) errors.push("Next of Kin Firstname is required")
-  if (!store.studentData.nextKinOneRelationship) errors.push("Next of Kin Relationship is required")
-  if (!store.studentData.nextKinOnePhone) errors.push("Next of Kin Phone Number is required")
-  if (!store.studentData.nextKinTwoSurname) errors.push("Next of Kin Surname is required")
-  if (!store.studentData.nextKinTwoFirstname) errors.push("Next of Kin Firstname is required")
-  if (!store.studentData.nextKinTwoRelationship) errors.push("Next of Kin Relationship is required")
-  if (!store.studentData.nextKinTwoPhone) errors.push("Next of Kin Phone Number is required")
+  if (!store.registrationData.surname) errors.push("Surname is required")
+  if (!store.registrationData.firstname) errors.push("Firstname is required")
+  if (!store.registrationData.middlename) errors.push("Middlename is required")
+  if (!store.registrationData.occupation) errors.push("Occupation is required")
+  if (!store.registrationData.dateOfBirth) errors.push("Date of birth is required")
+  if (!store.registrationData.gender) errors.push("Gender is required")
+  if (!store.registrationData.homeAddress) errors.push("Current home address is required")
+  if (!store.registrationData.homeTown) errors.push("Home Town is required")
+  if (!store.registrationData.maritalStat) errors.push("Marital Status is required")
+  if (!store.registrationData.eduQualify) errors.push("Educational Qualification is required")
+  if (!store.registrationData.phone) errors.push("Phone Number is required")
+  if (!store.registrationData.email) errors.push("Email Address is required")
+  if (!store.registrationData.employerName) errors.push("Employer's Name is required")
+  if (!store.registrationData.employerAddress) errors.push("Employer's Address is required")
+  if (!store.registrationData.employerLocation) errors.push("Employer's Location is required")  
+  if (!store.registrationData.nextKinOneSurname) errors.push("Next of Kin Surname is required")
+  if (!store.registrationData.nextKinOneFirstname) errors.push("Next of Kin Firstname is required")
+  if (!store.registrationData.nextKinOneRelationship) errors.push("Next of Kin Relationship is required")
+  if (!store.registrationData.nextKinOnePhone) errors.push("Next of Kin Phone Number is required")
+  if (!store.registrationData.nextKinTwoSurname) errors.push("Next of Kin Surname is required")
+  if (!store.registrationData.nextKinTwoFirstname) errors.push("Next of Kin Firstname is required")
+  if (!store.registrationData.nextKinTwoRelationship) errors.push("Next of Kin Relationship is required")
+  if (!store.registrationData.nextKinTwoPhone) errors.push("Next of Kin Phone Number is required")
   if (!selectedState.value) errors.push("State of Origin is required")
   if (!selectedLGA.value) errors.push("Local Government is required")
 
@@ -462,9 +461,9 @@ const validateForm = () => {
 // SUBMIT FORM DETAILS
 const submitRegistration = async () => {
     showValidationErrors.value = true
-    store.studentData.paymentId = registrationId
-    store.studentData.state = selectedState.value
-    store.studentData.localGvt = selectedLGA.value
+    store.registrationData.paymentId = registrationId
+    store.registrationData.state = selectedState.value
+    store.registrationData.localGvt = selectedLGA.value
 
     if(!validateForm()){
         window.scrollTo({top:0, behavior: 'smooth'})

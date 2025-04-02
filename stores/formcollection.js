@@ -59,7 +59,7 @@ export const useFormStore = defineStore ('form', () => {
             
             // UPLOAD THE PASSPORT
             const {data:passportData, error:passportError} = await client.storage
-            .from('members_passport')
+            .from('memberspassport')
             .upload(passportPhotoPath, registrationData.passportPhoto)
             if(passportError) throw passportError
 
@@ -69,9 +69,9 @@ export const useFormStore = defineStore ('form', () => {
             .getPublicUrl(passportPhotoPath).data.publicUrl
 
             // SAVE URLs TO REACTIVE STORE
-            studentData.passportUrl = passportUrll
+            registrationData.passportUrl = passportUrll
 
-            return{passportUrll, certificateUrll}
+            return{passportUrll}
 
         } catch (err) {
             error.value = err.message
