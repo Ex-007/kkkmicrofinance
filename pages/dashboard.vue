@@ -7,13 +7,25 @@
                     <img :src='cusInfo.passportUrl || "/img/profilepicture.jpeg"' alt="">
                     <h2>{{ cusInfo.surname + ' ' + cusInfo.firstname }}</h2>
                 </div>
-                <button>Logout</button>
+                <h2 class="menuIcon" @click="openMenu"><i class="fa fa-bars"></i></h2>
             </div>
 
             <!-- ACCOUNT BALANCE -->
              <div class="accountBalance">
                 <h2>Account Balance</h2>
                 <h3>{{ formatCurrency(cusInfo.accountBalance) }}</h3>
+             </div>
+
+             <!-- MENU ITEMS -->
+             <div class="menuP" v-if="menuItem">
+                <ul>
+                    <li><nuxt-link to="/profile">Profile</nuxt-link></li>
+                    <li><nuxt-link to="/transHistory">Transaction History</nuxt-link></li>
+                    <li>Loan Status</li>
+                    <li><nuxt-link to="/customer-support">Customer Support</nuxt-link></li>
+                    <li>Logout</li>
+                    <li class="closeMenu" @click="closeMenu"><i class="fa fa-times"></i></li>
+                </ul>
              </div>
 
              <!-- DEPOSIT AND LOAN REQUESTS -->
@@ -112,6 +124,19 @@ import {useRoute, useRouter} from 'vue-router'
 import{useCustomerStore} from '@/stores/customerProfile'
 const customer = useCustomerStore()
 const router = useRouter()
+
+// OPEN AND CLOSE MENU
+const menuItem = ref(false)
+
+const openMenu = () => {
+    menuItem.value = true
+}
+
+const closeMenu = () => {
+    menuItem.value = false
+}
+
+
 
 // DEFINE THE PAGE META
 definePageMeta({
@@ -423,4 +448,47 @@ onMounted(async () => {
         text-align: center;
         color: white;
     }
+
+    /* MENU ICON */
+    .menuIcon{
+        color: white;
+        cursor: pointer;
+        font-size: 30px;
+    }
+
+    /* THE MENU CONTENTS */
+    .menuP{
+        position: absolute;
+        top: 10px;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        background-color: #6897a7;
+        padding: 10px 0;
+        border-radius: 10px;
+        box-shadow: inset 10px 6px 50px rgb(26, 49, 195);
+        width: 300px;
+    }
+
+    .menuP ul{
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .menuP ul li{
+        list-style-type: none;
+        color: white;
+        cursor: pointer;
+    }
+    .menuP ul a{
+        text-decoration: none;
+        color: white;
+    }
+    .closeMenu i{
+        color: red;
+    }
+
 </style>
