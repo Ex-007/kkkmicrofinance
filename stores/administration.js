@@ -310,6 +310,11 @@ export const useAdminStore = defineStore('admin', () => {
         }
     }
 
+    // DISPLAY LOAN REQUESTS
+    const viewLoanRequests = () => {
+        
+    }
+
 
 
 

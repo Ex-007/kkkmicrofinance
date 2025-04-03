@@ -570,7 +570,7 @@ onMounted(async () => {
     .loanPop{
         position: absolute;
         top: 100px;
-        right: 100px;
+        right: 50px;
         display: flex;
         justify-content: center;
         align-items: center;
