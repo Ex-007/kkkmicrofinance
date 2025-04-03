@@ -15,41 +15,41 @@
 
                 <!-- SURNAME -->
                 <label for="surnanme">Surname:</label>
-                <input type="text" id="surname" class="contactInput" v-model="loanDetails.surname" required>
+                <input type="text" id="surname" class="contactInput" v-model="loanDetails.surname" required readonly>
 
                 <!-- FIRSTNAME -->
                 <label for="firstname">Firstname:</label>
-                <input type="text" id="firstname" class="contactInput" v-model="loanDetails.firstname" required>
+                <input type="text" id="firstname" class="contactInput" v-model="loanDetails.firstname" required readonly>
 
                 <!-- MIDDLENAME -->
                 <label for="middlename">Middlename:</label>
-                <input type="text" id="middlename" class="contactInput" v-model="loanDetails.middlename" required>
+                <input type="text" id="middlename" class="contactInput" v-model="loanDetails.middlename" required readonly>
 
                 <!-- ADDRESS -->
                 <label for="address">Address:</label>
-                <input type="text" id="address" class="contactInput" v-model="loanDetails.address" required>
+                <input type="text" id="address" class="contactInput" v-model="loanDetails.address" required readonly>
 
                 <!-- EMAIL -->
                 <label for="email">Email:</label>
                 <input type="email" id="email" class="contactInput" v-model="loanDetails.email"
-                    required>
+                    required readonly>
 
                 <!-- OCCUPATION -->
                 <label for="occupation">Occupation:</label>
-                <input type="text" id="occupation" class="contactInput" v-model="loanDetails.occupation" required>
+                <input type="text" id="occupation" class="contactInput" v-model="loanDetails.occupation" required readonly>
 
                 <!-- POSITION -->
                 <label for="position">Position:</label>
-                <input type="email" id="position" class="contactInput" v-model="loanDetails.position"
+                <input type="text" id="position" class="contactInput" v-model="loanDetails.position"
                     required>
 
                 <!-- PHONE NUMBER -->
                 <label for="phone">Phone Number:</label>
-                <input type="text" id="phone" class="contactInput" v-model="loanDetails.phone" required>
+                <input type="text" id="phone" class="contactInput" v-model="loanDetails.phone" required readonly>
 
                 <!-- EMPLOYER'S NAME -->
                 <label for="employersName">Employer's name/Business:</label>
-                <input type="text" id="employersName" class="contactInput" v-model="loanDetails.employerName" required>
+                <input type="text" id="employersName" class="contactInput" v-model="loanDetails.employerName" required readonly>
 
                 <!--  EMPLOYER'S ADDRESS/BUSIMESS -->
                 <label for="employersAddress">Employer's Address/Business:</label>
@@ -64,7 +64,7 @@
                 <!--  LOAN AMOUNT -->
                 <label for="loanAmount">Loan Amount:</label>
                 <input type="text" id="loanAmount" class="contactInput" v-model="loanDetails.loanAmount"
-                    required>
+                    required readonly>
 
                 <!--  LOAN PERIOD -->
                 <label for="loanPeriod">Loan Period:</label>
@@ -77,7 +77,7 @@
                 <!--  AMOUNT IN WORDS -->
                 <label for="amountInWords">Amount in Words:</label>
                 <input type="text" id="amountInWords" class="contactInput" v-model="loanDetails.amountInWords"
-                    required>
+                    required readonly>
 
                     
                 <!--  LOAN PURPOSE -->
@@ -130,7 +130,7 @@
         <div v-if="formSubmitted" class="success-container">
             <div class="success-message">
                 <h2>Registration Successful!</h2>
-                <p>Your form has been successfully submitted and saved to our database.</p>
+                <p>Your form has been successfully submitted please print and fill the guarantors form.</p>
                 <div class="print-actions">
                     <button @click="printForm" class="print-button">Print Registration Form</button>
                     <button @click="goToHome" class="home-button">Profile</button>
@@ -273,7 +273,7 @@
 </template>
 
 <script setup>
-    import {ref, watch, computed } from 'vue'
+    import {ref, watch, computed, onMounted } from 'vue'
     import {useRouter, useRoute} from 'vue-router'
     import {useLoanStore} from '@/stores/loanApp'
 
@@ -286,6 +286,7 @@
     const registrationId = route.params.id
     const successMessage = ref('')
     const formSubmitted = ref(false)
+
     // const registrationId = ref('')
 
     // FETCH SIGNED IN USER DETAILS
@@ -305,11 +306,11 @@
         loanPeriod: '',
         amountInWords: '',
         loanPurpose: '',
+        accountBalance : ''
     })
 
     // FETCH SIGNED IN USER DETAILS AND ATTACH TO THE FORM
-    const attachDetails = () => {
-        console.log(loan.userDetails)
+    const attachDetails = async () => {
         loanDetails.value.surname = loan.userDetails.surname
         loanDetails.value.firstname = loan.userDetails.firstname
         loanDetails.value.middlename = loan.userDetails.middlename
@@ -319,24 +320,82 @@
         loanDetails.value.businessAddress = loan.userDetails.employerAddress
         loanDetails.value.employerName = loan.userDetails.employerName
         loanDetails.value.phone = loan.userDetails.phone
+        loanDetails.value.accountBalance = loan.userDetails.accountBalance
     }
 
-    // PROCESS LOAN
-    const processLoan = async () => {
-        if(loanDetails.value.surname || loanDetails.value.firstname || loanDetails.value.middlename || loanDetails.value.address || loanDetails.value.email || loanDetails.value.occupation || loanDetails.value.position || loanDetails.value.phone || loanDetails.value.businessAddress || loanDetails.value.employerName || loanDetails.value.employerPhone || loanDetails.value.loanAmount || loanDetails.value.loanPeriod || loanDetails.value.amountInWords || loanDetails.value.loanPurpose == ''){
-            noInput.value = true
-            errorMessage.value = 'Please Fill all Details'
-            return
+    // ENTITLED AMOUNT
+    const available = async () => {
+        const loanable = loanDetails.value.accountBalance * 3
+        const mainValue = formatCurrency(loanable)
+        loanDetails.value.loanAmount = mainValue
+    }
+
+    // FORMAT THE CURRENCY
+    const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'NGN',
+    }).format(amount);
+    };
+
+    // CONVERT TO WORDS
+    const numberToWords = (num) => {
+        const ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
+        const teens = ["Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+        const tens = ["", "Ten", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+        const thousands = ["", "Thousand", "Million", "Billion", "Trillion"];
+
+        if (num === 0) return "Zero Naira";
+
+        const convertLessThanThousand = (n) => {
+            let str = "";
+            if (n >= 100) {
+                str += ones[Math.floor(n / 100)] + " Hundred ";
+                n %= 100;
+            }
+            if (n >= 11 && n <= 19) {
+                str += teens[n - 11] + " ";
+            } else {
+                str += tens[Math.floor(n / 10)] + " ";
+                str += ones[n % 10] + " ";
+            }
+            return str.trim();
+        };
+
+        let word = "";
+        let i = 0;
+
+        while (num > 0) {
+            if (num % 1000 !== 0) {
+                word = convertLessThanThousand(num % 1000) + " " + thousands[i] + " " + word;
+            }
+            num = Math.floor(num / 1000);
+            i++;
         }
-        noInput.value = false
-        errorMessage.value = ''
-        await loan.processLoan(loanDetails.value)
+
+        return word.trim() + " Naira Only";
+    };
+
+    // AMOUNT IN WORDS
+    const amountToWords = async() => {
+        const loanAmount = loanDetails.value.accountBalance * 3
+        const wordAmount = numberToWords(loanAmount)
+        loanDetails.value.amountInWords = wordAmount
     }
 
 
 
-
-
+// PROCESS LOAN
+const processLoan = async () => {
+    if(loanDetails.value.position == '' || loanDetails.value.employerPhone == '' || loanDetails.value.businessAddress == '' || loanDetails.value.loanPeriod == '' || loanDetails.value.loanPurpose == ''){
+        noInput.value = true
+        errorMessage.value = 'Please Fill all Details'
+        return
+    }
+    noInput.value = false
+    errorMessage.value = ''
+    await loan.checkLoanCollector(loanDetails.value, registrationId)
+}
 
 
 // Get today's date formatted
@@ -348,12 +407,21 @@ const formattedDate = computed(() => {
     })
 })
 
-
     // SUCCESSFUL
 watch(() => loan.canProceed, (newVal) => {
     if (newVal) {
         successMessage.value = 'Loan Application submission successful, Please Print the Form to fill Guarantor details!'
         formSubmitted.value = true
+    }
+});
+
+    // WATCH FALSE REGISTRATION ID
+watch(() => loan.trueAlarm, (newVal) => {
+    if (newVal) {
+        noInput.value = true
+        successMessage.value = 'No such ID!'
+        errorMessage.value = 'No such ID'
+        return
     }
 });
 
@@ -477,29 +545,21 @@ const printForm = () => {
         }, 500)
     }
 
-    // Navigate back to home
-    const goToHome = () => {
-        router.push('/userdash')
-    }
+// Navigate back to home
+const goToHome = () => {
+    router.push('/dashboard')
+}
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+onMounted(async () => {
+    await loan.signinUser()
+    await attachDetails()
+    await available()
+    await amountToWords()
+})
 
 
 </script>

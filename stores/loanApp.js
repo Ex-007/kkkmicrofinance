@@ -7,6 +7,7 @@ export const useLoanStore = defineStore('loan', () => {
     const isBypass = ref(false)
     const userDetails = ref(null)
     const canProceed = ref(false)
+    const trueAlarm = ref(false)
 
 
     // CHECK IF A USER IS SIGNED IN
@@ -61,25 +62,54 @@ export const useLoanStore = defineStore('loan', () => {
             .eq('email', ident)
             .single()
             if(signedStuError) throw signedStuError
-            console.log(signedStuData)
             userDetails.value = signedStuData
         } catch (err) {
             error.value = err.message
-            console.log(err.message)
+        } finally{
+            isLoading.value = false
+        }
+    }
+
+    // CHECK IF THE COLLECTOR EXISTS IN THE DATABASE OF REGISTERED USERS
+    const checkLoanCollector = async(loanDetails, registrationId) => {
+        isLoading.value = true
+        error.value = null
+        trueAlarm.value = false
+        const client = useSupabaseClient()
+        try {
+            const {data:checkData, error:checkError} = await client
+            .from('REGISTRATIONID')
+            .select('*')
+            .eq('reg_identity', registrationId)
+            .single()
+            
+            if(checkError){
+                if (checkError.code === 'PGRST116') {
+                    error.value = 'Registration ID not found'
+                    trueAlarm.value = true
+                    isLoading.value = false
+                    return
+                }
+                throw checkError
+            }
+            await processLoan(loanDetails, registrationId)
+        } catch (err) {
+            error.value = err.message
         } finally{
             isLoading.value = false
         }
     }
 
     // PROCESS THE LOAN APPLICATION
-    const processLoan = async (loanDetails) => {
+    const processLoan = async (loanDetails, registrationId) => {
         isLoading.value = true
         error.value = null
         const client = useSupabaseClient()
         try {
-            const {data:loanData, error:loanError} = await client.auth
+            const {data:loanData, error:loanError} = await client
             .from('LOANREQUESTS')
             .insert({
+                registrationId: registrationId,
                 surname: loanDetails.surname,
                 firstname: loanDetails.firstname,
                 middlename: loanDetails.middlename,
@@ -108,6 +138,7 @@ export const useLoanStore = defineStore('loan', () => {
         }
     }
 
+    
 
 
     return{
@@ -118,6 +149,7 @@ export const useLoanStore = defineStore('loan', () => {
         user,
         userDetails,
         canProceed,
-        processLoan
+        checkLoanCollector,
+        trueAlarm
     }
 })

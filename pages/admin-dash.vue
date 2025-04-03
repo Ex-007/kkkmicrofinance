@@ -431,7 +431,7 @@ const makeDeposit = async () => {
     depositV.value.message = 'Amount cannot be lower than 0'
     return
   }
-  const type = 'deposit'
+  const type = 'Deposit'
   depositV.value.pop = false
   await admin.depositMoney(searchView.value.reg_identity, searchView.value.accountBalance, depositAmount.value, type)
   depositV.value.pop = true
@@ -461,7 +461,7 @@ const makeWithdraw = async () => {
   }
   
   withdrawV.value.pop = false
-  const type = 'withdraw'
+  const type = 'Withdrawal'
   await admin.withdrawMoney(searchView.value.reg_identity, searchView.value.accountBalance, withdrawAmount.value, type)
   withdrawV.value.pop = true
   withdrawV.value.message = `Withdraw of ${formatCurrency(withdrawAmount.value)} Successfully Made`

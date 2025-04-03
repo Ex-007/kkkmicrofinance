@@ -6,6 +6,7 @@ export const useCustomerStore = defineStore('customerPro', () => {
     const user = ref(null)
     const canOut = ref(false)
     const isBypass = ref(false)
+    const imageUploaded = ref(false)
     const recentTransact = ref([])
 
     // FETCH THE SIGNED IN USER
@@ -114,41 +115,88 @@ export const useCustomerStore = defineStore('customerPro', () => {
         }
     }
 
-   
-// UPLOADING THE IMAGE
-const uploadFiles = async() => {
-    isLoading.value = true
-    error.value = null
-    const client = useSupabaseClient()
+    // FOR GUARANTOR'S IMAGE
+    const guarantor = reactive({
+        passportPhoto: null,
+        passportPhotoUrl: null
+    })
 
-    try {
-        const passportPhotoPath = `profile-picture/${Date.now()}-${studentPicture.passportPicture.name}`
-        
-        // UPLOAD THE PASSPORT
-        const {data:passportData, error:passportError} = await client.storage
-        .from('studentform')
-        .upload(passportPhotoPath, studentPicture.passportPhoto)
-        if(passportError) throw passportError
-
-
-        // GET THE DOWNLOADURL FOR THE FILES
-        const passportUrll = client.storage
-        .from('studentform')
-        .getPublicUrl(passportPhotoPath).data.publicUrl
-
-        // SAVE URLs TO REACTIVE STORE
-        studentPicture.passportPictureUrl = passportUrll
-
-        return{passportUrll}
-
-    } catch (err) {
-        error.value = err.message
-        console.log(err.message)
-        throw error
-    } finally{
-        isLoading.value = false
+    function setGuarantorPhoto(file){
+        guarantor.passportPhoto = file
     }
-}
+    
+    // UPLOADING THE FILES
+    const uploadFiles = async() => {
+        isLoading.value = true
+        error.value = null
+        const client = useSupabaseClient()
+
+        try {
+            const guarantorPhotoPath = `guarantors/${Date.now()}-${guarantor.passportPhoto.name}`
+            
+            const {data:guarantorData, error:guarantorError} = await client.storage
+            .from('guarantors')
+            .upload(guarantorPhotoPath, guarantor.passportPhoto)
+            if(guarantorError) throw guarantorError
+
+            const guarantorUrll = client.storage
+            .from('guarantors')
+            .getPublicUrl(guarantorPhotoPath).data.publicUrl
+
+            guarantor.passportPhotoUrl = guarantorUrll
+
+            return guarantorUrll
+
+        } catch (err) {
+            error.value = err.message
+            throw error
+        } finally{
+            isLoading.value = false
+        }
+    }
+    
+    // function to upload the picture
+    const uploadGuarantorImage = async () => {
+        isLoading.value = true
+        error.value = null
+        const client = useSupabaseClient()
+        const registrationId = user.value.reg_identity
+        imageUploaded.value = false
+        try {
+            const photoUrl = await uploadFiles()
+            const {data:upData, error:upError} = await client
+            .from('LOANREQUESTS')
+            .update({
+                guarantor: photoUrl
+            })
+            .eq('registrationId', registrationId)
+            if(upError) throw upError
+            imageUploaded.value = true
+        } catch (err) {
+            error.value = err.message
+        } finally{
+            isLoading.value = false
+        }
+    
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -162,7 +210,10 @@ const uploadFiles = async() => {
         error,
         user,
         signinUser,
-        recentTransact
+        recentTransact,
+        setGuarantorPhoto,
+        imageUploaded,
+        uploadGuarantorImage
     }
 
 

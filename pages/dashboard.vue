@@ -17,16 +17,44 @@
              </div>
 
              <!-- MENU ITEMS -->
-             <div class="menuP" v-if="menuItem">
-                <ul>
-                    <li><nuxt-link to="/profile">Profile</nuxt-link></li>
-                    <li><nuxt-link to="/transHistory">Transaction History</nuxt-link></li>
-                    <li>Loan Status</li>
-                    <li><nuxt-link to="/customer-support">Customer Support</nuxt-link></li>
-                    <li>Logout</li>
-                    <li class="closeMenu" @click="closeMenu"><i class="fa fa-times"></i></li>
-                </ul>
-             </div>
+              <transition name="fade">
+    
+                  <div class="menuP" v-if="menuItem">
+                     <ul>
+                         <li><nuxt-link to="/profile">Profile</nuxt-link></li>
+                         <li><nuxt-link to="/transHistory">Transaction History</nuxt-link></li>
+                         <li>Loan Status</li>
+                         <li><nuxt-link to="/customer-support">Customer Support</nuxt-link></li>
+                         <li>Logout</li>
+                         <li class="closeMenu" @click="closeMenu"><i class="fa fa-times"></i></li>
+                     </ul>
+                  </div>
+              </transition>
+
+              <!-- LOAN APPLICATION POPUP -->
+             <transition name="fade">
+                 <div class="loanPop" v-if="openLoanModal">
+                    <p class="closeLoanInput" @click="closeAppSub"><i class="fa fa-times"></i></p>
+                    <button @click="submitLoanApp">Submit Loan Application Form</button>
+                    <button @click="fillLoanApp">Fill Loan Application Form</button>
+                 </div>
+             </transition>
+
+             <!-- SUBMIT LOAN APPLICATION -->
+             <transition name="fade">
+                 <div class="loanPop" v-if="submitLoanInput">
+                    <p class="closeLoanInput" @click="closeLoanInput"><i class="fa fa-times"></i></p>
+                    <p>Please Submit The Guarantor's Loan Application Page.</p>
+                    <input type="file" class="contactInput" @change="handlePassportPhoto" accept="image/*" required>
+                    <div v-if="passportPreviewUrl" class="preview">
+                        <img :src="passportPreviewUrl" alt="Passport Preview" width="100" />
+                    </div>
+                    <p>{{ photoUploaded }}</p>
+                    <button @click="uploadApp" :disabled="customer.isLoading">{{customer.isLoading ? 'Upload...' : 'Upload'}}</button>
+                 </div>
+             </transition>
+
+
 
              <!-- DEPOSIT AND LOAN REQUESTS -->
              <p class="notEligible" v-if="noteligible">{{ ineligible }}</p>
@@ -37,7 +65,7 @@
 
               <!-- LOAN INFORMATION -->
                <div class="loanInformation">
-                <h1>Loan Information</h1>
+                <h1>Current Loan Information</h1>
                 <div class="steps">
                     <div class="step">
                         <h3>Amount Collected</h3>
@@ -45,13 +73,8 @@
                     </div>
             
                     <div class="step">
-                        <h3>Total Payback</h3>
-                        <p>$ 5,600</p>
-                    </div>
-            
-                    <div class="step">
-                        <h3>Amount Paid</h3>
-                        <p>$ 2,700</p>
+                        <h3>Interest</h3>
+                        <p>18%</p>
                     </div>
             
                     <div class="step">
@@ -60,11 +83,17 @@
                     </div>
             
                     <div class="step">
+                        <h3>Amount Paid</h3>
+                        <p>$ 2,00</p>
+                    </div>
+            
+                    <div class="step">
                         <h3>Remaining Balance</h3>
                         <p>$ 2,900</p>
                     </div>
-                    </div>
                </div>
+               </div>
+
 
                <!-- RECENT TRANSACTIONS -->
                 <div class="recentTrx">
@@ -106,7 +135,31 @@ const closeMenu = () => {
     menuItem.value = false
 }
 
+// OPEN LOAN MODAL
+const openLoanModal = ref(false)
 
+
+// CLOSE LOAN APPLICATION SUBMISSION
+const closeAppSub = () => {
+    openLoanModal.value = false
+}
+
+// OPEN LOAN APPLICATION SUBMISSION
+const submitLoanInput = ref(false)
+// OPEN LOAN INPUT
+const submitLoanApp = () => {
+    submitLoanInput.value = true
+}
+// XLOSE LOAN INPUT
+const closeLoanInput = () => {
+    submitLoanInput.value = false
+}
+
+// FILL LOAN APPLICATION PAGE
+const fillLoanApp = () => {
+    const registrationId = cusInfo.value.reg_identity
+    router.push(`/loan/${registrationId}`)
+}
 
 // DEFINE THE PAGE META
 definePageMeta({
@@ -208,17 +261,18 @@ const formatTime = (dateString) => {
 
 const ineligible = ref('')
 const noteligible = ref(false)
-const createdAt = ref('2025-03-01')
+const createdAt = ref('2025-01-01')
 // CHECKING LOAN ELIGIBILITY
 const requestLoan = () => {
-    let registrationDate = new Date(createdAt.value); // Ensure correct Date conversion
+    let registrationDate = new Date(createdAt.value);
     let currentDate = new Date();
     let differenceInMs = currentDate - registrationDate;
     let differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
     let requiredDays = 90;
 
     if (differenceInDays >= requiredDays) {
-        router.push('/loan-application')
+        openLoanModal.value = true
+        // router.push('/loan-application')
     } else {
         let daysRemaining = Math.ceil(requiredDays - differenceInDays);
         noteligible.value = true
@@ -254,8 +308,31 @@ const requestLoan = () => {
 //     }
 // };
 
-// DISPLAY RECENT TRANSACTIONS
+// UPLOADING GUARANTOR'S FORM
+const passportPreviewUrl = ref('') 
+// HANDLE GUARANTOR'S FILE UPLOAD
+const handlePassportPhoto = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+        customer.setGuarantorPhoto(file)
+        passportPreviewUrl.value = URL.createObjectURL(file)
+    }
+}
+// UPLOAD IMAGE
+const uploadApp = () => {
+    customer.uploadGuarantorImage()
+}
 
+//   WATCH UPLOADED GUARANTOR IMAGE TO LOG SUCCESS
+const photoUploaded = ref('')
+watch(() => customer.imageUploaded, (newVal) => {
+    if (newVal) {
+        photoUploaded.value = 'Update Successful'
+        passportPreviewUrl.value = ''
+        openLoanModal.value = false
+        submitLoanInput.value = false
+    }
+});
 
 
 
@@ -489,5 +566,78 @@ onMounted(async () => {
     .closeMenu i{
         color: red;
     }
+
+    .loanPop{
+        position: absolute;
+        top: 100px;
+        right: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        background-color: #6897a7;
+        padding: 10px 0;
+        border-radius: 10px;
+        box-shadow: inset 10px 6px 50px rgb(26, 49, 195);
+        width: 300px;
+        gap: 10px;
+        margin: 0 auto;
+        z-index: 1;
+    }
+    .loanPop button{
+        height: 30px;
+        background-color: #f1f1f1;
+        border-radius: 20px;
+        cursor: pointer;
+        border: none;
+        color: #616dad;
+        padding: 0 5px;
+    }
+    .loanPop button:hover{
+        background-color: #616dad;
+        color: white;
+        border: 2px solid #616dad;
+        outline: 3px solid white;
+    }
+    .loanPop p{
+        text-align: center;
+        color: white;
+    }
+
+    .fade-enter-active, .fade-leave-active {
+        transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    }
+
+    .fade-enter-from, .fade-leave-to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    .fade-enter-to, .fade-leave-from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .contactInput{
+      width: 290px;
+      border-radius: 10px;
+      height: 35px;
+      border: none;
+      outline: none;
+      padding: 10px;
+      box-shadow: inset 10px 6px 50px rgb(192, 192, 196);
+  }
+  .closeLoanInput{
+    color: red;
+    cursor: pointer;
+  }
+  .preview {
+        margin-top: 10px;
+        border: 1px solid #ddd;
+        padding: 5px;
+        display: inline-block;
+        border-radius: 4px;
+    }
+
 
 </style>
