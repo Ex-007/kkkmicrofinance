@@ -1,11 +1,12 @@
 import{defineStore} from 'pinia'
 
-export const useCustomerStore = defineStore('studentStore', () => {
+export const useCustomerStore = defineStore('customerPro', () => {
     const isLoading = ref(false)
     const error = ref(null)
     const user = ref(null)
     const canOut = ref(false)
     const isBypass = ref(false)
+    const recentTransact = ref([])
 
     // FETCH THE SIGNED IN USER
     const signinUser = async () => {
@@ -32,6 +33,7 @@ export const useCustomerStore = defineStore('studentStore', () => {
             if (loggedUserData && loggedUserData.user) {
                 let loggedEmail = loggedUserData.user.email
                 await fetchDetails(loggedEmail)
+                await recentTransactions(loggedEmail)
                 // console.log(loggedUserData.user.email)
                 return loggedUserData.user
             } else {
@@ -78,6 +80,36 @@ export const useCustomerStore = defineStore('studentStore', () => {
         } catch (err) {
             error.value = err.message
         } finally{
+            isLoading.value = false
+        }
+    }
+
+    // DISPLAY RECENT TRANSACTIONS
+    const recentTransactions = async(loggedEmail) => {
+        isLoading.value = true
+        error.value = null
+        const client = useSupabaseClient()
+        try {
+            const { data: historyData, error: historyError } = await client
+            .from("REGISTEREDUSERS")
+            .select("transactionHistory")
+            .eq("email", loggedEmail)
+            .single();
+
+            if (historyError) throw historyError;
+
+            let transactions = historyData.transactionHistory?.payments || [];
+
+            transactions = transactions
+                .sort((a, b) => new Date(b.date) - new Date(a.date)) // Sort descending
+                .slice(0, 6); 
+
+            recentTransact.value = transactions
+            return transactions; 
+        } catch (err) {
+            error.value = err.message
+            console.log(err.message)
+        }finally{
             isLoading.value = false
         }
     }
@@ -129,7 +161,8 @@ const uploadFiles = async() => {
         isLoading,
         error,
         user,
-        signinUser
+        signinUser,
+        recentTransact
     }
 
 

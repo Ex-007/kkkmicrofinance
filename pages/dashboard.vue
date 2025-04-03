@@ -37,6 +37,7 @@
 
               <!-- LOAN INFORMATION -->
                <div class="loanInformation">
+                <h1>Loan Information</h1>
                 <div class="steps">
                     <div class="step">
                         <h3>Amount Collected</h3>
@@ -69,49 +70,18 @@
                 <div class="recentTrx">
                     <h1>Recent Transactions</h1>
                     <div class="transactions">
-                        <div class="paymentAndDate">
-                            <h2>Deposit</h2>
-                            <p>12/12/2024</p>
-                        </div>
-                        <div class="amount">
-                            <h3>$ 350</h3>
-                        </div>
-                    </div>
-                    <div class="transactions">
-                        <div class="paymentAndDate">
-                            <h2>Deposit</h2>
-                            <p>18/12/2024</p>
-                        </div>
-                        <div class="amount">
-                            <h3>$ 400</h3>
+                        <div v-for="(details, index) in customer.recentTransact" :key="index" class="typeDate">
+                            <div class="paymentAndDate">
+                                <h2>{{ details.type }}</h2>
+                                <p>{{ formatDate(details.date) }} <span>{{ formatTime(details.date) }}</span></p>
+                            </div>
+                            <div class="amount">
+                                <h3>{{ formatCurrency(details.amount) }}</h3> 
+                            </div>
                         </div>
                     </div>
-                    <div class="transactions">
-                        <div class="paymentAndDate">
-                            <h2>Deposit</h2>
-                            <p>2/1/2025</p>
-                        </div>
-                        <div class="amount">
-                            <h3>$ 250</h3>
-                        </div>
-                    </div>
-                    <div class="transactions">
-                        <div class="paymentAndDate">
-                            <h2>Loan Disbursed</h2>
-                            <p>25/2/2025</p>
-                        </div>
-                        <div class="amount">
-                            <h3>$ 5000</h3>
-                        </div>
-                    </div>
-                    <div class="transactions">
-                        <div class="paymentAndDate">
-                            <h2>Loan Repayment</h2>
-                            <p>25/3/2025</p>
-                        </div>
-                        <div class="amount">
-                            <h3>$ 750</h3>
-                        </div>
+                    <div v-if="customer.recentTransact.length === 0">
+                        <h2>No recent transactions available.</h2>
                     </div>
                 </div>
         </div>
@@ -210,7 +180,7 @@ const attachSearchDetails = async () => {
     cusInfo.value.transactionHistory = customer.user.transactionHistory
     cusInfo.value.loansRecord = customer.user.loansRecord
     cusInfo.value.createdAt = customer.user.created_at
-    cusInfo.value.createdAt = customer.user.accountBalance
+    cusInfo.value.accountBalance = customer.user.accountBalance
 
 }
 
@@ -221,6 +191,20 @@ const formatCurrency = (amount) => {
         currency: 'NGN',
     }).format(amount);
 };
+
+// FORMAT DATE AND TIME
+const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-GB'); // Format: DD/MM/YYYY
+};
+
+const formatTime = (dateString) => {
+    return new Date(dateString).toLocaleTimeString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+};
+
 
 const ineligible = ref('')
 const noteligible = ref(false)
@@ -270,7 +254,7 @@ const requestLoan = () => {
 //     }
 // };
 
-
+// DISPLAY RECENT TRANSACTIONS
 
 
 
@@ -419,6 +403,9 @@ onMounted(async () => {
     .step h3{
         font-size: 20px;
     }
+    .loanInformation h1{
+        font-size: 25px;
+    }
   }
 
     /* TRANSACTIONS HISTORY */
@@ -429,9 +416,17 @@ onMounted(async () => {
     .transactions{
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        flex-direction: column;
+        margin: 5px 0;
+        gap: 10px;
+    }
+    .typeDate{
+        display: flex;
+        justify-content: space-between;
+        /* align-items: center; */
         margin: 5px 0;
         border-bottom: 4px solid white;
+        gap: 10px;
     }
     .transactions h2{
         font-size: 20px;
@@ -445,6 +440,10 @@ onMounted(async () => {
         color: white;
     }
     .recentTrx h1{
+        text-align: center;
+        color: white;
+    }
+    .loanInformation h1{
         text-align: center;
         color: white;
     }

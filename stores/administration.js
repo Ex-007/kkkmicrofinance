@@ -166,6 +166,8 @@ export const useAdminStore = defineStore('admin', () => {
         }
      }
 
+     
+    // ACCOUNT UPDATE
     //  DEPOSIT MONEY
     const depositMoney = async(userIdentification, accountBalance, depositAmount, type) => {
         // console.log(userIdentification, accountBalance, depositAmount, type)
@@ -196,14 +198,37 @@ export const useAdminStore = defineStore('admin', () => {
         }
     }
 
-
     //  WITHDRAW MONEY
-    const withdrawMoney = async(depositAmount) => {
+    const withdrawMoney = async(userIdentification, accountBalance, withdrawAmount, type) => {
+        isLoading.value = true
+        error.value = null
+        const client = useSupabaseClient()
+        try {
+            if(withdrawAmount <= 0){
+                error.value = 'Withdrawal amount must be greater than 0'
+                isLoading.value = false
+                return
+            }
+            let newBalance = accountBalance - withdrawAmount
 
+            const {data:depositData, error:depositError} = await client
+            .from('REGISTEREDUSERS')
+            .update({accountBalance: newBalance})
+            .eq('reg_identity', userIdentification)
+
+            if(depositError) throw depositError
+
+            await updateWithdrawTransHistory(userIdentification, withdrawAmount, type)
+        } catch (err) {
+            error.value = err.message
+            console.log(err.message)
+        }finally{
+            isLoading.value = false
+        }
     }
 
     // UPDATE TRANSACTION hISTORY
-    const updateCustomerTransHistory = async(userIdentification, accountBalance, depositAmount, type) => {
+    const updateCustomerTransHistory = async(userIdentification, depositAmount, type) => {
         isLoading.value = true
         error.value = null
         const client = useSupabaseClient()
@@ -244,6 +269,47 @@ export const useAdminStore = defineStore('admin', () => {
         }
     }
 
+    const updateWithdrawTransHistory = async(userIdentification, withdrawAmount, type) => {
+        isLoading.value = true
+        error.value = null
+        const client = useSupabaseClient()
+        try {
+            const {data:historyData, error:historyError} = await client
+            .from('REGISTEREDUSERS')
+            .select('transactionHistory')
+            .eq('reg_identity', userIdentification)
+            .single()
+
+            if(historyError) throw historyError
+            const metadataUpdate = historyData.transactionHistory || {}
+            if(!metadataUpdate.payments){
+                metadataUpdate.payments = []
+            }
+
+            const newTransactionHistory = {
+                amount: withdrawAmount,
+                date: new Date().toISOString(),
+                type: type,
+            }
+
+            metadataUpdate.payments.push(newTransactionHistory)
+
+            const {data: lastData, error: lastError} = await client
+            .from('REGISTEREDUSERS')
+            .update({
+                transactionHistory: metadataUpdate
+            })
+            .eq('reg_identity', userIdentification)
+
+            if(lastError) throw lastError
+            return lastData
+        } catch (err) {
+            error.value = err.message
+        }finally{
+            isLoading.value = false
+        }
+    }
+
 
 
 
@@ -259,7 +325,6 @@ export const useAdminStore = defineStore('admin', () => {
 
     // LOAN REQUESTS
 
-    // ACCOUNT UPDATE
 
 
 

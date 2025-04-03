@@ -196,7 +196,7 @@
               <div class="logRegistrationId" v-if="withdrawBox">
                 <h3>Withdraw Money</h3>
                 <input type="number" class="contactInput" placeholder="Enter Amount to Withdraw" min="0" oninput="this.value = Math.abs(this.value)" v-model="withdrawAmount">
-                <p v-if="withdrawV.pop">{{ withrawV.message }}</p>
+                <p v-if="withdrawV.pop">{{ withdrawV.message }}</p>
                 <button @click="makeWithdraw">Withdraw</button>
               </div>
             </div>
@@ -417,6 +417,7 @@ const openWithdraw = () => {
   withdrawBox.value = true
 }
 
+
 // DEPOSITING AND WITHDRAWING FUNCTION
 // MAKE DEPOSIT
 const depositAmount = ref('')
@@ -440,7 +441,6 @@ const makeDeposit = async () => {
     depositV.value.pop = false
   }, 2000);
 }
-
 // MAKE WITHDRAW
 const withdrawAmount = ref('')
 const withdrawV = ref({
@@ -453,9 +453,22 @@ const makeWithdraw = async () => {
     withdrawV.value.message = 'Amount cannot be lower than 0'
     return
   }
-  withdrawV.value.pop = false
 
-  console.log('Withdrawing...', withdrawAmount.value)
+  if(withdrawAmount.value > searchView.value.accountBalance){
+    withdrawV.value.pop = true
+    withdrawV.value.message = 'Insufficient Balance'
+    return
+  }
+  
+  withdrawV.value.pop = false
+  const type = 'withdraw'
+  await admin.withdrawMoney(searchView.value.reg_identity, searchView.value.accountBalance, withdrawAmount.value, type)
+  withdrawV.value.pop = true
+  withdrawV.value.message = `Withdraw of ${formatCurrency(withdrawAmount.value)} Successfully Made`
+  withdrawAmount.value = ''
+  setTimeout(() => {
+    withdrawV.value.pop = false
+  }, 2000);
 }
 
 
