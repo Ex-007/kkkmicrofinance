@@ -155,7 +155,51 @@
 
         <!-- LOAN REQUESTS -->
         <section v-if="activeTab === 'loanRequests'">
-          <div class="transactionDet">
+          <div class="newly">
+              <!-- <h1>Registered Students</h1> -->
+              <div class="left listFormStudents">
+                <ul>
+                  <li
+                  v-for="users in admin.loanRequests" :key="users.id"
+                  @click="fetchMainLoan(users.id)"
+                  class="user-item"
+                  :class="{active:admin.selectedLoan?.id === users.id}">
+                  <span>{{ users.surname + " " + users.firstname + " " + users.middlename }}</span>
+                  <small>{{ new Date(users.created_at).toLocaleDateString() }}</small>
+                </li>
+                </ul>
+              </div>
+              <div class="right user-details" v-if="admin.selectedLoan">
+                <ul>
+                    <h1>lOAN Details</h1>
+                    <li>Registration ID: {{ admin.selectedLoan.registrationId }}</li>
+                    <li>Surname: {{ admin.selectedLoan.surname }}</li>
+                    <li>Firstname: {{ admin.selectedLoan.firstname }}</li>
+                    <li>Middlename: {{ admin.selectedLoan.middlename }}</li>
+                    <li>Occupation: {{ admin.selectedLoan.occupation }}</li>
+                    <li>Address: {{ admin.selectedLoan.address }}</li>
+                    <li>Email: {{ admin.selectedLoan.email }}</li>
+                    <li>Position: {{ admin.selectedLoan.position }}</li>
+                    <li>Home Town: {{ admin.selectedLoan.phone }}</li>
+                    <li>Phone: {{ admin.selectedLoan.businessAddress }}</li>
+                    <li>Employer's Name: {{ admin.selectedLoan.employerName }}</li>
+                    <li>Employer's Phone Number: {{ admin.selectedLoan.employerPhone }}</li>
+                    <li>Loan Amount: {{ admin.selectedLoan.loanAmount }}</li>
+                    <li>Loan Period: {{ admin.selectedLoan.loanPeriod }}</li>
+                    <li>Amount in Words: {{ admin.selectedLoan.amountInWords }}</li>
+                    <li>Loan Purpose: {{ admin.selectedLoan.loanPurpose }}</li>
+                    <li>Loan Status: {{ admin.selectedLoan.status }}</li>
+                    <div class="imagePassport">
+                      <img :src="admin.selectedLoan.guarantor" alt="Passport" class="profilePicture" />
+                    </div>
+                    <p>{{ statusMessage }}</p>
+                    <div class="appD">
+                      <button @click="loanApproval(admin.selectedLoan.registrationId)" :disabled="admin.isLoading">{{admin.isLoading ? 'Approving' : "Approve"}}</button>
+                      <button @click="loanDisapproval(admin.selectedLoan.registrationId)" :disabled="admin.isLoading">{{admin.isLoading ? 'Disapproving' : "Disapprove"}}</button>
+                    </div>
+
+                </ul>
+              </div>
           </div>
         </section>
 
@@ -222,7 +266,7 @@
     // definePageMeta({
     //   middleware: [auth]
     // })
-    const activeTab = ref('accountUpdate');
+    const activeTab = ref('loanRequests');
     // const activeTab = ref('home');
     
     // GENERATE REGISTRATION ID
@@ -266,6 +310,7 @@
       display: false,
       message: ''
     })
+
     // SAVE REG ID
     const saveReg = async () => {
       if(customerRegInfo.value.registrationID == '' || customerRegInfo.value.firstname == '' || customerRegInfo.value.lastname == '' || customerRegInfo.value.email == '' || customerRegInfo.value.phoneNumber == ''){
@@ -471,7 +516,31 @@ const makeWithdraw = async () => {
   }, 2000);
 }
 
+// LOAN REQUESTS
+  // LIST AND FETCH INDIVIDUAL FORM REGISTERED By MEMBERS
+  const fetchMainLoan = async (formId) => {
+    if(formId === null || formId === undefined) return
+    admin.selectLoan(formId)
+  }
 
+  const statusMessage = ref('')
+  // LOAN APPROVAL
+  const loanApproval = (regId) => {
+    admin.approveLoan(regId)
+    statusMessage.value = 'Loan Approved'
+    setTimeout(() => {
+      statusMessage.value = ''
+    }, 2000);
+  }
+
+  // LOAN DISAPPROVAL
+  const loanDisapproval = (regId) => {
+    admin.disapproveLoan(regId)
+    statusMessage.value = 'Loan Rejected'
+    setTimeout(() => {
+      statusMessage.value = ''
+    }, 2000);
+  }
 
 
 
@@ -492,6 +561,7 @@ const makeWithdraw = async () => {
 
 onMounted(async () => {
   await admin.fetchRegistered()
+  await admin.viewLoanRequests()
 })
 
 
@@ -559,6 +629,12 @@ onMounted(async () => {
         width: 100%;
         display: flex;
         flex-direction: column;
+    }
+    .right{
+      font-size: 15px;
+    }
+    .right li{
+      font-size: 13px;
     }
   }
   .generateId{
@@ -781,6 +857,24 @@ input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-o
 input[type="number"]{
   -moz-appearance: textfield;
 
+}
+
+/* APPROVE AND DISAPPROVE BUTTON */
+.appD{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+.appD button{
+  padding: 5px;
+  border-radius: 15px;
+  cursor: pointer;
+  background-color: #0c3084;
+  color: white;
+  border: none;
+  width: 150px;
+  height: 30px;
 }
 
 </style>

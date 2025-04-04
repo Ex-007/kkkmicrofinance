@@ -7,6 +7,8 @@ export const useAdminStore = defineStore('admin', () => {
     const searchingData = ref(null)
     const selectedUser = ref(null)
     const registeredCustomers = ref([])
+    const loanRequests = ref([])
+    const selectedLoan = ref(null)
     const userBalance = ref(null)
 
 
@@ -311,8 +313,92 @@ export const useAdminStore = defineStore('admin', () => {
     }
 
     // DISPLAY LOAN REQUESTS
-    const viewLoanRequests = () => {
-        
+    const viewLoanRequests = async () => {
+        isLoading.value = false
+        error.value = null
+        const client = useSupabaseClient()
+        try {
+            const {data:fetchData, error:fetchError} = await client
+            .from('LOANREQUESTS')
+            .select('id, firstname, middlename, surname, created_at')
+            .order('created_at', {
+                ascending: false
+            })
+
+            if(fetchError) throw fetchError
+            loanRequests.value = fetchData
+        } catch (err) {
+            error.value = err.message
+        }finally{
+            isLoading.value = false
+        }
+    }
+
+     //SEARCH SELECTED USERS
+     const selectLoan = async(userId) => {
+        const client = useSupabaseClient()
+        try {
+            
+            if(selectedUser.value && selectedUser.value?.id === 'userId'){
+                selectedUser.value = null
+                return
+            }
+            const {data:formData, error:formError} = await client
+            .from('LOANREQUESTS')
+            .select('*')
+            .eq('id', userId)
+            .single()
+
+            if(formError) throw formError
+            selectedLoan.value = formData
+
+        } catch (err) {
+            error.value = err.message
+        }
+     }
+
+    //  LOAN APPROVAL
+    const approveLoan = async(regId) => {
+        isLoading.value = false
+        error.value = null
+        const client = useSupabaseClient()
+        try {
+            const {data:approvalData, error:approvalError} = await client
+            .from('LOANREQUESTS')
+            .update({
+                status : 'APPROVED'
+            })
+            .eq('registrationId', regId)
+
+            if(approvalError) throw approvalError
+        } catch (err) {
+            error.value = err.message
+            console.log(err.message)
+        }finally{
+            isLoading.value = false
+        }
+    }
+
+    //  LOAN APPROVAL
+    const disapproveLoan = async(regId) => {
+        isLoading.value = false
+        error.value = null
+        const client = useSupabaseClient()
+        try {
+            const {data:disapprovalData, error:disapprovalError} = await client
+            .from('LOANREQUESTS')
+            .update({
+                status : 'REJECTED'
+            })
+            .eq('registrationId', regId)
+
+            if(disapprovalError) throw disapprovalError
+        } catch (err) {
+            error.value = err.message
+            console.log(err.message)
+        }finally{
+            isLoading.value = false
+        }
     }
 
 
@@ -346,6 +432,12 @@ export const useAdminStore = defineStore('admin', () => {
         selectUser,
         fetchRegistered,
         withdrawMoney,
-        depositMoney
+        depositMoney,
+        loanRequests,
+        viewLoanRequests,
+        selectedLoan,
+        selectLoan,
+        approveLoan,
+        disapproveLoan
     }
 })

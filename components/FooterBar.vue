@@ -4,7 +4,7 @@
         <!-- Logo & About -->
         <div class="footer-section">
           <h2 class="logo">Kodun Kopo Kope</h2>
-          <p>...Your Trusted Microfinance Bank for Savings, Loans and Easy Transactions.</p>
+          <p>...Your Trusted Cooperative Bank for Savings, Loans and Easy Transactions.</p>
         </div>
   
         <!-- Quick Links -->

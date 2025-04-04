@@ -25,7 +25,7 @@
                          <li><nuxt-link to="/transHistory">Transaction History</nuxt-link></li>
                          <li>Loan Status</li>
                          <li><nuxt-link to="/customer-support">Customer Support</nuxt-link></li>
-                         <li>Logout</li>
+                         <li @click="logout">{{customer.isLoading ? 'exiting' : 'logout'}}</li>
                          <li class="closeMenu" @click="closeMenu"><i class="fa fa-times"></i></li>
                      </ul>
                   </div>
@@ -331,6 +331,16 @@ watch(() => customer.imageUploaded, (newVal) => {
         passportPreviewUrl.value = ''
         openLoanModal.value = false
         submitLoanInput.value = false
+    }
+});
+
+// LOGOUT CUSTOMER
+const logout = () => {
+    customer.logOut()
+}
+watch(() => customer.canOut, (newVal) => {
+    if (newVal) {
+        router.push('/')
     }
 });
 

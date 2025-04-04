@@ -8,6 +8,7 @@ export const useCustomerStore = defineStore('customerPro', () => {
     const isBypass = ref(false)
     const imageUploaded = ref(false)
     const recentTransact = ref([])
+    const overallTransact = ref([])
 
     // FETCH THE SIGNED IN USER
     const signinUser = async () => {
@@ -35,6 +36,7 @@ export const useCustomerStore = defineStore('customerPro', () => {
                 let loggedEmail = loggedUserData.user.email
                 await fetchDetails(loggedEmail)
                 await recentTransactions(loggedEmail)
+                await allTransactions(loggedEmail)
                 // console.log(loggedUserData.user.email)
                 return loggedUserData.user
             } else {
@@ -110,6 +112,30 @@ export const useCustomerStore = defineStore('customerPro', () => {
         } catch (err) {
             error.value = err.message
             console.log(err.message)
+        }finally{
+            isLoading.value = false
+        }
+    }
+
+    // DISPLAY RECENT TRANSACTIONS
+    const allTransactions = async(loggedEmail) => {
+        isLoading.value = true
+        error.value = null
+        const client = useSupabaseClient()
+        try {
+            const { data: historyData, error: historyError } = await client
+            .from("REGISTEREDUSERS")
+            .select("transactionHistory")
+            .eq("email", loggedEmail)
+            .single();
+
+            if (historyError) throw historyError;
+
+            overallTransact.value = historyData.transactionHistory?.payments || [];
+            
+            return historyData; 
+        } catch (err) {
+            error.value = err.message
         }finally{
             isLoading.value = false
         }
@@ -213,7 +239,12 @@ export const useCustomerStore = defineStore('customerPro', () => {
         recentTransact,
         setGuarantorPhoto,
         imageUploaded,
-        uploadGuarantorImage
+        uploadGuarantorImage,
+        allTransactions,
+        overallTransact,
+        isBypass,
+        canOut,
+        logOut
     }
 
 

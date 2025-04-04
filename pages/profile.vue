@@ -118,7 +118,7 @@ onMounted(async () => {
     .page{
         display: flex;
         justify-content: center;
-        align-items: center;
+        /* align-items: center;  */
         flex-direction: column;
         gap: 10px;
         background-color: #6897a7;
@@ -129,25 +129,16 @@ onMounted(async () => {
         color: white;
     }
 
-    h2{
-        color: white;
-        text-align: center;
-        text-align-last: center;
-        text-align-last: center;
-    }
-
 @media (max-width: 768px){
-    h2{
+    h3{
         color: white;
-        text-align: center;
-        text-align-last: center;
-        font-size: 17px;
-        text-align-last: center;
+        font-size: 14px;
     }
 }
 .imageDiv img{
     display: flex;
     justify-content: center;
+    align-items: center;
     width: 150px;
     border-radius: 20px;
 }
