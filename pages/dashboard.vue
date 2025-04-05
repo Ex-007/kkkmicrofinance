@@ -23,7 +23,7 @@
                      <ul>
                          <li><nuxt-link to="/profile">Profile</nuxt-link></li>
                          <li><nuxt-link to="/transHistory">Transaction History</nuxt-link></li>
-                         <li>Loan Status</li>
+                         <li><nuxt-link to="/loan-status">Loans</nuxt-link></li>
                          <li><nuxt-link to="/customer-support">Customer Support</nuxt-link></li>
                          <li @click="logout">{{customer.isLoading ? 'exiting' : 'logout'}}</li>
                          <li class="closeMenu" @click="closeMenu"><i class="fa fa-times"></i></li>
