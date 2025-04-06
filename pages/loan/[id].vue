@@ -66,6 +66,13 @@
                 <input type="text" id="loanAmount" class="contactInput" v-model="loanDetails.loanAmount"
                     required readonly>
 
+                <!--  LOAN TYPE -->
+                <label for="loanType">Loan Type:</label>
+                <select id="loanType" required class="contactInput" v-model="loanDetails.loanType" @change="checkLoanType">
+                    <option>Soft Loan</option>
+                    <option>Main Loan</option>
+                </select>
+
                 <!--  LOAN PERIOD -->
                 <label for="loanPeriod">Loan Period:</label>
                 <select id="loanPeriod" class="contactInput" v-model="loanDetails.loanPeriod" required>
@@ -306,7 +313,8 @@
         loanPeriod: '',
         amountInWords: '',
         loanPurpose: '',
-        accountBalance : ''
+        accountBalance : '',
+        loanType : ''
     })
 
     // FETCH SIGNED IN USER DETAILS AND ATTACH TO THE FORM
@@ -323,13 +331,23 @@
         loanDetails.value.accountBalance = loan.userDetails.accountBalance
     }
 
-    // ENTITLED AMOUNT
-    const available = async () => {
-        const loanable = loanDetails.value.accountBalance * 3
-        const mainValue = formatCurrency(loanable)
-        loanDetails.value.loanAmount = mainValue
-    }
+    // CHECK LOAN TYPE
+    const checkLoanType = async () => {
+        if(loanDetails.value.loanType == 'Soft Loan'){
+            const loanable = loanDetails.value.accountBalance * 0.6
+            const mainValue = formatCurrency(loanable)
+            loanDetails.value.loanAmount = mainValue
 
+            const wordAmount = numberToWords(loanable)
+            loanDetails.value.amountInWords = wordAmount
+        }else if(loanDetails.value.loanType == 'Main Loan'){
+            const loanable = loanDetails.value.accountBalance * 3
+            const mainValue = formatCurrency(loanable)
+            loanDetails.value.loanAmount = mainValue
+            const wordAmount = numberToWords(loanable)
+            loanDetails.value.amountInWords = wordAmount
+        }
+    }
     // FORMAT THE CURRENCY
     const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
@@ -557,8 +575,8 @@ const goToHome = () => {
 onMounted(async () => {
     await loan.signinUser()
     await attachDetails()
-    await available()
-    await amountToWords()
+    await checkLoanType()
+    // await amountToWords()
 })
 
 

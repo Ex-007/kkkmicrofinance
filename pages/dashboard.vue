@@ -290,7 +290,6 @@ const requestLoan = () => {
 
     if (differenceInDays >= requiredDays) {
         openLoanModal.value = true
-        // router.push('/loan-application')
     } else {
         let daysRemaining = Math.ceil(requiredDays - differenceInDays);
         noteligible.value = true
