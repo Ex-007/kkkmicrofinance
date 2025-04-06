@@ -75,9 +75,9 @@
     import{useCustomerStore} from '@/stores/customerProfile'
     const customer = useCustomerStore()
 
-    const currentShow = ref(false)
+    const currentShow = ref(true)
     const repayShow = ref(false)
-    const loanHisShow = ref(true)
+    const loanHisShow = ref(false)
 
     const currentL = () => {
         currentShow.value = true
@@ -169,6 +169,9 @@ onMounted(async () => {
     }
     @media (max-width: 768px) {
         .loanHisDisplay h3{
+            font-size: 13px;
+        }
+        .byMonths h3{
             font-size: 13px;
         }
     }

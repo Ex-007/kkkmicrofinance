@@ -22,6 +22,7 @@
                   <div class="menuP" v-if="menuItem">
                      <ul>
                          <li><nuxt-link to="/profile">Profile</nuxt-link></li>
+                         <li @click="openAccount">Accounts</li>
                          <li><nuxt-link to="/transHistory">Transaction History</nuxt-link></li>
                          <li><nuxt-link to="/loan-status">Loans</nuxt-link></li>
                          <li><nuxt-link to="/customer-support">Customer Support</nuxt-link></li>
@@ -30,6 +31,23 @@
                      </ul>
                   </div>
               </transition>
+
+              <!-- OTHER ACCOUNTS -->
+              <transition name="fade">
+                  <div class="loanPop" v-if="account">
+                    <div class="separate">
+                        <h3>Accounts</h3>
+                        <p class="closeLoanInput" @click="closeAccount"><i class="fa fa-times"></i></p>
+                    </div>
+                    <div class="current">
+                        <h3>Saving: {{ formatCurrency(cusInfo.accountBalance) }}</h3>
+                        <h3>Investments: {{ formatCurrency(cusInfo.accountBalance) }}</h3>
+                        <h3>Shares: {{ formatCurrency(cusInfo.accountBalance) }}</h3>
+                    </div>
+                  </div>
+              </transition>
+
+              
 
               <!-- LOAN APPLICATION POPUP -->
              <transition name="fade">
@@ -344,8 +362,15 @@ watch(() => customer.canOut, (newVal) => {
     }
 });
 
+// OPEN AND CLOSE ACCOUNTS
+const account = ref(false)
 
-
+const openAccount = () => {
+    account.value = true
+}
+const closeAccount = () => {
+    account.value = false
+}
 
 
 
@@ -492,6 +517,9 @@ onMounted(async () => {
     }
     .loanInformation h1{
         font-size: 25px;
+    }
+    .current{
+        font-size: 13px;
     }
   }
 
@@ -647,6 +675,26 @@ onMounted(async () => {
         padding: 5px;
         display: inline-block;
         border-radius: 4px;
+    }
+        .current{
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        gap: 10px;
+        background-color: #37a187;
+        margin: 5px;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: inset 10px 6px 50px rgb(30, 39, 95);
+        color: white;
+    }
+
+    .separate{
+        display: flex;
+        justify-content: space-between;
+        gap: 100px;
+        color: white;
+        /* align-items: center; */
     }
 
 
