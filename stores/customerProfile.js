@@ -9,6 +9,8 @@ export const useCustomerStore = defineStore('customerPro', () => {
     const imageUploaded = ref(false)
     const recentTransact = ref([])
     const overallTransact = ref([])
+    const allLoans = ref([])
+    const mostRecentLoan = ref(null)
 
     // FETCH THE SIGNED IN USER
     const signinUser = async () => {
@@ -37,6 +39,8 @@ export const useCustomerStore = defineStore('customerPro', () => {
                 await fetchDetails(loggedEmail)
                 await recentTransactions(loggedEmail)
                 await allTransactions(loggedEmail)
+                await fetchMostRecentLoan(loggedEmail)
+                await fetchAllLoans(loggedEmail)
                 // console.log(loggedUserData.user.email)
                 return loggedUserData.user
             } else {
@@ -206,7 +210,51 @@ export const useCustomerStore = defineStore('customerPro', () => {
     
     }
 
+    // FETCH ALL LOANS
+    const fetchAllLoans = async (regEmail) => {
+        isLoading.value = true
+        error.value = null
+        const client = useSupabaseClient()
+        try {
+            const {data:allLoanData, error:allLoanError} = await client
+            .from('LOANREQUESTS')
+            .select('*')
+            .eq('email', regEmail)
 
+            if(allLoanError) throw allLoanError
+            allLoans.value = allLoanData
+        } catch (err) {
+            error.value = err.message
+            console.log(err.message)
+        } finally{
+            isLoading.value = false
+        }
+    }
+
+    // FETCH THE CURRENT LOAN
+    const fetchMostRecentLoan = async (regEmail) => {  
+        isLoading.value = true  
+        error.value = null  
+        const client = useSupabaseClient()  
+        try {  
+            const { data: recentLoanData, error: recentLoanError } = await client  
+                .from('LOANREQUESTS')  
+                .select('*')  
+                .eq('email', regEmail)  
+                .order('created_at', { ascending: false })  
+                .limit(1)
+        
+            if (recentLoanError) throw recentLoanError  
+            if (recentLoanData.length === 0) {  
+                throw new Error('No loan data found for the provided email.')  
+            }
+            mostRecentLoan.value = recentLoanData[0]
+        } catch (err) {  
+            error.value = err.message   
+        } finally {  
+            isLoading.value = false  
+        }  
+    }  
 
 
 
@@ -244,7 +292,9 @@ export const useCustomerStore = defineStore('customerPro', () => {
         overallTransact,
         isBypass,
         canOut,
-        logOut
+        logOut,
+        allLoans,
+        mostRecentLoan
     }
 
 

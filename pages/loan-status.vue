@@ -12,11 +12,13 @@
                 <div class="header">
                     <h3>Current Loan</h3>
                 </div>
-                <h3>Principal Amount: #59,000</h3>
-                <h3>Total Payback + Interest: #68,000</h3>
-                <h3>Interest: 2%</h3>
-                <h3>Total Payback Interest: #5,000</h3>
-                <h3>Repayment Period: 3 months</h3>
+                <div class="loanHisDisplay">
+                    <h3>Date : {{ formatDate(customer.mostRecentLoan.created_at) }}</h3>
+                    <h3>Amount : {{ customer.mostRecentLoan.loanAmount }}</h3>
+                    <h3>Amount in Words : {{ customer.mostRecentLoan.amountInWords }}</h3>
+                    <h3>Loan Period : {{ customer.mostRecentLoan.loanPeriod }}</h3>
+                    <h3>Loan Purpose : {{ customer.mostRecentLoan.loanPurpose }}</h3>
+                </div>
             </div>
         </div>
 
@@ -51,16 +53,31 @@
 
         <!-- LOAN HISTORY -->
         <div class="loanHistory" v-if="loanHisShow">
-            <h1>This is the Loan History</h1>
+            <div class="current">
+                <div class="header">
+                    <h3>Loan History</h3>
+                </div>
+                <div class="loanHisDisplay" v-for="(loans, index) in customer.allLoans" :key="index">
+                    <h3>Date : {{ formatDate(loans.created_at) }}</h3>
+                    <h3>Amount : {{ loans.loanAmount }}</h3>
+                    <h3>Amount in Words : {{ loans.amountInWords }}</h3>
+                    <h3>Loan Period : {{ loans.loanPeriod }}</h3>
+                    <h3>Loan Purpose : {{ loans.loanPurpose }}</h3>
+                    <h3>Status : {{ loans.status }}</h3>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup>
 
+    import{useCustomerStore} from '@/stores/customerProfile'
+    const customer = useCustomerStore()
+
     const currentShow = ref(false)
-    const repayShow = ref(true)
-    const loanHisShow = ref(false)
+    const repayShow = ref(false)
+    const loanHisShow = ref(true)
 
     const currentL = () => {
         currentShow.value = true
@@ -79,6 +96,14 @@
         repayShow.value = false
         loanHisShow.value = true
     }
+
+    // FORMAT DATE AND TIME
+const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-GB'); // Format: DD/MM/YYYY
+};
+onMounted(async () => {
+    await customer.signinUser()
+})
 
 </script>
 
@@ -129,5 +154,22 @@
         border-radius: 10px;
         box-shadow: inset 10px 6px 50px rgb(30, 39, 95);
         color: white;
+    }
+    .loanHisDisplay{
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        gap: 10px;
+        background-color: #37a187;
+        margin: 5px;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: inset 10px 6px 50px rgb(30, 39, 95);
+        color: white;
+    }
+    @media (max-width: 768px) {
+        .loanHisDisplay h3{
+            font-size: 13px;
+        }
     }
 </style>
