@@ -47,6 +47,14 @@
                 <label for="phone">Phone Number:</label>
                 <input type="text" id="phone" class="contactInput" v-model="loanDetails.phone" required readonly>
 
+                
+                <!--  LOAN TYPE -->
+                <label for="loanType">Loan Type:</label>
+                <select id="loanType" required class="contactInput" v-model="loanDetails.loanType" @change="checkLoanType">
+                    <option>Soft Loan</option>
+                    <option>Main Loan</option>
+                </select>
+
                 <!-- EMPLOYER'S NAME -->
                 <label for="employersName">Employer's name/Business:</label>
                 <input type="text" id="employersName" class="contactInput" v-model="loanDetails.employerName" required readonly>
@@ -66,20 +74,10 @@
                 <input type="text" id="loanAmount" class="contactInput" v-model="loanDetails.loanAmount"
                     required readonly>
 
-                <!--  LOAN TYPE -->
-                <label for="loanType">Loan Type:</label>
-                <select id="loanType" required class="contactInput" v-model="loanDetails.loanType" @change="checkLoanType">
-                    <option>Soft Loan</option>
-                    <option>Main Loan</option>
-                </select>
-
                 <!--  LOAN PERIOD -->
                 <label for="loanPeriod">Loan Period:</label>
-                <select id="loanPeriod" class="contactInput" v-model="loanDetails.loanPeriod" required>
-                    <option>3 Months</option>
-                    <option>6 Months</option>
-                    <option>9 Months</option>
-                </select>
+                <input type="text" id="loanPeriod" class="contactInput" v-model="loanDetails.loanPeriod"
+                    required readonly>
 
                 <!--  AMOUNT IN WORDS -->
                 <label for="amountInWords">Amount in Words:</label>
@@ -103,28 +101,25 @@
                     <h2>Guarantor's Details</h2>
                     <h3>First Guarantor</h3><br>
                     <label>Guarantor's Name</label>
-                    <p>________________________________________________</p><br>
+                    <p>_______________________________</p><br>
                     <label>Guarantor's Address</label>
-                    <p>________________________________________________</p><br>
+                    <p>_______________________________</p><br>
                     <label>Guarantor's Phone Number</label>
-                    <p>________________________________________________</p><br>
+                    <p>_______________________________</p><br>
                     <label>Guarantor's Signature & Date</label>
-                    <p>________________________________________________</p><br>
+                    <p>_______________________________</p><br>
                     <br><br>
                     <h3>Second Guarantor</h3>
                     <label>Guarantor's Name</label>
-                    <p>________________________________________________</p><br>
+                    <p>_______________________________</p><br>
                     <label>Guarantor's Address</label>
-                    <p>________________________________________________</p><br>
+                    <p>_______________________________</p><br>
                     <label>Guarantor's Phone Number</label>
-                    <p>________________________________________________</p><br>
+                    <p>_______________________________</p><br>
                     <label>Guarantor's Signature & Date</label>
-                    <p>________________________________________________</p>
+                    <p>_______________________________</p>
                  </div>
             </div>
-
-
-            
 
             <div class="stepA buttonSign">
                 <h5 v-if="noInput" class="error-message">{{ errorMessage }}</h5>
@@ -179,6 +174,10 @@
                         <div class="info-row">
                             <div class="info-label">Phone Number:</div>
                             <div class="info-value">{{ loanDetails.phone }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Loan Type:</div>
+                            <div class="info-value">{{ loanDetails.loanType }}</div>
                         </div>
                         <div class="info-row">
                             <div class="info-label">Employer's name/Business:</div>
@@ -337,8 +336,9 @@
             const loanable = loanDetails.value.accountBalance * 0.6
             const mainValue = formatCurrency(loanable)
             loanDetails.value.loanAmount = mainValue
-
             const wordAmount = numberToWords(loanable)
+            const duration = '3 Months'
+            loanDetails.value.loanPeriod = duration
             loanDetails.value.amountInWords = wordAmount
         }else if(loanDetails.value.loanType == 'Main Loan'){
             const loanable = loanDetails.value.accountBalance * 3
@@ -346,6 +346,8 @@
             loanDetails.value.loanAmount = mainValue
             const wordAmount = numberToWords(loanable)
             loanDetails.value.amountInWords = wordAmount
+            const duration = '6 Months'
+            loanDetails.value.loanPeriod = duration
         }
     }
     // FORMAT THE CURRENCY
