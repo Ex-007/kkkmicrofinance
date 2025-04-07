@@ -47,13 +47,40 @@
                   </div>
               </transition>
 
+              <!-- DEPOSIT ACCOUNTS -->
+              <transition name="fade">
+                  <div class="loanPop depositting" v-if="depositt">
+                    <div class="separate">
+                        <h3>Deposit</h3>
+                        <p class="closeLoanInput" @click="closeDeposit"><i class="fa fa-times"></i></p>
+                    </div>
+                        <button @click="openSaving(saving)">Savings</button>
+                        <button @click="openSaving(investment)">Investments</button>
+                        <button @click="openSaving(shares)">Shares</button>
+                  </div>
+              </transition>
+
+            <!-- DEPOSIT SAVINGS -->
+             <transition name="fade">
+                 <div class="loanPop" v-if="depositor">
+                    <p class="closeLoanInput" @click="closeSaving"><i class="fa fa-times"></i></p>
+                    <p>Please Submit your Deposit Receipt.</p>
+                    <input type="file" class="contactInput" @change="handleDepositPhoto" accept="image/*" required>
+                    <div v-if="depositPreviewUrl" class="preview">
+                        <img :src="depositPreviewUrl" alt="Deposit Preview" width="100" />
+                    </div>
+                    <p>{{ photoUploaded }}</p>
+                    <button @click="uploadApp" :disabled="customer.isLoading">{{customer.isLoading ? 'Uploading...' : 'Upload'}}</button>
+                 </div>
+             </transition>
+
               
 
               <!-- LOAN APPLICATION POPUP -->
              <transition name="fade">
                  <div class="loanPop" v-if="openLoanModal">
                     <p class="closeLoanInput" @click="closeAppSub"><i class="fa fa-times"></i></p>
-                    <button @click="submitLoanApp">Submit Loan Application Form</button>
+                    <button @click="submitLoanApp">Submit Guarantor's Form</button>
                     <button @click="fillLoanApp">Fill Loan Application Form</button>
                  </div>
              </transition>
@@ -62,7 +89,7 @@
              <transition name="fade">
                  <div class="loanPop" v-if="submitLoanInput">
                     <p class="closeLoanInput" @click="closeLoanInput"><i class="fa fa-times"></i></p>
-                    <p>Please Submit The Guarantor's Loan Application Page.</p>
+                    <p>Please Submit The Guarantor's Form.</p>
                     <input type="file" class="contactInput" @change="handlePassportPhoto" accept="image/*" required>
                     <div v-if="passportPreviewUrl" class="preview">
                         <img :src="passportPreviewUrl" alt="Passport Preview" width="100" />
@@ -77,7 +104,7 @@
              <!-- DEPOSIT AND LOAN REQUESTS -->
              <p class="notEligible" v-if="noteligible">{{ ineligible }}</p>
               <div class="depositAndLoanReq">
-                  <button>Deposit</button>
+                  <button @click="depositMoney">Deposit</button>
                 <button @click='requestLoan'>Request Loan</button>
               </div>
 
@@ -375,6 +402,26 @@ const closeAccount = () => {
     account.value = false
 }
 
+const depositt = ref(false)
+
+const depositMoney = () => {
+    depositt.value = true
+}
+
+const closeDeposit = () => {
+    depositt.value = false
+}
+
+
+const depositor = ref(false)
+
+const openSaving = () => {
+    depositor.value = true
+}
+
+const closeSaving = () => {
+    depositor.value = false
+}
 
 
 
@@ -712,6 +759,17 @@ onMounted(async () => {
     .rejectedLoan{
         background-color: red;
         text-align: center;
+    }
+
+    .depositting{
+        border: none;
+        gap: 5px;
+    }
+    .depositting button{
+        border: none;
+        border-radius: 0;
+        width: 100px;
+        cursor: pointer;
     }
 
 
