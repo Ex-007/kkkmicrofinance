@@ -109,7 +109,7 @@
               </div>
 
               <!-- LOAN INFORMATION -->
-               <!-- <div class="loanInformation">
+               <div class="loanInformation">
                     <h1>Current Loan Information</h1>
                     <div class="current" v-if="customer.mostRecentLoan.status == 'APPROVED'">
                 <div class="header">
@@ -131,7 +131,7 @@
                 <h3>Loan Pending...</h3>
             </div>
                    
-               </div> -->
+               </div>
 
 
                <!-- RECENT TRANSACTIONS -->
