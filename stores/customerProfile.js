@@ -13,6 +13,7 @@ export const useCustomerStore = defineStore('customerPro', () => {
     const mostRecentLoan = ref(null)
     const loanRepaymentSchedule = ref([])
     const pendingLoan = ref(false)
+    const depositUpload = ref(false)
 
     // FETCH THE SIGNED IN USER
     const signinUser = async () => {
@@ -246,10 +247,6 @@ export const useCustomerStore = defineStore('customerPro', () => {
                 throw new Error('No loan data found for the provided email.')  
             }
 
-            // if(recentLoanData.status === 'PENDING' || recentLoanData.status === 'REJECTED'){
-            //     return
-            // }
-
             mostRecentLoan.value = recentLoanData[0]
             const principalFetched = recentLoanData[0].loanAmount
             const principal = convertCurrency(principalFetched)
@@ -347,7 +344,73 @@ export const useCustomerStore = defineStore('customerPro', () => {
         return 0;
     }
   
+    // DEPOSIT FILE UPLOAD
+    const deposit = reactive({
+        depositPhoto: null,
+        depositPhotoUrl: null
+    })
+    function setDepositPhoto(file){
+        deposit.depositPhoto = file
+    }
+     // UPLOADING THE FILES
+     const depositFile = async() => {
+        isLoading.value = true
+        error.value = null
+        const client = useSupabaseClient()
 
+        try {
+            const depositPhotoPath = `deposit/${Date.now()}-${deposit.depositPhoto.name}`
+            
+            const {data:depositData, error:depositError} = await client.storage
+            .from('deposits')
+            .upload(depositPhotoPath, deposit.depositPhoto)
+            if(depositError) throw depositError
+
+            const depositUrll = client.storage
+            .from('deposits')
+            .getPublicUrl(depositPhotoPath).data.publicUrl
+
+            deposit.depositPhotoUrl = depositUrll
+
+            return depositUrll
+
+        } catch (err) {
+            console.log(err.message)
+            error.value = err.message
+            throw error
+        } finally{
+            isLoading.value = false
+        }
+    }
+
+    // SAVING THE FILES
+    const uploadDepositFile = async (types) => {
+        isLoading.value = true
+        error.value = null
+        const client = useSupabaseClient()
+        // depositUpload.value = false
+        const registrationId = user.value.reg_identity
+        try {
+            const photoUrl = await depositFile()
+            const {data:upData, error:upError} = await client
+            .from('DEPOSITS')
+            .insert({
+                registrationId: registrationId,
+                depositType: types,
+                depositUrl: photoUrl
+            })
+            .select()
+
+            if(upError) throw upError
+            // depositUpload.value = true
+        } catch (err) {
+            error.value = err.message
+            console.log(err.message)
+        } finally{
+            isLoading.value = false
+        }
+    
+    }
 
 
 
@@ -385,7 +448,10 @@ export const useCustomerStore = defineStore('customerPro', () => {
         logOut,
         allLoans,
         mostRecentLoan,
-        loanRepaymentSchedule
+        loanRepaymentSchedule,
+        setDepositPhoto,
+        depositUpload,
+        uploadDepositFile
     }
 
 

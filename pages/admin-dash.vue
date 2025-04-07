@@ -11,6 +11,7 @@
           <li @click="activeTab = 'searchMember'" :class="{ active: activeTab === 'searchMember' }">🏠 Search Member</li>
           <li @click="activeTab = 'registeredMember'" :class="{ active: activeTab === 'registeredMember' }">📩 Registered Members</li>
           <li @click="activeTab = 'loanRequests'" :class="{ active: activeTab === 'loanRequests' }">👤 Loan Requests</li>
+          <li @click="activeTab = 'deposits'" :class="{ active: activeTab === 'deposits' }">🧾 Deposits</li>
           <li @click="activeTab = 'accountUpdate'" :class="{ active: activeTab === 'accountUpdate' }">💎 Account Update</li>
           <li @click="logout">🚪 Logout</li>
         </ul>
@@ -21,7 +22,45 @@
         <!-- HOME -->
         <section v-if="activeTab === 'home'">
             <div class="homeDetails">
+              <h3>Name: {{admin.loggedAdmin.Fullname}}</h3>
+              <h3>Phone Number: {{admin.loggedAdmin.Phone}}</h3>
+              <h3>Email: {{admin.loggedAdmin.email}}</h3>
             </div>
+        </section>
+
+        <!-- DEPOSIT RECEIPTS -->
+        <section v-if="activeTab === 'deposits'">
+            <div class="newly">
+              <!-- <h1>Registered Students</h1> -->
+              <div class="left listFormStudents">
+                <ul>
+                  <li
+                    v-for="users in admin.depositRequests" :key="users.id"
+                    @click="fetchMainDeposit(users.id)"
+                    class="user-item"
+                    :class="{active:admin.selectedDeposit?.id === users.id}">
+                    <span>{{ users.registrationId}}</span>
+                    <small>{{ new Date(users.created_at).toLocaleDateString() }}</small>
+                  </li>
+                </ul>
+              </div>
+              <div class="right user-details" v-if="admin.selectedDeposit">
+                <ul>
+                    <h1>Deposit Details</h1>
+                    <li>Registration ID: {{ admin.selectedDeposit.registrationId }}</li>
+                    <li>Deposit Type: {{ admin.selectedDeposit.depositType }}</li>
+                    <li>Loan Status: {{ admin.selectedDeposit.status }}</li>
+                    <div class="imagePassport">
+                      <img :src="admin.selectedDeposit.depositUrl" alt="Passport" class="profilePicture" />
+                    </div>
+                    <p>{{ depositApproved }}</p>
+                    <div class="appD">
+                      <button @click="depositApproval(admin.selectedDeposit.id)" :disabled="admin.isLoading">{{admin.isLoading ? 'Approving' : "Approve"}}</button>
+                    </div>
+
+                </ul>
+              </div>
+          </div>
         </section>
 
         <!-- NEW MEMBER ID REGISTRATION -->
@@ -194,8 +233,8 @@
                     </div>
                     <p>{{ statusMessage }}</p>
                     <div class="appD">
-                      <button @click="loanApproval(admin.selectedLoan.registrationId)" :disabled="admin.isLoading">{{admin.isLoading ? 'Approving' : "Approve"}}</button>
-                      <button @click="loanDisapproval(admin.selectedLoan.registrationId)" :disabled="admin.isLoading">{{admin.isLoading ? 'Disapproving' : "Disapprove"}}</button>
+                      <button @click="loanApproval(admin.selectedLoan.id)" :disabled="admin.isLoading">{{admin.isLoading ? 'Approving' : "Approve"}}</button>
+                      <button @click="loanDisapproval(admin.selectedLoan.id)" :disabled="admin.isLoading">{{admin.isLoading ? 'Disapproving' : "Disapprove"}}</button>
                     </div>
 
                 </ul>
@@ -254,20 +293,17 @@
   import { ref, watch, onMounted  } from 'vue';
   import {useAdminStore} from '@/stores/administration'
   const admin = useAdminStore()
-  
-  definePageMeta({
-        layout: 'nofoot'
-    })
 
     // KKK-djGzG6yQJi65m22
     // KKK-3DwxWw8sUluZH7D
 
     // ROUTE GUARD
     definePageMeta({
+      layout: 'admin',
        middleware: ['admin']
     })
-    const activeTab = ref('loanRequests');
-    // const activeTab = ref('home');
+    //const activeTab = ref('deposits');
+    const activeTab = ref('home');
     
     // GENERATE REGISTRATION ID
     const generation = ref('')
@@ -525,8 +561,8 @@ const makeWithdraw = async () => {
 
   const statusMessage = ref('')
   // LOAN APPROVAL
-  const loanApproval = (regId) => {
-    admin.approveLoan(regId)
+  const loanApproval = (identity) => {
+    admin.approveLoan(identity)
     statusMessage.value = 'Loan Approved'
     setTimeout(() => {
       statusMessage.value = ''
@@ -534,15 +570,30 @@ const makeWithdraw = async () => {
   }
 
   // LOAN DISAPPROVAL
-  const loanDisapproval = (regId) => {
-    admin.disapproveLoan(regId)
+  const loanDisapproval = (identity) => {
+    admin.disapproveLoan(identity)
     statusMessage.value = 'Loan Rejected'
     setTimeout(() => {
       statusMessage.value = ''
     }, 2000);
   }
 
+  const fetchMainDeposit = async(formId) => {
+    console.log(formId)
+    if(formId === null || formId === undefined) return
+    admin.selectDeposit(formId)
+  }
+  const depositApproved = ref('')
 
+  const depositApproval = (identity) => {
+    console.log(identity)
+    if(identity === null || identity === undefined) return
+    admin.approveDeposit(identity)
+    depositApproved.value = 'Deposit Approved'
+    setTimeout(() => {
+      depositApproved.value = ''
+    }, 2000)
+  }
 
 
 
@@ -560,6 +611,7 @@ const makeWithdraw = async () => {
 
 
 onMounted(async () => {
+  await admin.signinUser()
   await admin.fetchRegistered()
   await admin.viewLoanRequests()
 })
@@ -633,8 +685,41 @@ onMounted(async () => {
     .right{
       font-size: 15px;
     }
-    .right li{
-      font-size: 13px;
+    .right ul h1{
+      font-size: 15px;
+    }
+    .right ul li{
+      font-size: 10px;
+    }
+    .left li {
+      font-size: 10px;
+      padding: 5px;
+    }
+    .user-item{
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar{
+      font-size: 10px;
+    }
+    .transactionDet{
+      font-size: 10px;
+    }
+    .homeDetails{
+      color: white;
+      font-size: 12px;
+    }
+    .generateId{
+      font-size: 12px;
+    }
+    .classical{
+      font-size: 10px;
+    }
+    .classical h3{
+      font-size: 10px;
+    }
+    .accBal{
+      font-size: 10px;
     }
   }
   .generateId{

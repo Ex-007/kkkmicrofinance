@@ -54,27 +54,23 @@
                         <h3>Deposit</h3>
                         <p class="closeLoanInput" @click="closeDeposit"><i class="fa fa-times"></i></p>
                     </div>
-                        <button @click="openSaving(saving)">Savings</button>
-                        <button @click="openSaving(investment)">Investments</button>
-                        <button @click="openSaving(shares)">Shares</button>
+                    <div class="otherDetails">
+                        <label for="types">Deposit Type</label>
+                        <select id="types" class="contactInput" v-model="depositType">
+                            <option>Savings</option>
+                            <option>Investments</option>
+                            <option>Shares</option>
+                        </select>
+                        <input type="file" class="contactInput" @change="handleDepositPhoto" accept="image/*" required>
+                        <div v-if="depositPreviewUrl" class="preview">
+                            <img :src="depositPreviewUrl" alt="Deposit Preview" width="100" />
+                        </div>
+                        <p>{{ depositMessage }}</p>
+                        <button @click="uploadDeposit" :disabled="customer.isLoading">{{customer.isLoading ? 'Uploading...' : 'Upload'}}</button>
+                    </div>
                   </div>
               </transition>
-
-            <!-- DEPOSIT SAVINGS -->
-             <transition name="fade">
-                 <div class="loanPop" v-if="depositor">
-                    <p class="closeLoanInput" @click="closeSaving"><i class="fa fa-times"></i></p>
-                    <p>Please Submit your Deposit Receipt.</p>
-                    <input type="file" class="contactInput" @change="handleDepositPhoto" accept="image/*" required>
-                    <div v-if="depositPreviewUrl" class="preview">
-                        <img :src="depositPreviewUrl" alt="Deposit Preview" width="100" />
-                    </div>
-                    <p>{{ photoUploaded }}</p>
-                    <button @click="uploadApp" :disabled="customer.isLoading">{{customer.isLoading ? 'Uploading...' : 'Upload'}}</button>
-                 </div>
-             </transition>
-
-              
+        
 
               <!-- LOAN APPLICATION POPUP -->
              <transition name="fade">
@@ -111,32 +107,20 @@
               <!-- LOAN INFORMATION -->
                <!-- <div class="loanInformation">
                     <h1>Current Loan Information</h1>
-                    <div class="current" v-if="customer.mostRecentLoan.status == 'APPROVED'">
-                <div class="header">
-                    <h3>Current Loan</h3>
-                </div>
-                <div class="loanHisDisplay">
-                    <h3>Date : {{ formatDate(customer.mostRecentLoan.created_at) }}</h3>
-                    <h3>Loan Type : {{ customer.mostRecentLoan.loanType }}</h3>
-                    <h3>Amount : {{ customer.mostRecentLoan.loanAmount }}</h3>
-                    <h3>Amount in Words : {{ customer.mostRecentLoan.amountInWords }}</h3>
-                    <h3>Loan Period : {{ customer.mostRecentLoan.loanPeriod }}</h3>
-                    <h3>Loan Purpose : {{ customer.mostRecentLoan.loanPurpose }}</h3>
-                </div>
-            </div>
-            <div class="current rejectedLoan" v-else-if="customer.mostRecentLoan.status == 'REJECTED'">
-                <h3>Loan Rejected...</h3>
-            </div>
-            <div class="current pendingLoan" v-else>
-                <h3>Loan Pending...</h3>
-            </div> -->
-                    <!-- <div class="steps">
-                        <div class="step">
-                            <h3>Amount Collected</h3>
-                            <p>$ 5,000</p>
+                    <div class="current">
+                    <div class="header">
+                        <h3>Current Loan</h3>
+                    </div>
+                    <div class="loanHisDisplay">
+                        <h3>Date : {{ formatDate(customer.mostRecentLoan.created_at) }}</h3>
+                        <h3>Loan Type : {{ customer.mostRecentLoan.loanType }}</h3>
+                        <h3>Amount : {{ customer.mostRecentLoan.loanAmount }}</h3>
+                        <h3>Amount in Words : {{ customer.mostRecentLoan.amountInWords }}</h3>
+                        <h3>Loan Period : {{ customer.mostRecentLoan.loanPeriod }}</h3>
+                        <h3>Loan Purpose : {{ customer.mostRecentLoan.loanPurpose }}</h3>
+                        <h3>Status : {{ customer.mostRecentLoan.status }}</h3>
                     </div>
                 </div> -->
-               <!-- </div> -->
 
 
                <!-- RECENT TRANSACTIONS -->
@@ -416,17 +400,31 @@ const closeDeposit = () => {
     depositt.value = false
 }
 
+const depositType = ref('Savings')
+const depositPreviewUrl = ref('')
+const depositMessage = ref('')
 
-const depositor = ref(false)
-
-const openSaving = () => {
-    depositor.value = true
+// HANDLE DEPOSIT FILE UPLOAD
+const handleDepositPhoto = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+        customer.setDepositPhoto(file)
+        depositPreviewUrl.value = URL.createObjectURL(file)
+    }
 }
+const uploadDeposit = () => {
+    if(depositType.value == ''){
+        depositMessage.value = 'Please Select Deposit Type'
+        return
+    }
 
-const closeSaving = () => {
-    depositor.value = false
+    depositMessage.value = ''
+    customer.uploadDepositFile(depositType.value)
+    depositMessage.value = 'Upload Successful'
+    setTimeout(() => {
+        depositt.value = false
+    }, 2000);
 }
-
 
 
 
@@ -434,12 +432,6 @@ const closeSaving = () => {
 
 
 // ONMOUNTED FUNCTION
-
-
-
-
-
-// ON MOUNTED FUNCTIONS
 onMounted(async () => {
     await customer.signinUser()
     await attachSearchDetails()
@@ -774,6 +766,18 @@ onMounted(async () => {
         border-radius: 0;
         width: 100px;
         cursor: pointer;
+    }
+
+    .otherDetails{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        color: white;
+    }
+    .otherDetails button{
+        height: 25px;
     }
 
 

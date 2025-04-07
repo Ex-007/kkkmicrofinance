@@ -4,21 +4,21 @@ export const useAdminStore = defineStore('admin', () => {
     const isLoading = ref(false)
     const noMemberFound = ref(false)
     const error = ref(null)
+    const loggedAdmin = ref(null)
     const searchingData = ref(null)
     const selectedUser = ref(null)
     const registeredCustomers = ref([])
     const loanRequests = ref([])
     const selectedLoan = ref(null)
-    const userBalance = ref(null)
+    const depositRequests = ref([])
+    const selectedDeposit = ref(null)
 
 
     // FETCH THE SIGNED IN USER
     const signinUser = async () => {
         isLoading.value = true
         error.value = null
-        isBypass.value = false
         const client = useSupabaseClient()
-        isLoggedIn.value = false
         
         try {
             const { data: loggedUserData, error: loggedUserError } = await client.auth.getUser()
@@ -26,8 +26,6 @@ export const useAdminStore = defineStore('admin', () => {
             if (loggedUserError) {
                 if (loggedUserError.code === 'PGRST116') {
                     error.value = 'No user logged in'
-                    console.log('not signed in')
-                    isBypass.value = true
                     return null
                 }
                 throw loggedUserError
@@ -35,11 +33,10 @@ export const useAdminStore = defineStore('admin', () => {
     
             if (loggedUserData && loggedUserData.user) {
                 loggedAdmin.value = loggedUserData.user.user_metadata
-                isLoggedIn.value = true 
-                // console.log("User data:", loggedUserData.user.user_metadata)
+                console.log(loggedUserData.user.user_metadata)
+                await viewDepositRequests()
                 return loggedUserData.user 
             } else {
-                console.log("No user data found:", loggedUserData)
                 return null
             }
         } catch (err) {
@@ -339,8 +336,8 @@ export const useAdminStore = defineStore('admin', () => {
         const client = useSupabaseClient()
         try {
             
-            if(selectedUser.value && selectedUser.value?.id === 'userId'){
-                selectedUser.value = null
+            if(selectedLoan.value && selectedLoan.value?.id === 'userId'){
+                selectedLoan.value = null
                 return
             }
             const {data:formData, error:formError} = await client
@@ -358,7 +355,7 @@ export const useAdminStore = defineStore('admin', () => {
      }
 
     //  LOAN APPROVAL
-    const approveLoan = async(regId) => {
+    const approveLoan = async(identity) => {
         isLoading.value = false
         error.value = null
         const client = useSupabaseClient()
@@ -368,7 +365,7 @@ export const useAdminStore = defineStore('admin', () => {
             .update({
                 status : 'APPROVED'
             })
-            .eq('registrationId', regId)
+            .eq('id', identity)
 
             if(approvalError) throw approvalError
         } catch (err) {
@@ -380,7 +377,7 @@ export const useAdminStore = defineStore('admin', () => {
     }
 
     //  LOAN APPROVAL
-    const disapproveLoan = async(regId) => {
+    const disapproveLoan = async(identity) => {
         isLoading.value = false
         error.value = null
         const client = useSupabaseClient()
@@ -390,7 +387,7 @@ export const useAdminStore = defineStore('admin', () => {
             .update({
                 status : 'REJECTED'
             })
-            .eq('registrationId', regId)
+            .eq('id', identity)
 
             if(disapprovalError) throw disapprovalError
         } catch (err) {
@@ -401,10 +398,73 @@ export const useAdminStore = defineStore('admin', () => {
         }
     }
 
+    // DISPLAY DEPOSIT REQUESTS
+    const viewDepositRequests = async () => {
+        isLoading.value = false
+        error.value = null
+        const client = useSupabaseClient()
+        try {
+            const {data:fetchData, error:fetchError} = await client
+            .from('DEPOSITS')
+            .select('id, depositType, registrationId, created_at')
+            .order('created_at', {
+                ascending: false
+            })
 
+            if(fetchError) throw fetchError
+            depositRequests.value = fetchData
+        } catch (err) {
+            error.value = err.message
+        }finally{
+            isLoading.value = false
+        }
+    }
 
+//SEARCH SELECTED USERS
+const selectDeposit = async(userId) => {
+    const client = useSupabaseClient()
+    console.log(userId)
+    try {
+        
+        if(selectedDeposit.value && selectedDeposit.value?.id === 'userId'){
+            selectedDeposit.value = null
+            return
+        }
+        const {data:formData, error:formError} = await client
+        .from('DEPOSITS')
+        .select('*')
+        .eq('id', userId)
+        .single()
 
+        if(formError) throw formError
+        selectedDeposit.value = formData
 
+    } catch (err) {
+        error.value = err.message
+    }
+ }
+
+    //  DEPOSIT APPROVAL
+    const approveDeposit = async(identity) => {
+        isLoading.value = false
+        error.value = null
+        const client = useSupabaseClient()
+        try {
+            const {data:approvalData, error:approvalError} = await client
+            .from('DEPOSITS')
+            .update({
+                status : 'APPROVED'
+            })
+            .eq('id', identity)
+
+            if(approvalError) throw approvalError
+        } catch (err) {
+            error.value = err.message
+            console.log(err.message)
+        }finally{
+            isLoading.value = false
+        }
+    }
 
 
 
@@ -423,6 +483,8 @@ export const useAdminStore = defineStore('admin', () => {
     return{
         isLoading,
         error,
+        signinUser,
+        loggedAdmin,
         registerNewMember,
         noMemberFound,
         searchMember,
@@ -438,6 +500,11 @@ export const useAdminStore = defineStore('admin', () => {
         selectedLoan,
         selectLoan,
         approveLoan,
-        disapproveLoan
+        disapproveLoan,
+        depositRequests,
+        viewDepositRequests,
+        selectDeposit,
+        selectedDeposit,
+        approveDeposit
     }
 })
