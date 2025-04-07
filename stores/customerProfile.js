@@ -185,29 +185,68 @@ export const useCustomerStore = defineStore('customerPro', () => {
     }
     
     // function to upload the picture
-    const uploadGuarantorImage = async () => {
-        isLoading.value = true
-        error.value = null
-        const client = useSupabaseClient()
-        const registrationId = user.value.reg_identity
-        imageUploaded.value = false
-        try {
-            const photoUrl = await uploadFiles()
-            const {data:upData, error:upError} = await client
+    // const uploadGuarantorImage = async () => {
+    //     isLoading.value = true
+    //     error.value = null
+    //     const client = useSupabaseClient()
+    //     const registrationId = user.value.reg_identity
+    //     try {
+    //         const photoUrl = await uploadFiles()
+    //         const {data:upData, error:upError} = await client
+    //         .from('LOANREQUESTS')
+    //         .update({
+    //             guarantor: photoUrl
+    //         })
+    //         .eq('registrationId', registrationId)
+    //         if(upError) throw upError
+    //         imageUploaded.value = true
+    //     } catch (err) {
+    //         error.value = err.message
+    //     } finally{
+    //         isLoading.value = false
+    //     }
+    
+    // }
+
+    // function to upload the picture
+const uploadGuarantorImage = async () => {
+    isLoading.value = true
+    error.value = null
+    const client = useSupabaseClient()
+    const registrationId = user.value.reg_identity
+    imageUploaded.value = false
+    
+    try {
+            const { data: recentLoan, error: fetchError } = await client
+            .from('LOANREQUESTS')
+            .select('id')
+            .eq('registrationId', registrationId)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single()
+        
+        if (fetchError) throw fetchError
+        if (!recentLoan) throw new Error('No loan requests found for this user')
+        
+        // Uploading the file
+        const photoUrl = await uploadFiles()
+        
+        // Update only the most recent loan request
+        const { data: upData, error: upError } = await client
             .from('LOANREQUESTS')
             .update({
                 guarantor: photoUrl
             })
-            .eq('registrationId', registrationId)
-            if(upError) throw upError
-            imageUploaded.value = true
-        } catch (err) {
-            error.value = err.message
-        } finally{
-            isLoading.value = false
-        }
-    
+            .eq('id', recentLoan.id)
+        
+        if (upError) throw upError
+        imageUploaded.value = true
+    } catch (err) {
+        error.value = err.message
+    } finally {
+        isLoading.value = false
     }
+}
 
     // FETCH ALL LOANS
     const fetchAllLoans = async (regEmail) => {
@@ -388,7 +427,6 @@ export const useCustomerStore = defineStore('customerPro', () => {
         isLoading.value = true
         error.value = null
         const client = useSupabaseClient()
-        // depositUpload.value = false
         const registrationId = user.value.reg_identity
         try {
             const photoUrl = await depositFile()
@@ -402,7 +440,6 @@ export const useCustomerStore = defineStore('customerPro', () => {
             .select()
 
             if(upError) throw upError
-            // depositUpload.value = true
         } catch (err) {
             error.value = err.message
             console.log(err.message)

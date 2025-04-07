@@ -12,6 +12,7 @@ export const useAdminStore = defineStore('admin', () => {
     const selectedLoan = ref(null)
     const depositRequests = ref([])
     const selectedDeposit = ref(null)
+    const canOut = ref(false)
 
 
     // FETCH THE SIGNED IN USER
@@ -33,7 +34,6 @@ export const useAdminStore = defineStore('admin', () => {
     
             if (loggedUserData && loggedUserData.user) {
                 loggedAdmin.value = loggedUserData.user.user_metadata
-                console.log(loggedUserData.user.user_metadata)
                 await viewDepositRequests()
                 return loggedUserData.user 
             } else {
@@ -169,7 +169,6 @@ export const useAdminStore = defineStore('admin', () => {
     // ACCOUNT UPDATE
     //  DEPOSIT MONEY
     const depositMoney = async(userIdentification, accountBalance, depositAmount, type) => {
-        // console.log(userIdentification, accountBalance, depositAmount, type)
         isLoading.value = true
         error.value = null
         const client = useSupabaseClient()
@@ -179,19 +178,34 @@ export const useAdminStore = defineStore('admin', () => {
                 isLoading.value = false
                 return
             }
-            let newBalance = accountBalance + depositAmount
 
-            const {data:depositData, error:depositError} = await client
-            .from('REGISTEREDUSERS')
-            .update({accountBalance: newBalance})
-            .eq('reg_identity', userIdentification)
-
-            if(depositError) throw depositError
-
-            await updateCustomerTransHistory(userIdentification, newBalance, depositAmount, type)
+            if(type == 'Savings'){
+                let newBalance = accountBalance + depositAmount
+                const {data:depositData, error:depositError} = await client
+                .from('REGISTEREDUSERS')
+                .update({accountBalance: newBalance})
+                .eq('reg_identity', userIdentification)
+                if(depositError) throw depositError
+                await updateCustomerTransHistory(userIdentification, depositAmount, type)
+            }else if(type == 'Shares'){
+                let newBalance = accountBalance + depositAmount
+                const {data:depositData, error:depositError} = await client
+                .from('REGISTEREDUSERS')
+                .update({shares: newBalance})
+                .eq('reg_identity', userIdentification)
+                if(depositError) throw depositError
+                await updateCustomerTransHistory(userIdentification, depositAmount, type)
+            }else{
+                let newBalance = accountBalance + depositAmount
+                const {data:depositData, error:depositError} = await client
+                .from('REGISTEREDUSERS')
+                .update({investment: newBalance})
+                .eq('reg_identity', userIdentification)
+                if(depositError) throw depositError
+                await updateCustomerTransHistory(userIdentification, depositAmount, type)
+            }
         } catch (err) {
             error.value = err.message
-            console.log(err.message)
         }finally{
             isLoading.value = false
         }
@@ -209,18 +223,15 @@ export const useAdminStore = defineStore('admin', () => {
                 return
             }
             let newBalance = accountBalance - withdrawAmount
-
             const {data:depositData, error:depositError} = await client
             .from('REGISTEREDUSERS')
             .update({accountBalance: newBalance})
             .eq('reg_identity', userIdentification)
 
             if(depositError) throw depositError
-
             await updateWithdrawTransHistory(userIdentification, withdrawAmount, type)
         } catch (err) {
             error.value = err.message
-            console.log(err.message)
         }finally{
             isLoading.value = false
         }
@@ -471,20 +482,13 @@ const selectDeposit = async(userId) => {
 
 
 
-
-
-
-    // LOAN REQUESTS
-
-
-
-
-
     return{
         isLoading,
         error,
         signinUser,
         loggedAdmin,
+        logOut,
+        canOut,
         registerNewMember,
         noMemberFound,
         searchMember,

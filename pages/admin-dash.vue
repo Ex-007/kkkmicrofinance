@@ -22,9 +22,9 @@
         <!-- HOME -->
         <section v-if="activeTab === 'home'">
             <div class="homeDetails">
-              <h3>Name: {{admin.loggedAdmin.Fullname}}</h3>
-              <h3>Phone Number: {{admin.loggedAdmin.Phone}}</h3>
-              <h3>Email: {{admin.loggedAdmin.email}}</h3>
+              <h3>Name : {{adminDetails.adminName}}</h3>
+              <h3>Phone Number : {{adminDetails.phoneNumber}}</h3>
+              <h3>Email : {{adminDetails.email}}</h3>
             </div>
         </section>
 
@@ -49,9 +49,11 @@
                     <h1>Deposit Details</h1>
                     <li>Registration ID: {{ admin.selectedDeposit.registrationId }}</li>
                     <li>Deposit Type: {{ admin.selectedDeposit.depositType }}</li>
-                    <li>Loan Status: {{ admin.selectedDeposit.status }}</li>
+                    <li>Deposit Status: {{ admin.selectedDeposit.status }}</li>
                     <div class="imagePassport">
-                      <img :src="admin.selectedDeposit.depositUrl" alt="Passport" class="profilePicture" />
+                      <a :href="admin.selectedDeposit.depositUrl" :download="getFilename(admin.selectedDeposit.depositUrl)">
+                        <img :src="admin.selectedDeposit.depositUrl" alt="Deposit Receipt" class="profilePicture" />
+                      </a>
                     </div>
                     <p>{{ depositApproved }}</p>
                     <div class="appD">
@@ -229,7 +231,9 @@
                     <li>Loan Purpose: {{ admin.selectedLoan.loanPurpose }}</li>
                     <li>Loan Status: {{ admin.selectedLoan.status }}</li>
                     <div class="imagePassport">
-                      <img :src="admin.selectedLoan.guarantor" alt="Passport" class="profilePicture" />
+                      <a :href="admin.selectedLoan.guarantor" :download="getFilename(admin.selectedLoan.guarantor)">
+                        <img :src="admin.selectedLoan.guarantor" alt="loan guarantor" class="profilePicture" />
+                      </a>
                     </div>
                     <p>{{ statusMessage }}</p>
                     <div class="appD">
@@ -258,21 +262,25 @@
                 <h1>Member Details</h1>
                 <p>Registration ID: {{ searchView.reg_identity }}</p>
                 <p>Fullname: {{ searchView.surname + ' ' + searchView.firstname + ' ' +  searchView.middlename}}</p>
-                <p>Phone Number: {{ searchView.phone }}</p>
-                <h3>Account Balance</h3>
-                <p class="accBal">{{ formatCurrency(searchView.accountBalance) }}</p>
+                  <p>Phone Number: {{ searchView.phone }}</p>
+                <div class="showBalances">
+                  <div class="current">
+                    <h3>Savings Balance</h3>
+                    <p class="accBal">{{ formatCurrency(searchView.accountBalance) }}</p>
+                  </div>
+                  <div class="current">
+                    <h3>Shares Balance</h3>
+                    <p class="accBal">{{ formatCurrency(searchView.shareBalance) }}</p>
+                  </div>
+                  <div class="current">
+                    <h3>Investment Balance</h3>
+                    <p class="accBal">{{ formatCurrency(searchView.investmentBalance) }}</p>
+                  </div>
+                </div>
                 <div class="depWith">
                   <button @click="openDeposit">Deposit</button>
                   <button @click="openWithdraw">Withdraw</button>
                 </div>
-              </div>
-
-              <!-- DEPOSIT CASH -->
-              <div class="logRegistrationId" v-if="depositBox">
-                <h3>Deposit Money</h3>
-                <input type="number" class="contactInput" placeholder="Enter Amount to Deposit" min="0" oninput="this.value = Math.abs(this.value)" v-model="depositAmount">
-                <p v-if="depositV.pop">{{ depositV.message }}</p>
-                <button @click="makeDeposit" :disabled="admin.isLoading">{{admin.isLoading ? 'Depositing...' : 'Deposit'}}</button>
               </div>
 
               <!-- WITHDRAW CASH -->
@@ -285,6 +293,27 @@
             </div>
           </div>
         </section>
+
+                <!-- OTHER ACCOUNTS -->
+        <transition name="fade">
+            <div class="loanPop depositting" v-if="depositBox">
+              <div class="separate">
+                  <h3>Deposit</h3>
+                  <p class="closeLoanInput" @click="closeDeposit"><i class="fa fa-times"></i></p>
+              </div>
+              <div class="otherDetails">
+                  <label for="types">Deposit Type</label>
+                  <select id="types" class="contactInput" v-model="depositConfig.depositType">
+                      <option>Savings</option>
+                      <option>Investments</option>
+                      <option>Shares</option>
+                  </select>
+                  <input type="number" class="contactInput" placeholder="Enter Amount" required min="0" oninput="this.value = Math.abs(this.value)" v-model="depositConfig.depositAmount">
+                  <p v-if="depositV.pop">{{ depositV.message }}</p>
+                  <button @click="makeDeposit" :disabled="admin.isLoading">{{admin.isLoading ? 'Depositing...' : 'Deposit'}}</button>
+              </div>
+            </div>
+        </transition>
       </main>
     </div>
   </template>
@@ -292,6 +321,8 @@
   <script setup>
   import { ref, watch, onMounted  } from 'vue';
   import {useAdminStore} from '@/stores/administration'
+  import{useRoute, useRouter} from 'vue-router'
+  const router = useRouter()
   const admin = useAdminStore()
 
     // KKK-djGzG6yQJi65m22
@@ -427,12 +458,14 @@
       nextKinTwoPhone: '',
       transactionHistory: '',
       loansRecord: '',
-      accountBalance: ''
+      accountBalance: '',
+      shareBalance: '',
+      investmentBalance: ''
     })
 
 
     const attachSearchDetails = async () => {
-      // console.log(admin.searchingData)
+      //console.log(admin.searchingData)
       showVal.value = true
       searchView.value.passportUrl = admin.searchingData.passportUrl
       searchView.value.surname = admin.searchingData.surname
@@ -464,10 +497,10 @@
       searchView.value.transactionHistory = admin.searchingData.transactionHistory
       searchView.value.loansRecord = admin.searchingData.loansRecord
       searchView.value.accountBalance = admin.searchingData.accountBalance
+      searchView.value.shareBalance = admin.searchingData.shares
+      searchView.value.investmentBalance = admin.searchingData.investment
 
     }
-
-
 
     // LIST AND FETCH INDIVIDUAL FORM REGISTERED By MEMBERS
   const fetchMainForm = async (formId) => {
@@ -484,6 +517,8 @@ const formatCurrency = (amount) => {
         currency: 'NGN',
     }).format(amount);
 };
+
+
 // DEPOSIT AND WITHDRAW BOX
 const depositBox = ref(false)
 const withdrawBox = ref(false)
@@ -491,6 +526,10 @@ const withdrawBox = ref(false)
 const openDeposit = () => {
   depositBox.value = true
   withdrawBox.value = false
+}
+
+const closeDeposit = () => {
+  depositBox.value = false
 }
 
 const openWithdraw = () => {
@@ -501,27 +540,60 @@ const openWithdraw = () => {
 
 // DEPOSITING AND WITHDRAWING FUNCTION
 // MAKE DEPOSIT
-const depositAmount = ref('')
+const depositConfig = ref({
+  depositAmount: '',
+  depositType: 'Savings'
+})
 const depositV = ref({
   pop: false,
   message: ''
 })
+
 const makeDeposit = async () => {
-  if(depositAmount.value == '' || depositAmount.value == 0){
+
+  //FOR WHITESPACE CHECKING
+  if(depositConfig.value.depositAmount == '' || depositConfig.value.depositAmount == 0){
     depositV.value.pop = true
     depositV.value.message = 'Amount cannot be lower than 0'
     return
   }
-  const type = 'Deposit'
   depositV.value.pop = false
-  await admin.depositMoney(searchView.value.reg_identity, searchView.value.accountBalance, depositAmount.value, type)
-  depositV.value.pop = true
-  depositV.value.message = `Deposit of ${formatCurrency(depositAmount.value)} Successfully Made`
-  depositAmount.value = ''
-  setTimeout(() => {
-    depositV.value.pop = false
-  }, 2000);
+
+  //FOR SAVINGS
+  if(depositConfig.value.depositType == 'Savings'){
+    const type = 'Savings'
+    await admin.depositMoney(searchView.value.reg_identity, searchView.value.accountBalance, depositConfig.value.depositAmount, type)
+    depositV.value.pop = true
+    depositV.value.message = `Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Made`
+    depositConfig.value.depositAmount = ''
+    setTimeout(() => {
+      depositV.value.pop = false
+    }, 2000);
+
+  }else if(depositConfig.value.depositType == 'Shares'){
+    const type = 'Shares'
+    await admin.depositMoney(searchView.value.reg_identity, searchView.value.shareBalance, depositConfig.value.depositAmount, type)
+          
+    depositV.value.pop = true
+    depositV.value.message = `Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Made`
+    depositConfig.value.depositAmount = ''
+    setTimeout(() => {
+      depositV.value.pop = false
+    }, 2000);
+  }else{
+    const type = 'Investments'
+    await admin.depositMoney(searchView.value.reg_identity, searchView.value.investmentBalance, depositConfig.value.depositAmount, type)
+          
+    depositV.value.pop = true
+    depositV.value.message = `Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Made`
+    depositConfig.value.depositAmount = ''
+    setTimeout(() => {
+      depositV.value.pop = false
+    }, 2000);
+  }
 }
+
+
 // MAKE WITHDRAW
 const withdrawAmount = ref('')
 const withdrawV = ref({
@@ -594,6 +666,23 @@ const makeWithdraw = async () => {
       depositApproved.value = ''
     }, 2000)
   }
+ // DOWNLOADING THE DEPOSIT IMAGES
+  const getFilename = (url) => {
+    return url.split('/').pop().split('?')[0] || 'download.jpg'
+  }
+
+  //ATTACH ADMIN Details
+  const adminDetails = ref({
+    adminName: '',
+    phoneNumber: '',
+    email: ''
+  })
+
+  const attachAdminDetails = async () => {
+    adminDetails.value.adminName = admin.loggedAdmin.Fullname
+    adminDetails.value.phoneNumber = admin.loggedAdmin.Phone
+    adminDetails.value.email = admin.loggedAdmin.email
+  }
 
 
 
@@ -608,12 +697,22 @@ const makeWithdraw = async () => {
 
 
 
-
+// LOGOUT
+const logout = () => {
+  admin.logOut()
+}
+//WATCH LOGOUT
+  watch(() => admin.canOut, (newVal) => {
+      if (newVal) {
+        router.push('/')
+      }
+  });
 
 onMounted(async () => {
   await admin.signinUser()
   await admin.fetchRegistered()
   await admin.viewLoanRequests()
+  await attachAdminDetails()
 })
 
 
@@ -721,7 +820,19 @@ onMounted(async () => {
     .accBal{
       font-size: 10px;
     }
+    .showBalances{
+      font-size: 10px;
+    }
+    .current h3{
+      font-size: 12px;
+    }
+    .contactInput{
+      width: 150px;
+    }
   }
+      .homeDetails{
+      color: white;
+    }
   .generateId{
     display: flex;
     justify-content: center;
@@ -769,7 +880,7 @@ onMounted(async () => {
     }
 
     .contactInput{
-      width: 300px;
+      width: 200px;
       border-radius: 10px;
       height: 35px;
       border: none;
@@ -812,7 +923,7 @@ onMounted(async () => {
   /* LIST REGISTERED MEMBERS */
   .newly {
     display: flex;
-    height: calc(100vh - 500px); 
+    height: 100vh; 
     max-height: 800px; 
     overflow: none; 
     margin-bottom: 30px;
@@ -911,7 +1022,7 @@ onMounted(async () => {
 /* ACCOUNT BALANCE */
 .accBal{
   text-align: center;
-  font-size: 25px;
+  font-size: 20px;
 }
 
 /* ACCOUNT UPDATE */
@@ -961,6 +1072,87 @@ input[type="number"]{
   width: 150px;
   height: 30px;
 }
+
+    .fade-enter-active, .fade-leave-active {
+        transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    }
+
+    .fade-enter-from, .fade-leave-to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    .fade-enter-to, .fade-leave-from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+        .loanPop{
+        position: absolute;
+        top: 100px;
+        right: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        background-color: #6897a7;
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: inset 10px 6px 50px rgb(26, 49, 195);
+        width: 300px;
+        gap: 10px;
+        margin: 0 auto;
+        z-index: 1;
+    }
+        .depositting{
+        border: none;
+        gap: 5px;
+        padding: 10px;
+    }
+    .depositting button{
+        border: none;
+        border-radius: 0;
+        width: 100px;
+        cursor: pointer;
+    }
+
+    .otherDetails{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        color: white;
+    }
+    .otherDetails button{
+        height: 25px;
+    }
+        .separate{
+        display: flex;
+        justify-content: space-between;
+        gap: 100px;
+        color: white;
+    }
+      .closeLoanInput{
+    color: red;
+    cursor: pointer;
+  }
+      .current{
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        gap: 10px;
+        background-color: #37a187;
+        margin: 5px;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: inset 10px 6px 50px rgb(30, 39, 95);
+        color: white;
+        color: white;
+    }
+    .showBalances{
+      display: flex;
+      flex-direction: column;
+    }
 
 </style>
   
