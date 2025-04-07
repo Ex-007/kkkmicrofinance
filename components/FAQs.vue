@@ -4,7 +4,6 @@
       <div v-for="(faq, index) in faqs" :key="index" class="faq-item">
         <div class="faq-question" @click="toggleAnswer(index)">
           <span>{{ faq.question }}</span>
-          <font-awesome-icon :icon="faq.open ? 'minus' : 'plus'" />
         </div>
         <div v-if="faq.open" class="faq-answer">
           {{ faq.answer }}

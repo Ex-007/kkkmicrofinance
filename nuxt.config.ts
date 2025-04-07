@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  modules: ['@pinia/nuxt', '@nuxtjs/supabase', '@nuxtjs/google-fonts'],
+  modules: ['@pinia/nuxt', '@nuxtjs/supabase', '@nuxtjs/google-fonts', '@vite-pwa/nuxt'],
   css: [
     "~/assets/css/global.css",
     'font-awesome/css/font-awesome.min.css',
@@ -12,16 +12,15 @@ export default defineNuxtConfig({
   ],
   googleFonts: {
     families: {
-      // Add the fonts you want to use
-      Inter: [400, 500, 700],  // Regular, Medium, Bold
+      Inter: [400, 500, 700],
       Poppins: [400, 600, 700],
       // You can add more fonts here
     },
-    display: 'swap', // This improves page load speed
+    display: 'swap',
     preload: true,
     prefetch: true,
     preconnect: true,
-    download: false // Set to true if you want to download fonts instead of using CDN
+    download: false
   },
   build: {
     transpile: ["font-awesome"]
@@ -46,5 +45,54 @@ export default defineNuxtConfig({
   ssr: true,
   nitro: {
     preset: 'static'
+  },
+  pwa: {
+    manifest: {
+      name: 'KKK Cooperative',
+      short_name: 'KKK',
+      description: 'Your Trusted Cooperative Bank for Savings, Loans and easy Transactions.',
+      theme_color: '#ffffff',
+      background_color: '#ffffff',
+      display: 'standalone',
+      icons: [
+        {
+          src: '/icons/icon-16.png',
+          sizes: '16x16',
+          type: 'image/png'
+        },
+        {
+          src: '/icons/icon-32.png',
+          sizes: '32x32',
+          type: 'image/png'
+        },
+        {
+          src: '/icons/icon-192.png',
+          sizes: '192x192',
+          type: 'image/png'
+        },
+        {
+          src: '/icons/icon-512.png',
+          sizes: '512x512',
+          type: 'image/png'
+        }
+      ]
+    },
+    registerType: 'autoUpdate',
+    workbox: {
+      runtimeCaching: [
+        {
+          urlPattern: ({ url }) => url.origin === self.location.origin,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'static-resources',
+            expiration: { maxEntries: 50, maxAgeSeconds: 86400 }
+          }
+        }
+      ]
+    },
+    devOptions: {
+      enabled: true,
+      type: 'module'
+    }
   }
 })
