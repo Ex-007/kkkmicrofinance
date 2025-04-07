@@ -41,8 +41,8 @@
                     </div>
                     <div class="current">
                         <h3>Saving: {{ formatCurrency(cusInfo.accountBalance) }}</h3>
-                        <h3>Investments: {{ formatCurrency(cusInfo.accountBalance) }}</h3>
-                        <h3>Shares: {{ formatCurrency(cusInfo.accountBalance) }}</h3>
+                        <h3>Investments: {{ formatCurrency(cusInfo.investment) }}</h3>
+                        <h3>Shares: {{ formatCurrency(cusInfo.shares) }}</h3>
                     </div>
                   </div>
               </transition>
@@ -248,7 +248,9 @@ const cusInfo = ref({
     transactionHistory: '',
     loansRecord: '',
     accountBalance: '',
-    createdAt: ''
+    createdAt: '',
+    investment: '',
+    shares: ''
 })
 // ATTACH CUSTOMER'S INFORMATION TO THE PAGE
 const attachSearchDetails = async () => {
@@ -283,6 +285,8 @@ const attachSearchDetails = async () => {
     cusInfo.value.loansRecord = customer.user.loansRecord
     cusInfo.value.createdAt = customer.user.created_at
     cusInfo.value.accountBalance = customer.user.accountBalance
+    cusInfo.value.investment = customer.user.investment
+    cusInfo.value.shares = customer.user.shares
 
 }
 
