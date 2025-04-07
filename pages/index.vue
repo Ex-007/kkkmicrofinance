@@ -27,6 +27,9 @@
     useHead(() => ({
         title : seoData.value.title,
         meta: [
+            { charset: 'utf-8' },
+            { name: 'theme-color', content: '#ffffff' },
+            { name: 'viewport', content: 'width=device-width, initial-scale=1' },
             {
                 name: 'description',
                 content: seoData.value.description
@@ -80,7 +83,11 @@
                 content: seoData.value.twitterHandle
             },
         ],
-        link : [{rel: 'canonical', href: seoData.value.url}]
+        link : [
+            {rel: 'canonical', href: seoData.value.url},
+            { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+            { rel: 'apple-touch-icon', href: '/icons/apple-touch-icon.png' }
+            ]
     }))
 
 </script>
