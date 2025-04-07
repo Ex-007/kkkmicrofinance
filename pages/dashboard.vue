@@ -109,7 +109,7 @@
               </div>
 
               <!-- LOAN INFORMATION -->
-               <div class="loanInformation">
+               <!-- <div class="loanInformation">
                     <h1>Current Loan Information</h1>
                     <div class="current" v-if="customer.mostRecentLoan.status == 'APPROVED'">
                 <div class="header">
@@ -129,9 +129,14 @@
             </div>
             <div class="current pendingLoan" v-else>
                 <h3>Loan Pending...</h3>
-            </div>
-                   
-               </div>
+            </div> -->
+                    <!-- <div class="steps">
+                        <div class="step">
+                            <h3>Amount Collected</h3>
+                            <p>$ 5,000</p>
+                    </div>
+                </div> -->
+               <!-- </div> -->
 
 
                <!-- RECENT TRANSACTIONS -->
