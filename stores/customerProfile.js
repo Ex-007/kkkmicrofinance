@@ -246,9 +246,9 @@ export const useCustomerStore = defineStore('customerPro', () => {
                 throw new Error('No loan data found for the provided email.')  
             }
 
-            if(recentLoanData.status === 'PENDING' || recentLoanData.status === 'REJECTED'){
-                return
-            }
+            // if(recentLoanData.status === 'PENDING' || recentLoanData.status === 'REJECTED'){
+            //     return
+            // }
 
             mostRecentLoan.value = recentLoanData[0]
             const principalFetched = recentLoanData[0].loanAmount
