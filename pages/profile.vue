@@ -33,6 +33,12 @@
 </template>
 
 <script setup>
+
+// ROUTE GUARD
+definePageMeta({
+    middleware: ['auth']
+})
+
 import{ref, watch, onMounted} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import{useCustomerStore} from '@/stores/customerProfile'

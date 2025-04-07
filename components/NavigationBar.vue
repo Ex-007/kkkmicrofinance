@@ -68,7 +68,7 @@ a{
 }
 @media (max-width: 768px){
         h1{
-            font-size: 25px;
+            font-size: 20px;
         }
     }
 </style>

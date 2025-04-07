@@ -142,6 +142,11 @@ import{useCustomerStore} from '@/stores/customerProfile'
 const customer = useCustomerStore()
 const router = useRouter()
 
+// ROUTE GUARD
+definePageMeta({
+    middleware: ['auth']
+})
+
 // OPEN AND CLOSE MENU
 const menuItem = ref(false)
 

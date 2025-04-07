@@ -12,5 +12,14 @@ html, body{
     #2db3bf 70%,
     #7486df 100%,
     rgb(17, 73, 118));
-font-family: 'Courier New', Courier, monospace;
+    font-family: 'Inter', sans-serif;
 }
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+  }
+
+  @media (max-width: 768px){
+    p{
+        font-size: 13px;
+    }
+  }

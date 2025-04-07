@@ -283,6 +283,12 @@
     import {useRouter, useRoute} from 'vue-router'
     import {useLoanStore} from '@/stores/loanApp'
 
+
+// ROUTE GUARD
+definePageMeta({
+    middleware: ['auth']
+})
+
     const loan = useLoanStore()
     const router = useRouter()
     const route = useRoute()

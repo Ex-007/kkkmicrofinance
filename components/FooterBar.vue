@@ -10,12 +10,12 @@
         <!-- Quick Links -->
         <div class="footer-section">
           <h3>Quick Links</h3>
-          <!-- <ul>
+          <ul>
             <li><nuxt-link to="/" class="routerMove"><i class="fa fa-home"></i>Home</nuxt-link></li>
             <li><nuxt-link to="/About" class="routerMove"><i class="fa fa-user"></i>About Us</nuxt-link></li>
-            <li><nuxt-link to="/Notifications" class="routerMove"><i class="fa fa-bell"></i>Notifications</nuxt-link></li>
-            <li><nuxt-link to="/Support" class="routerMove"><i class="fa fa-heart"></i>Support</nuxt-link></li>
-          </ul> -->
+            <li><nuxt-link to="/Notifications" class="routerMove"><i class="fa fa-bell"></i>Terms and Conditions</nuxt-link></li>
+            <li><nuxt-link to="/Support" class="routerMove"><i class="fa fa-heart"></i>Offers</nuxt-link></li>
+          </ul>
         </div>
   
         <!-- Support & Help -->
@@ -40,8 +40,8 @@
       </div>
       <!-- Copyright -->
       <div class="footer-bottom">
-        <p>&copy; {{ new Date().getFullYear() }} Angelsheight. All rights reserved.</p>
-        <p><a href="mailto:info@angelsheight.org">info@angelsheight.org</a></p>
+        <p>&copy; {{ new Date().getFullYear() }} kodun kopo kope. All rights reserved.</p>
+        <p><a href="mailto:info@angelsheight.org">info@kodunkopokope.org</a></p>
         <p>Designed by <a href="https://abtech-two.vercel.app">ABTech</a></p>
       </div>
     </footer>
@@ -129,6 +129,12 @@
   .routerMove{
     display: flex;
     gap: 5px;
+  }
+
+  @media (max-width: 768px){
+    .logo{
+      font-size: 16px;
+    }
   }
   </style>
   

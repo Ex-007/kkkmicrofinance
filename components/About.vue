@@ -26,7 +26,7 @@
               <i class="fa fa-thumbs-up"></i>
             </div>
             <h3>Secure Savings</h3>
-            <p>Sasve your money with confidence without no hassle and an interest.</p>
+            <p>Save your money with confidence without no hassle and an interest.</p>
           </div>
         </div>
       </div>

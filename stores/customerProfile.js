@@ -11,6 +11,8 @@ export const useCustomerStore = defineStore('customerPro', () => {
     const overallTransact = ref([])
     const allLoans = ref([])
     const mostRecentLoan = ref(null)
+    const loanRepaymentSchedule = ref([])
+    const pendingLoan = ref(false)
 
     // FETCH THE SIGNED IN USER
     const signinUser = async () => {
@@ -41,14 +43,11 @@ export const useCustomerStore = defineStore('customerPro', () => {
                 await allTransactions(loggedEmail)
                 await fetchMostRecentLoan(loggedEmail)
                 await fetchAllLoans(loggedEmail)
-                // console.log(loggedUserData.user.email)
                 return loggedUserData.user
             } else {
-                console.log("No user data found:", loggedUserData)
                 return null
             }
         } catch (err) {
-            console.error("Error in signinUser:", err)
             error.value = err.message
             return null
         } finally {
@@ -115,7 +114,6 @@ export const useCustomerStore = defineStore('customerPro', () => {
             return transactions; 
         } catch (err) {
             error.value = err.message
-            console.log(err.message)
         }finally{
             isLoading.value = false
         }
@@ -225,7 +223,6 @@ export const useCustomerStore = defineStore('customerPro', () => {
             allLoans.value = allLoanData
         } catch (err) {
             error.value = err.message
-            console.log(err.message)
         } finally{
             isLoading.value = false
         }
@@ -248,15 +245,108 @@ export const useCustomerStore = defineStore('customerPro', () => {
             if (recentLoanData.length === 0) {  
                 throw new Error('No loan data found for the provided email.')  
             }
+
+            if(recentLoanData.status === 'PENDING' || recentLoanData.status === 'REJECTED'){
+                return
+            }
+
             mostRecentLoan.value = recentLoanData[0]
+            const principalFetched = recentLoanData[0].loanAmount
+            const principal = convertCurrency(principalFetched)
+            const durationM = recentLoanData[0].loanPeriod
+            const durationMonths = duration(durationM)
+            const annualInterestRate = 2
+            await calculateRepayment(principal, annualInterestRate, durationMonths)
         } catch (err) {  
-            error.value = err.message   
+            error.value = err.message  
         } finally {  
             isLoading.value = false  
         }  
     }  
 
+    // CALCULATE THE LOAN REPAYMENT
+    const calculateRepayment = async (principal, annualInterestRate, durationMonths) => {
+        isLoading.value = true;
+        error.value = null;
+        try {
+            const monthlyInterestRate = annualInterestRate / 100;
+            const monthlyPayment = principal * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, durationMonths) / 
+                          (Math.pow(1 + monthlyInterestRate, durationMonths) - 1);
+            
+            // Generate amortization schedule
+            let remainingBalance = principal;
+            const schedule = [];
+            
+            for (let month = 1; month <= durationMonths; month++) {
+                const interestPayment = remainingBalance * monthlyInterestRate;
+                let principalPayment;
+                
+                
+                if (month === durationMonths) {
+                    principalPayment = remainingBalance;
+                    
+                    const finalMonthlyPayment = principalPayment + interestPayment;
+                    
+                    schedule.push({
+                        month,
+                        payment: finalMonthlyPayment,
+                        principalPayment,
+                        interestPayment,
+                        remainingBalance: 0
+                    });
+                } else {
+                    
+                    principalPayment = monthlyPayment - interestPayment;
+                    remainingBalance -= principalPayment;
+                    
+                    schedule.push({
+                        month,
+                        payment: monthlyPayment,
+                        principalPayment,
+                        interestPayment,
+                        remainingBalance: Math.max(0, remainingBalance)
+                    });
+                }
+            }
+            
+            loanRepaymentSchedule.value = schedule;
+            
+            const actualTotalPayment = schedule.reduce((sum, month) => sum + month.payment, 0);
+            
+            return {
+                monthlyPayment,
+                totalPayment: actualTotalPayment,
+                totalInterest: actualTotalPayment - principal,
+                schedule
+            };
+        } catch (err) {
+            error.value = err.message;
+        }
+    };
 
+    // CONVERT CURRENCY TO NUMBER
+    const convertCurrency = (principalFetched) => {
+        if (!principalFetched || typeof principalFetched !== 'string') {
+            return 0;
+        }
+          
+        let numericString = principalFetched.replace(/^[A-Z]{3}\s+/, '');
+        
+        return parseFloat(numericString.replace(/,/g, ''));
+    }
+    // EXTRACT THE NUMBER FROM DURATION
+    const duration = (durationM) => {
+        if (!durationM || typeof durationM !== 'string') {
+            return 0;
+        }
+        const match = durationM.match(/^\d+/);
+        if (match) {
+            return parseInt(match[0], 10);
+        }
+
+        return 0;
+    }
+  
 
 
 
@@ -294,7 +384,8 @@ export const useCustomerStore = defineStore('customerPro', () => {
         canOut,
         logOut,
         allLoans,
-        mostRecentLoan
+        mostRecentLoan,
+        loanRepaymentSchedule
     }
 
 

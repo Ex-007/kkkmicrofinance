@@ -24,6 +24,11 @@
 
 <script setup>
 
+// ROUTE GUARD
+definePageMeta({
+    middleware: ['auth']
+})
+
 import{useCustomerStore} from '@/stores/customerProfile'
 const customer = useCustomerStore()
 

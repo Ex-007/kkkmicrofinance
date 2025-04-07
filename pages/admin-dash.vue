@@ -263,9 +263,9 @@
     // KKK-3DwxWw8sUluZH7D
 
     // ROUTE GUARD
-    // definePageMeta({
-    //   middleware: [auth]
-    // })
+    definePageMeta({
+       middleware: ['admin']
+    })
     const activeTab = ref('loanRequests');
     // const activeTab = ref('home');
     

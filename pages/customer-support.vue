@@ -7,6 +7,10 @@
 </template>
 
 <script setup>
+// ROUTE GUARD
+definePageMeta({
+    middleware: ['auth']
+})
 </script>
 
 <style scoped>
