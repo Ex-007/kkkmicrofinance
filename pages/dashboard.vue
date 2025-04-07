@@ -83,33 +83,32 @@
 
               <!-- LOAN INFORMATION -->
                <div class="loanInformation">
-                <h1>Current Loan Information</h1>
-                <div class="steps">
-                    <div class="step">
-                        <h3>Amount Collected</h3>
-                        <p>$ 5,000</p>
+                    <h1>Current Loan Information</h1>
+                    <div class="current" v-if="customer.mostRecentLoan.status == 'APPROVED'">
+                <div class="header">
+                    <h3>Current Loan</h3>
+                </div>
+                <div class="loanHisDisplay">
+                    <h3>Date : {{ formatDate(customer.mostRecentLoan.created_at) }}</h3>
+                    <h3>Loan Type : {{ customer.mostRecentLoan.loanType }}</h3>
+                    <h3>Amount : {{ customer.mostRecentLoan.loanAmount }}</h3>
+                    <h3>Amount in Words : {{ customer.mostRecentLoan.amountInWords }}</h3>
+                    <h3>Loan Period : {{ customer.mostRecentLoan.loanPeriod }}</h3>
+                    <h3>Loan Purpose : {{ customer.mostRecentLoan.loanPurpose }}</h3>
+                </div>
+            </div>
+            <div class="current rejectedLoan" v-else-if="customer.mostRecentLoan.status == 'REJECTED'">
+                <h3>Loan Rejected...</h3>
+            </div>
+            <div class="current pendingLoan" v-else>
+                <h3>Loan Pending...</h3>
+            </div>
+                    <!-- <div class="steps">
+                        <div class="step">
+                            <h3>Amount Collected</h3>
+                            <p>$ 5,000</p>
                     </div>
-            
-                    <div class="step">
-                        <h3>Interest</h3>
-                        <p>18%</p>
-                    </div>
-            
-                    <div class="step">
-                        <h3>Duration</h3>
-                        <p>3 Months</p>
-                    </div>
-            
-                    <div class="step">
-                        <h3>Amount Paid</h3>
-                        <p>$ 2,00</p>
-                    </div>
-            
-                    <div class="step">
-                        <h3>Remaining Balance</h3>
-                        <p>$ 2,900</p>
-                    </div>
-               </div>
+                </div> -->
                </div>
 
 
@@ -525,6 +524,13 @@ onMounted(async () => {
     .current{
         font-size: 13px;
     }
+            .pendingLoan h3, .rejectedLoan h3{
+            font-size: 17px;
+        }
+        .loanHeading button{
+            font-size: 12px;
+            padding: 0 4px;
+        }
   }
 
     /* TRANSACTIONS HISTORY */
@@ -698,7 +704,14 @@ onMounted(async () => {
         justify-content: space-between;
         gap: 100px;
         color: white;
-        /* align-items: center; */
+    }
+        .pendingLoan{
+        text-align: center;
+        background-color: yellow;
+    }
+    .rejectedLoan{
+        background-color: red;
+        text-align: center;
     }
 
 

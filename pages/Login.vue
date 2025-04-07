@@ -326,6 +326,7 @@ button{
     padding: 10px;
     border-radius: 20px;
     cursor: pointer;
+    border: none;
 }
 span{
     color: white;
