@@ -17,7 +17,7 @@
         title: 'KKK Cooperative Bank',
         description : 'KKK Cooperative Bank.',
         url : 'https://angelsheight.org',
-        image : '/img/angelsImage.jpg',
+        image : '/icons/icon-512.png',
         siteName : 'KKK Cooperative Bank',
         type : 'website',
         twitterHandle : '@angelsheight',
@@ -86,7 +86,8 @@
         link : [
             {rel: 'canonical', href: seoData.value.url},
             { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-            { rel: 'apple-touch-icon', href: '/icons/apple-touch-icon.png' }
+            { rel: 'apple-touch-icon', href: '/icons/apple-touch-icon.png' },
+            { rel: 'manifest', href: '/manifest.webmanifest' }
             ]
     }))
 

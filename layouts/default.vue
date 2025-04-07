@@ -1,7 +1,6 @@
 <template>
     <div>
         <NavigationBar />
-        <PwaUpdate />
         <div>
             <slot />
         </div>

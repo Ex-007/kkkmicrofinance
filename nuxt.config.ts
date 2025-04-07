@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  modules: ['@pinia/nuxt', '@nuxtjs/supabase', '@nuxtjs/google-fonts', '@vite-pwa/nuxt'],
+  modules: ['@pinia/nuxt', '@nuxtjs/supabase', '@nuxtjs/google-fonts'],
   css: [
     "~/assets/css/global.css",
     'font-awesome/css/font-awesome.min.css',
@@ -21,6 +21,18 @@ export default defineNuxtConfig({
     prefetch: true,
     preconnect: true,
     download: false
+  },
+  head: {
+    link: [
+      { rel: 'manifest', href: '/manifest.webmanifest' },
+      { rel: 'apple-touch-icon', href: '/icons/icon-192.png' }
+    ],
+    meta: [
+      { name: 'theme-color', content: '#ffffff' },
+      { name: 'apple-mobile-web-app-capable', content: 'yes' },
+      { name: 'mobile-web-app-capable', content: 'yes' },
+      { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' }
+    ]
   },
   build: {
     transpile: ["font-awesome"]
@@ -46,53 +58,5 @@ export default defineNuxtConfig({
   nitro: {
     preset: 'static'
   },
-  pwa: {
-    manifest: {
-      name: 'KKK Cooperative',
-      short_name: 'KKK',
-      description: 'Your Trusted Cooperative Bank for Savings, Loans and easy Transactions.',
-      theme_color: '#ffffff',
-      background_color: '#ffffff',
-      display: 'standalone',
-      icons: [
-        {
-          src: '/icons/icon-16.png',
-          sizes: '16x16',
-          type: 'image/png'
-        },
-        {
-          src: '/icons/icon-32.png',
-          sizes: '32x32',
-          type: 'image/png'
-        },
-        {
-          src: '/icons/icon-192.png',
-          sizes: '192x192',
-          type: 'image/png'
-        },
-        {
-          src: '/icons/icon-512.png',
-          sizes: '512x512',
-          type: 'image/png'
-        }
-      ]
-    },
-    registerType: 'autoUpdate',
-    workbox: {
-      runtimeCaching: [
-        {
-          urlPattern: ({ url }) => url.origin === self.location.origin,
-          handler: 'CacheFirst',
-          options: {
-            cacheName: 'static-resources',
-            expiration: { maxEntries: 50, maxAgeSeconds: 86400 }
-          }
-        }
-      ]
-    },
-    devOptions: {
-      enabled: true,
-      type: 'module'
-    }
-  }
+  
 })
