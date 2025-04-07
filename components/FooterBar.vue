@@ -10,12 +10,12 @@
         <!-- Quick Links -->
         <div class="footer-section">
           <h3>Quick Links</h3>
-          <ul>
+          <!-- <ul>
             <li><nuxt-link to="/" class="routerMove"><i class="fa fa-home"></i>Home</nuxt-link></li>
-            <li><nuxt-link to="/About" class="routerMove"><i class="fa fa-user"></i>About Us</nuxt-link></li>
-            <li><nuxt-link to="/Notifications" class="routerMove"><i class="fa fa-bell"></i>Terms and Conditions</nuxt-link></li>
-            <li><nuxt-link to="/Support" class="routerMove"><i class="fa fa-heart"></i>Offers</nuxt-link></li>
-          </ul>
+            <li><nuxt-link to="/" class="routerMove"><i class="fa fa-user"></i>About Us</nuxt-link></li>
+            <li><nuxt-link to="/" class="routerMove"><i class="fa fa-bell"></i>Terms and Conditions</nuxt-link></li>
+            <li><nuxt-link to="/" class="routerMove"><i class="fa fa-heart"></i>Offers</nuxt-link></li>
+          </ul> -->
         </div>
   
         <!-- Support & Help -->
