@@ -3,7 +3,7 @@
         
         <div class="overall">
             <div class="firstTop">
-                <img src="/img/kkklogo.png" alt="The logo image" width="60px">
+                <img src="/icons/icon-512.png" alt="The logo image" width="40px">
                 <h1>KODUN KOPO KOPE</h1>
             </div>
 
