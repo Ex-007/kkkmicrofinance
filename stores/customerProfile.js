@@ -82,12 +82,10 @@ export const useCustomerStore = defineStore('customerPro', () => {
               filter: `email=eq.${loggedEmail}`,
             },
             (payload) => {
-              console.log('Realtime update received:', payload)
               fetchDetails(loggedEmail)
             }
           )
           .subscribe((status) => {
-            console.log('🧬 Subscribed to realtime:', status)
           })
       }
 
@@ -627,7 +625,7 @@ const uploadGuarantorImage = async () => {
     return{
         isLoading,
         error,
-        user,
+        user: computed(() => user.value),
         signinUser,
         setUser,
         recentTransact,

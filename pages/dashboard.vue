@@ -13,7 +13,7 @@
             <!-- ACCOUNT BALANCE -->
              <div class="accountBalance">
                 <h2>Account Balance</h2>
-                <h3>{{ formatCurrency(cusInfo.accountBalance) }}</h3>
+                <h3>{{ formatCurrency(customer.user.accountBalance) }}</h3>
              </div>
 
              <!-- MENU ITEMS -->
@@ -256,7 +256,7 @@ const cusInfo = ref({
     nextKinTwoPhone: '',
     transactionHistory: '',
     loansRecord: '',
-    accountBalance: '',
+    // accountBalance: '',
     createdAt: '',
     investment: '',
     shares: ''
@@ -293,7 +293,7 @@ const attachSearchDetails = async () => {
     cusInfo.value.transactionHistory = customer.user.transactionHistory
     cusInfo.value.loansRecord = customer.user.loansRecord
     cusInfo.value.createdAt = customer.user.created_at
-    cusInfo.value.accountBalance = customer.user.accountBalance
+    // cusInfo.value.accountBalance = customer.user.accountBalance
     cusInfo.value.investment = customer.user.investment
     cusInfo.value.shares = customer.user.shares
 
@@ -325,49 +325,49 @@ const ineligible = ref('')
 const noteligible = ref(false)
 const createdAt = ref('2025-01-01')
 // CHECKING LOAN ELIGIBILITY
-const requestLoan = () => {
-    let registrationDate = new Date(createdAt.value);
-    let currentDate = new Date();
-    let differenceInMs = currentDate - registrationDate;
-    let differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
-    let requiredDays = 90;
-
-    if (differenceInDays >= requiredDays) {
-        openLoanModal.value = true
-    } else {
-        let daysRemaining = Math.ceil(requiredDays - differenceInDays);
-        noteligible.value = true
-        ineligible.value = `Not yet eligible. ${daysRemaining} days remaining.`;
-        setTimeout(() => {
-            noteligible.value = false
-        }, 2000);
-    }
-}
-
 // const requestLoan = () => {
-//     let registrationDate = new Date(cusInfo.value.createdAt);
+//     let registrationDate = new Date(createdAt.value);
 //     let currentDate = new Date();
-    
-//     if (isNaN(registrationDate)) {
-//         ineligible.value = "Invalid registration date.";
-//         return;
-//     }
-
 //     let differenceInMs = currentDate - registrationDate;
 //     let differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
 //     let requiredDays = 90;
 
 //     if (differenceInDays >= requiredDays) {
-//         router.push('/loan-application');
+//         openLoanModal.value = true
 //     } else {
 //         let daysRemaining = Math.ceil(requiredDays - differenceInDays);
-//         noteligible.value = true;
+//         noteligible.value = true
 //         ineligible.value = `Not yet eligible. ${daysRemaining} days remaining.`;
 //         setTimeout(() => {
-//             noteligible.value = false;
+//             noteligible.value = false
 //         }, 2000);
 //     }
-// };
+// }
+
+const requestLoan = () => {
+    let registrationDate = new Date(cusInfo.value.createdAt);
+    let currentDate = new Date();
+    
+    if (isNaN(registrationDate)) {
+        ineligible.value = "Invalid registration date.";
+        return;
+    }
+
+    let differenceInMs = currentDate - registrationDate;
+    let differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
+    let requiredDays = 90;
+
+    if (differenceInDays >= requiredDays) {
+        router.push('/loan-application');
+    } else {
+        let daysRemaining = Math.ceil(requiredDays - differenceInDays);
+        noteligible.value = true;
+        ineligible.value = `Not yet eligible. ${daysRemaining} days remaining.`;
+        setTimeout(() => {
+            noteligible.value = false;
+        }, 2000);
+    }
+};
 
 // UPLOADING GUARANTOR'S FORM
 const passportPreviewUrl = ref('') 
@@ -493,6 +493,7 @@ const distributeFund = async () => {
         await customer.distributeBalance(fundsMovement.value, balance, accountBalance)
         fundsMovement.value.message = `You have sent ${formatCurrency(fundsMovement.value.amount)} to Your ${fundsMovement.value.type} account, New ${fundsMovement.value.type} Balance is ${formatCurrency(newBalance)}.`
         setTimeout(() => {
+            fundsMovement.value.amount = ''
             fundsMovement.value.open = false
             moveOpen.value = false
 
@@ -507,6 +508,7 @@ const distributeFund = async () => {
         await customer.distributeBalance(fundsMovement.value, balance, accountBalance)
         fundsMovement.value.message = `You have sent ${formatCurrency(fundsMovement.value.amount)} to Your ${fundsMovement.value.type} account, New ${fundsMovement.value.type} Balance is ${formatCurrency(newBalance)}.`
         setTimeout(() => {
+            fundsMovement.value.amount = ''
             fundsMovement.value.open = false
             moveOpen.value = false
         }, 2000);
@@ -663,6 +665,9 @@ onMounted(async () => {
     .loanInformation h1{
         font-size: 25px;
     }
+        .paymentAndDate h2{
+        font-size: 14px;
+    }
     .current{
         font-size: 13px;
     }
@@ -705,6 +710,9 @@ onMounted(async () => {
     }
     .paymentAndDate p{
         color: white;
+    }
+    .paymentAndDate h2{
+        font-size: 14px;
     }
     .recentTrx h1{
         text-align: center;
