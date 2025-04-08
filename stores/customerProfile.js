@@ -14,6 +14,7 @@ export const useCustomerStore = defineStore('customerPro', () => {
     const loanRepaymentSchedule = ref([])
     const pendingLoan = ref(false)
     const depositUpload = ref(false)
+    let channel = null
 
     // FETCH THE SIGNED IN USER
     const signinUser = async () => {
@@ -39,11 +40,12 @@ export const useCustomerStore = defineStore('customerPro', () => {
 
             if (loggedUserData && loggedUserData.user) {
                 let loggedEmail = loggedUserData.user.email
-                await fetchDetails(loggedEmail)
+                // await fetchDetails(loggedEmail)
                 await recentTransactions(loggedEmail)
                 await allTransactions(loggedEmail)
                 await fetchMostRecentLoan(loggedEmail)
                 await fetchAllLoans(loggedEmail)
+                await listenToUserDetails(loggedEmail)
                 return loggedUserData.user
             } else {
                 return null
@@ -55,6 +57,46 @@ export const useCustomerStore = defineStore('customerPro', () => {
             isLoading.value = false
         }
     }
+
+    const setUser = async (newUser) => {
+        let loggedEmail = newUser.email
+        user.value = newUser
+        await fetchDetails(loggedEmail)
+        await listenToUserDetails(loggedEmail)
+      }
+
+      const listenToUserDetails = async (loggedEmail) => {
+        const client = useSupabaseClient()
+        if (channel) {
+          await client.removeChannel(channel)
+        }
+    
+        channel = client
+          .channel('user-details-realtime')
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'REGISTEREDUSERS',
+              filter: `email=eq.${loggedEmail}`,
+            },
+            (payload) => {
+              console.log('Realtime update received:', payload)
+              fetchDetails(loggedEmail)
+            }
+          )
+          .subscribe((status) => {
+            console.log('🧬 Subscribed to realtime:', status)
+          })
+      }
+
+
+
+
+
+
+
 
     // SIGNOUT 
     const logOut = async () => {
@@ -217,7 +259,8 @@ const uploadGuarantorImage = async () => {
     imageUploaded.value = false
     
     try {
-            const { data: recentLoan, error: fetchError } = await client
+       
+        const { data: recentLoan, error: fetchError } = await client
             .from('LOANREQUESTS')
             .select('id')
             .eq('registrationId', registrationId)
@@ -449,6 +492,118 @@ const uploadGuarantorImage = async () => {
     
     }
 
+    // DISTRIBUTE THE SAVINGS ACCOUNT TO OTHER ACOUNTS
+    const distributeBalance = async(fundsMovement, balance, accountBalance) => {
+        isLoading.value = true
+        error.value = null
+        let identity = user.value.reg_identity
+        const client = useSupabaseClient()
+
+        try {
+            if(fundsMovement.type == 'Shares'){
+                let newBalance = fundsMovement.amount + balance
+                
+                let upType = 'Balance to Shares'
+                console.log('This is for shares')
+                const {data:depositData, error:depositError} = await client
+                .from('REGISTEREDUSERS')
+                .update({
+                    shares: newBalance
+                })
+                .eq('reg_identity', identity)
+
+                if(depositError) throw depositError
+                await updateBalance(fundsMovement, accountBalance)
+                await historyData(fundsMovement, upType)
+            }else{
+                let newBalance = fundsMovement.amount + balance
+                let upType = 'Balance to Investment'
+                console.log('This is for investment')
+                const {data:depositData, error:depositError} = await client
+                .from('REGISTEREDUSERS')
+                .update({
+                    investment: newBalance
+                })
+                .eq('reg_identity', identity)
+                await updateBalance(fundsMovement, accountBalance)
+                await historyData(fundsMovement, upType)
+            }
+
+        } catch (err) {
+            error.value = err.message
+        } finally{
+            isLoading.value = false
+        }
+    }
+
+    // UPDATE THE REMAINING BALANCE
+    const updateBalance = async (fundsMovement, accountBalance) => {
+        isLoading.value = true
+        error.value = false
+        let identity = user.value.reg_identity
+        const client = useSupabaseClient()
+        try {
+            let newBalance = accountBalance - fundsMovement.amount
+            
+            const {data:balanceData, error:balanceError} = await client
+            .from('REGISTEREDUSERS')
+            .update({
+                accountBalance: newBalance
+            })
+            .eq('reg_identity', identity)
+
+            if(balanceError) throw balanceError
+        } catch (err) {
+            error.value = err.message
+        } finally{
+            isLoading.value = false
+        }
+    }
+
+    // UPDATE THE HISTORY
+    const historyData = async(fundsMovement, upType) => {
+        isLoading.value = true
+        error.value = null
+        let identity = user.value.reg_identity
+        const client = useSupabaseClient()
+        try {
+            const {data:historyData, error:historyError} = await client
+            .from('REGISTEREDUSERS')
+            .select('transactionHistory')
+            .eq('reg_identity', identity)
+            .single()
+
+            if(historyError) throw historyError
+            const metadataUpdate = historyData.transactionHistory || {}
+            if(!metadataUpdate.payments){
+                metadataUpdate.payments = []
+            }
+
+            const newTransactionHistory = {
+                amount: fundsMovement.amount,
+                date: new Date().toISOString(),
+                type: upType,
+            }
+
+            metadataUpdate.payments.push(newTransactionHistory)
+
+            const {data: lastData, error: lastError} = await client
+            .from('REGISTEREDUSERS')
+            .update({
+                transactionHistory: metadataUpdate
+            })
+            .eq('reg_identity', identity)
+
+            if(lastError) throw lastError
+            return lastData
+
+
+        } catch (err) {
+            error.value = err.message
+        }finally{
+            isLoading.value = false
+        }
+    }
 
 
 
@@ -474,6 +629,7 @@ const uploadGuarantorImage = async () => {
         error,
         user,
         signinUser,
+        setUser,
         recentTransact,
         setGuarantorPhoto,
         imageUploaded,
@@ -488,7 +644,8 @@ const uploadGuarantorImage = async () => {
         loanRepaymentSchedule,
         setDepositPhoto,
         depositUpload,
-        uploadDepositFile
+        uploadDepositFile,
+        distributeBalance
     }
 
 

@@ -23,6 +23,7 @@
                      <ul>
                          <li><nuxt-link to="/profile">Profile</nuxt-link></li>
                          <li @click="openAccount">Accounts</li>
+                         <li @click="openFunds">Save</li>
                          <li><nuxt-link to="/transHistory">Transaction History</nuxt-link></li>
                          <li><nuxt-link to="/loan-status">Loans</nuxt-link></li>
                          <li><nuxt-link to="/customer-support">Customer Support</nuxt-link></li>
@@ -46,6 +47,30 @@
                     </div>
                   </div>
               </transition>
+
+              <!-- SAVE TO OTHER ACCOUNTS -->
+              <transition name="fade">
+                  <div class="loanPop" v-if="moveOpen">
+                    <div class="separate">
+                        <h3>Move Funds</h3>
+                        <p class="closeLoanInput" @click="closeFunds"><i class="fa fa-times"></i></p>
+                    </div>
+                    <div class="toOtherAccts">
+                        <label for="destination">Destination</label>
+                        <select id="destination" class="contactInput" v-model="fundsMovement.type">
+                            <option>Investment</option>
+                            <option>Shares</option>
+                        </select>
+                        <label for="amountMoving">Amount</label>
+                        <input type="number" class="contactInput" placeholder="Input Amount" min="0" oninput="this.value = Math.abs(this.value)" v-model="fundsMovement.amount">
+                        <p class="movingFundd" v-if="fundsMovement.open">{{ fundsMovement.message }}</p>
+                        <button @click="distributeFund">Move</button>
+                    </div>
+                  </div>
+              </transition>
+
+
+
 
               <!-- DEPOSIT ACCOUNTS -->
               <transition name="fade">
@@ -426,6 +451,80 @@ const uploadDeposit = () => {
     }, 2000);
 }
 
+// HANDLE FUNDS MOVEMEMNT
+const moveOpen = ref(false)
+const openFunds = () => {
+    moveOpen.value = true
+    menuItem.value = false
+}
+const closeFunds = () => {
+    moveOpen.value = false
+}
+
+const fundsMovement = ref({
+    amount: '',
+    type: 'investment',
+    message: '',
+    open: false
+})
+
+const distributeFund = async () => {
+    const accountBalance = cusInfo.value.accountBalance
+    if(fundsMovement.value.amount == ''){
+        fundsMovement.value.open = true
+        fundsMovement.value.message = 'Amount cannot be empty'
+        return
+    }
+    fundsMovement.value.open = false
+    fundsMovement.value.message = ''
+    if(fundsMovement.value.amount > accountBalance){
+        fundsMovement.value.open = true
+        fundsMovement.value.message = 'The Amount You\re trying to move is greater than your balance. Please reduce it and try again'
+        return
+    }
+    fundsMovement.value.open = false
+    fundsMovement.value.message = ''
+    if(fundsMovement.value.type == 'Shares'){
+        const balance = cusInfo.value.shares
+        let newBalance = balance + fundsMovement.value.amount
+        fundsMovement.value.open = true
+        fundsMovement.value.message = `You're sending ${formatCurrency(fundsMovement.value.amount)} to ${fundsMovement.value.type}.`
+        console.log(fundsMovement.value.type)
+        await customer.distributeBalance(fundsMovement.value, balance, accountBalance)
+        fundsMovement.value.message = `You have sent ${formatCurrency(fundsMovement.value.amount)} to Your ${fundsMovement.value.type} account, New ${fundsMovement.value.type} Balance is ${formatCurrency(newBalance)}.`
+        setTimeout(() => {
+            fundsMovement.value.open = false
+            moveOpen.value = false
+
+        }, 2000);
+        return
+    }else{
+        let balance = cusInfo.value.investment
+        let newBalance = balance + fundsMovement.value.amount
+        fundsMovement.value.open = true
+        fundsMovement.value.message = `You're sending ${formatCurrency(fundsMovement.value.amount)} to ${fundsMovement.value.type}.`
+        console.log(fundsMovement.value.type)
+        await customer.distributeBalance(fundsMovement.value, balance, accountBalance)
+        fundsMovement.value.message = `You have sent ${formatCurrency(fundsMovement.value.amount)} to Your ${fundsMovement.value.type} account, New ${fundsMovement.value.type} Balance is ${formatCurrency(newBalance)}.`
+        setTimeout(() => {
+            fundsMovement.value.open = false
+            moveOpen.value = false
+        }, 2000);
+        return
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -710,7 +809,7 @@ onMounted(async () => {
     }
 
     .contactInput{
-      width: 290px;
+      width: 150px;
       border-radius: 10px;
       height: 35px;
       border: none;
@@ -778,6 +877,22 @@ onMounted(async () => {
     }
     .otherDetails button{
         height: 25px;
+    }
+    .toOtherAccts{
+        display: flex;
+        flex-direction: column;
+        color: white;
+        gap: 5px;
+    }
+    .movingFundd{
+        text-align: center;
+        text-align-last: center;
+        background-color: #37a187;
+        margin: 5px;
+        padding: 5px;
+        border-radius: 10px;
+        box-shadow: inset 10px 6px 50px rgb(30, 39, 95);
+        color: white;
     }
 
 

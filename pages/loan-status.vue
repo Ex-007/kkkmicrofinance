@@ -8,6 +8,9 @@
 
         <!-- CURRENT LOAN -->
         <div class="currentLoan" v-if="currentShow">
+            <div class="noRecentLoan" v-if="custom.noLoan">
+                <h1>No Loan History</h1>
+            </div>
             <div class="current" v-if="customer.mostRecentLoan.status == 'APPROVED'">
                 <div class="header">
                     <h3>Current Loan</h3>
@@ -112,6 +115,12 @@ const formatCurrency = (amount) => {
         currency: 'NGN',
     }).format(amount);
 };
+
+
+// const loanStatus = ref(false)
+// const checkForLoan = () => {
+
+// }
 onMounted(async () => {
     await customer.signinUser()
 })
