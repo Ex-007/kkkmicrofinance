@@ -667,7 +667,7 @@ onMounted(async () => {
         font-size: 25px;
     }
         .paymentAndDate h2{
-        font-size: 14px;
+        font-size: 12px;
     }
     .current{
         font-size: 13px;
@@ -678,6 +678,9 @@ onMounted(async () => {
         .loanHeading button{
             font-size: 12px;
             padding: 0 4px;
+        }
+        .amount h3{
+            font-size: 13px;
         }
   }
 
@@ -723,7 +726,9 @@ onMounted(async () => {
         text-align: center;
         color: white;
     }
-
+    .amount h3{
+            font-size: 14px;
+        }
     /* MENU ICON */
     .menuIcon{
         color: white;

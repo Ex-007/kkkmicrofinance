@@ -6,11 +6,14 @@
             <button @click="loanH">Loan History</button>
         </div>
 
+        <div class="checkLoan" v-if="customer.allLoans.length < 0">
+            <h1>No Loan History</h1>
+        </div>
+
+        <div class="another" v-else>
+
         <!-- CURRENT LOAN -->
         <div class="currentLoan" v-if="currentShow">
-            <div class="noRecentLoan" v-if="custom.noLoan">
-                <h1>No Loan History</h1>
-            </div>
             <div class="current" v-if="customer.mostRecentLoan.status == 'APPROVED'">
                 <div class="header">
                     <h3>Current Loan</h3>
@@ -69,6 +72,7 @@
                     <h3>Status : {{ loans.status }}</h3>
                 </div>
             </div>
+        </div>
         </div>
     </div>
 </template>
