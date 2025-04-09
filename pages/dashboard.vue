@@ -83,8 +83,8 @@
                         <label for="types">Deposit Type</label>
                         <select id="types" class="contactInput" v-model="depositType">
                             <option>Savings</option>
-                            <option>Investments</option>
-                            <option>Shares</option>
+                            <!-- <option>Investments</option>
+                            <option>Shares</option> -->
                         </select>
                         <input type="file" class="contactInput" @change="handleDepositPhoto" accept="image/*" required>
                         <div v-if="depositPreviewUrl" class="preview">
@@ -179,6 +179,7 @@ const router = useRouter()
 
 // ROUTE GUARD
 definePageMeta({
+    layout: 'custom',
     middleware: ['auth']
 })
 
@@ -220,9 +221,9 @@ const fillLoanApp = () => {
 }
 
 // DEFINE THE PAGE META
-definePageMeta({
-    layout: 'custom'
-})
+// definePageMeta({
+//     layout: 'custom'
+// })
 
 
 // CUSTOMER INFORMATION
@@ -256,7 +257,7 @@ const cusInfo = ref({
     nextKinTwoPhone: '',
     transactionHistory: '',
     loansRecord: '',
-    // accountBalance: '',
+    accountBalance: '',
     createdAt: '',
     investment: '',
     shares: ''
@@ -293,7 +294,7 @@ const attachSearchDetails = async () => {
     cusInfo.value.transactionHistory = customer.user.transactionHistory
     cusInfo.value.loansRecord = customer.user.loansRecord
     cusInfo.value.createdAt = customer.user.created_at
-    // cusInfo.value.accountBalance = customer.user.accountBalance
+    cusInfo.value.accountBalance = customer.user.accountBalance
     cusInfo.value.investment = customer.user.investment
     cusInfo.value.shares = customer.user.shares
 
