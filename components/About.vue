@@ -51,11 +51,12 @@
   h2 {
     font-size: 2rem;
     margin-bottom: 10px;
+    color: #d10000;
   }
   
   .description {
     font-size: 1.2rem;
-    color: #555;
+    color: #d10000;
     margin-bottom: 30px;
   }
   
@@ -67,7 +68,7 @@
   }
   
   .step {
-    background: #616dad;
+    background: #d10000;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

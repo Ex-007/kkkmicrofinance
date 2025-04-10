@@ -65,7 +65,7 @@
 
 
     // LOGIN VISIBILITY
-    const loginVisible = ref(false)
+    const loginVisible = ref(true)
     const toggleSign = () => {
         registerVisible.value = false
         loginVisible.value = true
@@ -73,7 +73,7 @@
     }
 
     // REGISTRATION VISIBILITY
-    const registerVisible = ref(true)
+    const registerVisible = ref(false)
     const toggleRegister = () => {
         registerVisible.value = true
         loginVisible.value = false
@@ -208,14 +208,14 @@
 
     // SEO METADATA
     const seoData = ref({
-        title: 'KKK Toluwalase | Microfinance Bank | Register with us',
-        description : 'Angels Height college of health technology offers top rated courses like Environmental Health Technology, Community Health Extension Worker (CHEW) Junior, Community Health Extension Worker (CHEW) Senior, Dental Therapy, Pharmacy Technician, Opticianry Dispensary, Public Health Technology, Health Assistant Medical, Health Technician, Computer Science Technology, Nutrition and Dietetics, Medical Laboratory Technician, Orthopedic Plaster Card. Join us for a rewarding career in healthcare.',
+        title: 'KKK Cooperative Bank',
+        description : 'KKK Cooperative Bank.',
         url : 'https://angelsheight.org',
-        image : '/img/angelsImage.jpg',
-        siteName : 'Angels Height College of Health Technology',
+        image : '/icons/icon-512.png',
+        siteName : 'KKK Cooperative Bank',
         type : 'website',
         twitterHandle : '@angelsheight',
-        keywords : 'Environmental Health Technology, Community Health Extension Worker (CHEW) Junior, Community Health Extension Worker (CHEW) Senior, Dental Therapy, Pharmacy Technician, Opticianry Dispensary, Public Health Technology, Health Assistant Medical, Health Technician, Computer Science Technology, Nutrition and Dietetics, Medical Laboratory Technician, Orthopedic Plaster Card, best health technology college in Nigeria'
+        keywords : 'Cooperative, Savings, Loans, Withdrawal, Deposit, Fast, Secured, Transparent'
     })
 
     useHead(() => ({
@@ -280,7 +280,7 @@
 
 <style scoped>
     .errorClass{
-        color: red;
+        color: rgb(255, 255, 255);
     }
 
     .page{
@@ -289,11 +289,11 @@
         align-items: center;
         flex-direction: column;
         gap: 10px;
-        background-color: #6897a7;
+        background-color: #e23e3e;
         margin: 10px;
         padding: 20px;
         border-radius: 10px;
-        box-shadow: inset 10px 6px 50px rgb(26, 49, 195);
+        box-shadow: inset 10px 6px 50px rgb(254, 254, 254);
     }
 .page p{
     text-align: center;
@@ -322,11 +322,12 @@ h5{
 button{
     width: 150px;
     background-color: white;
-    color: rgb(84, 8, 112);
+    color: #d10000;
     padding: 10px;
     border-radius: 20px;
     cursor: pointer;
     border: none;
+    margin: 0 5px;
 }
 span{
     color: white;
@@ -337,6 +338,8 @@ h3{
     text-align: center;
     text-align-last: center;
     color: white;
+    font-style: italic;
+    font-family: 'Inter', sans-serif;
 }
 @media (max-width: 768px){
     span{

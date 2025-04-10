@@ -105,7 +105,7 @@ const accountPage =  () => {
         transition: all 0.3s ease-in-out;
     }
     .primary-btn{
-        background-color: #616dad;
+        background-color: #d10000;
         color: white;
     }
     .secondary-btn{
@@ -114,11 +114,11 @@ const accountPage =  () => {
         border: 2px solid white;
     }
     .primary-btn:hover{
-        background-color: #232e6f;
+        background-color: #d10000;
     }
     .secondary-btn:hover{
         background-color: white;
-        color: #616dad;
+        color: #d10000;
     }
     .hero{
         background-attachment: fixed;

@@ -41,7 +41,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    color: #616dad;
+    color: #d10000;
 }
 ul{
     display: flex;
@@ -57,11 +57,11 @@ li{
     border-radius: 5px;
 }
 li:hover{
-    background: #232e6f;
+    background: #d10000;
     color: white;
 }
 a{
-    color: #616dad;
+    color: #d10000;
     text-decoration: none;
     font-size: 40px;
 

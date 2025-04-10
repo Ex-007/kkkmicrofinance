@@ -4,8 +4,9 @@
             <!-- NAME, PICTURE AND LOGOUT -->
             <div class="namePicture">
                 <div class="imageName">
-                    <img :src='cusInfo.passportUrl || "/img/profilepicture.jpeg"' alt="">
-                    <h2>{{ cusInfo.surname + ' ' + cusInfo.firstname }}</h2>
+                    <img :src='customer.user.passportUrl || "/img/profilepicture.jpeg"' alt="">
+                    <h2>{{ customer.user.surname + ' ' + customer.user.firstname }}</h2>
+                    <!-- <h2>{{ cusInfo.surname + ' ' + cusInfo.firstname }}</h2> -->
                 </div>
                 <h2 class="menuIcon" @click="openMenu"><i class="fa fa-bars"></i></h2>
             </div>
@@ -572,12 +573,12 @@ onMounted(async () => {
         border-radius: 20px;
         cursor: pointer;
         border: none;
-        color: #616dad;
+        color: #d10000;
     }
     .namePicture button:hover, .depositAndLoanReq button:hover{
-        background-color: #616dad;
+        background-color: #d10000;
         color: white;
-        border: 2px solid #616dad;
+        border: 2px solid #d10000;
         outline: 3px solid white;
     }
 
@@ -767,6 +768,14 @@ onMounted(async () => {
         text-decoration: none;
         color: white;
     }
+    .menuP ul li:hover{
+        background-color: #d10000;
+        color: white;
+        padding: 5px;
+        border-radius: 20px;
+    }
+
+
     .closeMenu i{
         color: red;
     }

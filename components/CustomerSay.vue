@@ -59,7 +59,7 @@
   }
 
 .details {
-    background: #616dad;
+    background: #d10000;
     /* background: rgb(53, 31, 73); */
     padding: 20px;
     border-radius: 10px;
@@ -88,6 +88,12 @@
     }
     :deep(.swiper-pagination) {
   display: none !important;
+}
+.saidAbout>p{
+    color: #d10000;
+}
+h2{
+    color: #d10000;
 }
 
 </style>

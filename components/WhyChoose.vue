@@ -65,6 +65,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
+    color: #d10000;
   }
   
   .step {
@@ -73,6 +74,7 @@
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease-in-out;
+    color: #d10000;
   }
   
   .step:hover {
@@ -81,7 +83,7 @@
   
   .icon {
     font-size: 2.5rem;
-    color: #007bff;
+    color: #d10000;
     margin-bottom: 15px;
   }
   
@@ -91,7 +93,7 @@
   }
   
   p {
-    color: #666;
+    color: #d10000;
   }
   
   /* Media Query for Mobile */

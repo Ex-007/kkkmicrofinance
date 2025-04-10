@@ -30,11 +30,12 @@
   h1{
     background-color: white;
     text-align: center;
+    color: #d10000;
   }
   .faq-container {
     max-width: 600px;
     margin: auto;
-    background-color: #616dad;
+    background-color: #d10000;
   }
   
   .faq-item {
@@ -43,6 +44,7 @@
     padding: 10px;
     margin: 20px 0 20px 10px;
     border-radius: 10px;
+    color: #d10000;
   }
   
   .faq-question {
