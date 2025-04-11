@@ -327,49 +327,49 @@ const ineligible = ref('')
 const noteligible = ref(false)
 const createdAt = ref('2025-01-01')
 // CHECKING LOAN ELIGIBILITY
-const requestLoan = () => {
-    let registrationDate = new Date(createdAt.value);
-    let currentDate = new Date();
-    let differenceInMs = currentDate - registrationDate;
-    let differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
-    let requiredDays = 90;
-
-    if (differenceInDays >= requiredDays) {
-        openLoanModal.value = true
-    } else {
-        let daysRemaining = Math.ceil(requiredDays - differenceInDays);
-        noteligible.value = true
-        ineligible.value = `Not yet eligible. ${daysRemaining} days remaining.`;
-        setTimeout(() => {
-            noteligible.value = false
-        }, 2000);
-    }
-}
-
 // const requestLoan = () => {
-//     let registrationDate = new Date(cusInfo.value.createdAt);
+//     let registrationDate = new Date(createdAt.value);
 //     let currentDate = new Date();
-    
-//     if (isNaN(registrationDate)) {
-//         ineligible.value = "Invalid registration date.";
-//         return;
-//     }
-
 //     let differenceInMs = currentDate - registrationDate;
 //     let differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
 //     let requiredDays = 90;
 
 //     if (differenceInDays >= requiredDays) {
-//         router.push('/loan-application');
+//         openLoanModal.value = true
 //     } else {
 //         let daysRemaining = Math.ceil(requiredDays - differenceInDays);
-//         noteligible.value = true;
+//         noteligible.value = true
 //         ineligible.value = `Not yet eligible. ${daysRemaining} days remaining.`;
 //         setTimeout(() => {
-//             noteligible.value = false;
+//             noteligible.value = false
 //         }, 2000);
 //     }
-// };
+// }
+
+const requestLoan = () => {
+    let registrationDate = new Date(cusInfo.value.createdAt);
+    let currentDate = new Date();
+    
+    if (isNaN(registrationDate)) {
+        ineligible.value = "Invalid registration date.";
+        return;
+    }
+
+    let differenceInMs = currentDate - registrationDate;
+    let differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
+    let requiredDays = 90;
+
+    if (differenceInDays >= requiredDays) {
+        router.push('/loan-application');
+    } else {
+        let daysRemaining = Math.ceil(requiredDays - differenceInDays);
+        noteligible.value = true;
+        ineligible.value = `Not yet eligible. ${daysRemaining} days remaining.`;
+        setTimeout(() => {
+            noteligible.value = false;
+        }, 2000);
+    }
+};
 
 // UPLOADING GUARANTOR'S FORM
 const passportPreviewUrl = ref('') 
