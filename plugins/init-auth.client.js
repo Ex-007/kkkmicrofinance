@@ -8,7 +8,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   supabase.auth.onAuthStateChange((event, session) => {
       auth.setUser(session?.user || null)
   })
-}, { priority: 20 }) // Higher number = higher priority
+}, { priority: 20 })
 
 
 

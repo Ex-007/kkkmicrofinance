@@ -55,6 +55,13 @@
                     <option>Main Loan</option>
                 </select>
 
+                <!-- DISBURSEMENT ACCOUNT DETAILS -->
+                <label for="bankName">Bank Name</label>
+                <input type="text" id="bankName" placeholder="Enter Bank's Name" required class="contactInput" v-model="loanDetails.bankName">
+                
+                <label for="acctNumber">Account Number</label>
+                <input type="text" id="acctNumber" placeholder="Enter Account Number" required class="contactInput" v-model="loanDetails.acctNumber">
+
                 <!-- EMPLOYER'S NAME -->
                 <label for="employersName">Employer's name/Business:</label>
                 <input type="text" id="employersName" class="contactInput" v-model="loanDetails.employerName" required readonly>
@@ -99,23 +106,46 @@
                 <!-- FIRST GUARANTOR -->
                  <div class="guarantors">
                     <h2>Guarantor's Details</h2>
-                    <h3>First Guarantor</h3><br>
+                    <h3>First Guarantor</h3>
                     <label>Guarantor's Name</label>
-                    <p>_______________________________</p><br>
+                    <input type="text" class="contactInput" required placeholder="Guarantor's name" v-model="loanDetails.guarantorOneName">
                     <label>Guarantor's Address</label>
-                    <p>_______________________________</p><br>
+                    <input type="text" class="contactInput" required placeholder="Guarantor's Address" v-model="loanDetails.guarantorOneAddress">
                     <label>Guarantor's Phone Number</label>
-                    <p>_______________________________</p><br>
+                    <input type="text" class="contactInput" required placeholder="Guarantor's Phone Number" v-model="loanDetails.guarantorOnePhone">
+                    <label for="areYou">Are You On Any Loan?</label>
+                    <select id="areYou" class="contactInput" required v-model="loanDetails.guarantorOneonLoan">
+                        <option>No</option>
+                        <option>Yes</option>
+                    </select>
+                    <label for="areYouAG">Are You a Guarantor to any member on Loan?</label>
+                    <select id="areYouAG" class="contactInput" required v-model="loanDetails.guarantorOneOnGuarantor">
+                        <option>No</option>
+                        <option>Yes</option>
+                    </select>
+                    <label for="savingValue">Your Savings Balance?</label>
+                    <input type="number" class="contactInput" required placeholder="Input Amount" min="0" oninput="this.value = Math.abs(this.value)" v-model="loanDetails.guarantorOneSaving">
                     <label>Guarantor's Signature & Date</label>
                     <p>_______________________________</p><br>
-                    <br><br>
                     <h3>Second Guarantor</h3>
                     <label>Guarantor's Name</label>
-                    <p>_______________________________</p><br>
+                    <input type="text" class="contactInput" required placeholder="Guarantor's name" v-model="loanDetails.guarantorTwoName">
                     <label>Guarantor's Address</label>
-                    <p>_______________________________</p><br>
+                    <input type="text" class="contactInput" required placeholder="Guarantor's Address" v-model="loanDetails.guarantorTwoAddress">
                     <label>Guarantor's Phone Number</label>
-                    <p>_______________________________</p><br>
+                    <input type="text" class="contactInput" required placeholder="Guarantor's Phone Number" v-model="loanDetails.guarantorTwoPhone">
+                    <label for="areYou">Are You On Any Loan?</label>
+                    <select id="areYou" class="contactInput" required v-model="loanDetails.guarantorTwoonLoan">
+                        <option>No</option>
+                        <option>Yes</option>
+                    </select>
+                    <label for="areYouAG">Are You a Guarantor to any member on Loan?</label>
+                    <select id="areYouAG" class="contactInput" required v-model="loanDetails.guarantorTwoOnGuarantor">
+                        <option>No</option>
+                        <option>Yes</option>
+                    </select>
+                    <label for="savingValue">Your Savings Balance?</label>
+                    <input type="number" class="contactInput" required placeholder="Input Amount" min="0" oninput="this.value = Math.abs(this.value)" v-model="loanDetails.guarantorTwoSaving">
                     <label>Guarantor's Signature & Date</label>
                     <p>_______________________________</p>
                  </div>
@@ -142,7 +172,7 @@
             <!-- Printable Form Section (hidden until print is clicked) -->
             <div id="printable-form" class="printable-form">
                 <div class="print-header">
-                    <h1>Membership Registration Form</h1>
+                    <h1>Loan Form</h1>
                     <p>Registration ID: {{ registrationId }}</p>
                     <p>Date: {{ formattedDate }}</p>
                 </div>
@@ -180,6 +210,14 @@
                             <div class="info-value">{{ loanDetails.loanType }}</div>
                         </div>
                         <div class="info-row">
+                            <div class="info-label">Bank Name:</div>
+                            <div class="info-value">{{ loanDetails.bankName }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Account Number:</div>
+                            <div class="info-value">{{ loanDetails.acctNumber }}</div>
+                        </div>
+                        <div class="info-row">
                             <div class="info-label">Employer's name/Business:</div>
                             <div class="info-value">{{ loanDetails.employerName }}</div>
                         </div>
@@ -188,7 +226,7 @@
                             <div class="info-value">{{ loanDetails.employerAddress }}</div>
                         </div>
                         <div class="info-row">
-                            <div class="info-label">Employer's Phone Number:</div>
+                            <div class="info-label">Employer's Address:</div>
                             <div class="info-value">{{ loanDetails.employerAddress }}</div>
                         </div>
                         <div class="info-row">
@@ -204,7 +242,7 @@
                             <div class="info-value">{{ loanDetails.loanPeriod }}</div>
                         </div>
                         <div class="info-row">
-                            <div class="info-label">Amount in ords:</div>
+                            <div class="info-label">Amount in Words:</div>
                             <div class="info-value">{{ loanDetails.amountInWords }}</div>
                         </div>
                         <div class="info-row">
@@ -219,15 +257,27 @@
                     <div class="info-grid">
                         <div class="info-row">
                             <div class="info-label">Guarantor's Name:</div>
-                            <div class="info-value">________________________________________________</div>
+                            <div class="info-value">{{ loanDetails.guarantorOneName }}</div>
                         </div>
                         <div class="info-row">
                             <div class="info-label">Guarantor's Address:</div>
-                            <div class="info-value">________________________________________________</div>
+                            <div class="info-value">{{ loanDetails.guarantorOneAddress }}</div>
                         </div>
                         <div class="info-row">
                             <div class="info-label">Guarantor's Phone Number:</div>
-                            <div class="info-value">________________________________________________</div>
+                            <div class="info-value">{{ loanDetails.guarantorOnePhone }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Are You on Any Loan?</div>
+                            <div class="info-value">{{ loanDetails.guarantorOneonLoan }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Are You a Guarantor for another Loan Paying Member?</div>
+                            <div class="info-value">{{ loanDetails.guarantorOneOnGuarantor }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Your Savings Balance</div>
+                            <div class="info-value">{{ loanDetails.guarantorOneSaving }}</div>
                         </div>
                         <div class="info-row">
                             <div class="info-label">Signature & Date:</div>
@@ -237,15 +287,27 @@
                         <h2>Second Guarantor</h2>
                         <div class="info-row">
                             <div class="info-label">Guarantor's Name:</div>
-                            <div class="info-value">________________________________________________</div>
+                            <div class="info-value">{{ loanDetails.guarantorTwoName }}</div>
                         </div>
                         <div class="info-row">
                             <div class="info-label">Guarantor's Address:</div>
-                            <div class="info-value">________________________________________________</div>
+                            <div class="info-value">{{ loanDetails.guarantorTwoAddress }}</div>
                         </div>
                         <div class="info-row">
                             <div class="info-label">Guarantor's Phone Number:</div>
-                            <div class="info-value">________________________________________________</div>
+                            <div class="info-value">{{ loanDetails.guarantorTwoPhone }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Are You on Any Loan?</div>
+                            <div class="info-value">{{ loanDetails.guarantorTwoonLoan }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Are You a Guarantor for another Loan Paying Member?</div>
+                            <div class="info-value">{{ loanDetails.guarantorTwoOnGuarantor }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Your Savings Balance</div>
+                            <div class="info-value">{{ loanDetails.guarantorTwoSaving }}</div>
                         </div>
                         <div class="info-row">
                             <div class="info-label">Signature & Date:</div>
@@ -271,8 +333,7 @@
                             <p>Treasurer Sign&Date</p>
                         </div>
                     </div>
-                    <p class="print-date">Printed on: {{ formattedDate }}</p>
-                </div>
+                    </div>
             </div>
         </div>
     </div>
@@ -319,7 +380,21 @@ definePageMeta({
         amountInWords: '',
         loanPurpose: '',
         accountBalance : '',
-        loanType : ''
+        loanType : '',
+        guarantorOneName: '',
+        guarantorOneAddress: '',
+        guarantorOnePhone: '',
+        guarantorOneonLoan: '',
+        guarantorOneSaving: '',
+        guarantorOneOnGuarantor: '',
+        guarantorTwoName: '',
+        guarantorTwoAddress: '',
+        guarantorTwoPhone: '',
+        guarantorTwoonLoan: '',
+        guarantorTwoSaving: '',
+        guarantorTwoOnGuarantor: '',
+        bankName: '',
+        acctNumber: ''
     })
 
     // FETCH SIGNED IN USER DETAILS AND ATTACH TO THE FORM
@@ -409,6 +484,16 @@ definePageMeta({
         loanDetails.value.amountInWords = wordAmount
     }
 
+    // VALIDATE INPUT FOR NUMBER
+    const validateNumber = (event) => {
+        const value = event.target.value
+        if (/^\d*$/.test(value)) {
+            this.loanDetails.acctNumber = value;
+        } else {
+            event.target.value = this.loanDetails.acctNumber;
+        }
+    }
+
 
 
 // PROCESS LOAN
@@ -461,11 +546,11 @@ const printForm = () => {
         printWindow.document.write(`
             <html>
                 <head>
-                    <title>kkk Toluwalase Membership Form</title>
+                    <title>kkk Toluwalase Loan Form</title>
                     <style>
                         body {
                             font-family: Arial, sans-serif;
-                            line-height: 1.6;
+                            line-height: 1;
                             padding: 20px;
                         }
                         .headerWithDet{
@@ -473,16 +558,16 @@ const printForm = () => {
                             flex-direction: column;
                             justify-content: center;
                             align-items: center;
-                            margin-bottom: 10px;
+                            margin-bottom: 5px;
                         }
                         .print-header {
                             text-align: center;
-                            margin-bottom: 20px;
+                            margin-bottom: 10px;
                             border-bottom: 2px solid #000;
-                            padding-bottom: 10px;
+                            padding-bottom: 5px;
                         }
                         .print-section {
-                            margin-bottom: 20px;
+                            margin-bottom: 10px;
                             page-break-inside: avoid;
                         }
                         .print-section h2 {
@@ -492,14 +577,14 @@ const printForm = () => {
                         .info-grid {
                             display: grid;
                             grid-template-columns: 1fr;
-                            gap: 8px;
+                            gap: 5px;
                         }
                         .info-row {
                             display: flex;
                         }
                         .info-label {
                             font-weight: bold;
-                            width: 200px;
+                            width: 400px;
                         }
                         .info-value {
                             flex: 1;
@@ -693,6 +778,13 @@ h1{
 }
 h5{
     text-align: center;
+}
+.guarantors{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 5px;
 }
 
 @media (max-width: 768px){

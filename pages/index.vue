@@ -16,7 +16,7 @@
     const seoData = ref({
         title: 'KKK Cooperative Bank',
         description : 'KKK Cooperative Bank.',
-        url : 'https://angelsheight.org',
+        url : 'https://kkktoluwalase.vercel.app',
         image : '/icons/icon-512.png',
         siteName : 'KKK Cooperative Bank',
         type : 'website',

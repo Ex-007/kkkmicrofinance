@@ -187,14 +187,14 @@ export const useAdminStore = defineStore('admin', () => {
                 .eq('reg_identity', userIdentification)
                 if(depositError) throw depositError
                 await updateCustomerTransHistory(userIdentification, depositAmount, type)
-            }else if(type == 'Shares'){
+            }else if(type == 'Fine-Minutes'){
                 let newBalance = accountBalance + depositAmount
                 const {data:depositData, error:depositError} = await client
                 .from('REGISTEREDUSERS')
-                .update({shares: newBalance})
+                .update({minutes: newBalance})
                 .eq('reg_identity', userIdentification)
                 if(depositError) throw depositError
-                await updateCustomerTransHistory(userIdentification, depositAmount, type)
+                // await updateCustomerTransHistory(userIdentification, depositAmount, type)
             }else{
                 let newBalance = accountBalance + depositAmount
                 const {data:depositData, error:depositError} = await client
@@ -476,6 +476,7 @@ const selectDeposit = async(userId) => {
             isLoading.value = false
         }
     }
+
 
 
 

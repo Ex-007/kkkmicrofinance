@@ -125,7 +125,9 @@ export const useLoanStore = defineStore('loan', () => {
                 loanPeriod: loanDetails.loanPeriod,
                 amountInWords: loanDetails.amountInWords,
                 loanPurpose: loanDetails.loanPurpose,
-                loanType: loanDetails.loanType
+                loanType: loanDetails.loanType,
+                bankName: loanDetails.bankName,
+                acctNumber: loanDetails.acctNumber
             })
             .select()
 

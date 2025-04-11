@@ -276,6 +276,10 @@
                     <h3>Investment Balance</h3>
                     <p class="accBal">{{ formatCurrency(searchView.investmentBalance) }}</p>
                   </div>
+                  <div class="current">
+                    <h3>Minutes/Fines</h3>
+                    <p class="accBal">{{ formatCurrency(searchView.minutes) }}</p>
+                  </div>
                 </div>
                 <div class="depWith">
                   <button @click="openDeposit">Deposit</button>
@@ -305,8 +309,8 @@
                   <label for="types">Deposit Type</label>
                   <select id="types" class="contactInput" v-model="depositConfig.depositType">
                       <option>Savings</option>
-                      <option>Investments</option>
-                      <option>Shares</option>
+                      <option>Fine-Minutes</option>
+                      <!-- <option>Shares</option> -->
                   </select>
                   <input type="number" class="contactInput" placeholder="Enter Amount" required min="0" oninput="this.value = Math.abs(this.value)" v-model="depositConfig.depositAmount">
                   <p v-if="depositV.pop">{{ depositV.message }}</p>
@@ -460,7 +464,8 @@
       loansRecord: '',
       accountBalance: '',
       shareBalance: '',
-      investmentBalance: ''
+      investmentBalance: '',
+      minutes: ''
     })
 
 
@@ -499,6 +504,7 @@
       searchView.value.accountBalance = admin.searchingData.accountBalance
       searchView.value.shareBalance = admin.searchingData.shares
       searchView.value.investmentBalance = admin.searchingData.investment
+      searchView.value.minutes = admin.searchingData.minutes
 
     }
 
@@ -570,12 +576,12 @@ const makeDeposit = async () => {
       depositV.value.pop = false
     }, 2000);
 
-  }else if(depositConfig.value.depositType == 'Shares'){
-    const type = 'Shares'
-    await admin.depositMoney(searchView.value.reg_identity, searchView.value.shareBalance, depositConfig.value.depositAmount, type)
+  }else if(depositConfig.value.depositType == 'Fine-Minutes'){
+    const type = 'Fine-Minutes'
+    await admin.depositMoney(searchView.value.reg_identity, searchView.value.minutes, depositConfig.value.depositAmount, type)
           
     depositV.value.pop = true
-    depositV.value.message = `Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Made`
+    depositV.value.message = `Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Added the Minutes and Fines Account`
     depositConfig.value.depositAmount = ''
     setTimeout(() => {
       depositV.value.pop = false
@@ -1152,6 +1158,7 @@ input[type="number"]{
     .showBalances{
       display: flex;
       flex-direction: column;
+      font-size: 13px;
     }
 
 </style>

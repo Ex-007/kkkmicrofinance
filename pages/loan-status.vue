@@ -66,6 +66,7 @@
                 <div class="loanHisDisplay" v-for="(loans, index) in customer.allLoans" :key="index">
                     <h3>Date : {{ formatDate(loans.created_at) }}</h3>
                     <h3>Amount : {{ loans.loanAmount }}</h3>
+                    <h3>Loan Type : {{ loans.loanType }}</h3>
                     <h3>Amount in Words : {{ loans.amountInWords }}</h3>
                     <h3>Loan Period : {{ loans.loanPeriod }}</h3>
                     <h3>Loan Purpose : {{ loans.loanPurpose }}</h3>
