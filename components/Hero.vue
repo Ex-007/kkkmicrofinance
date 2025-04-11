@@ -50,7 +50,7 @@ const accountPage =  () => {
     outline: 4px solid red;
     margin-bottom: 20px;
 } */
-     .hero {
+     /* .hero {
     position: relative;
     display: flex;
     justify-content: center;
@@ -62,7 +62,39 @@ const accountPage =  () => {
     padding: 20px;
     overflow: hidden;
     z-index: 1;
+} */
+
+.hero {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;
+    background: url('/public/img/heroSec.webp') center center no-repeat;
+    background-size: cover;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    overflow: hidden;
+    z-index: 1;
 }
+
+/* Desktop only - add back fixed attachment */
+@media (min-width: 992px) {
+    .hero {
+        background-attachment: fixed;
+    }
+}
+
+/* Additional optimization for mobile */
+@media (max-width: 768px) {
+    .hero {
+        background-position: center center;
+        background-size: cover;
+        background-attachment: scroll;
+    }
+}
+
     .overlay {
     position: absolute;
     top: 0;
@@ -70,7 +102,7 @@ const accountPage =  () => {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(3px);
+    /* backdrop-filter: blur(3px); */
     z-index: 1;
 }
     .hero-content {
