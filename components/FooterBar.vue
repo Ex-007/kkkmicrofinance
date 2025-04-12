@@ -4,27 +4,27 @@
         <!-- Logo & About -->
         <div class="footer-section">
           <h2 class="logo">Kodun Kopo Kope</h2>
-          <p>...Your Trusted Cooperative Bank for Savings, Loans and Easy Transactions.</p>
+          <p>...Your Trusted Cooperative Multi-Purpose Society for Savings, Loans and Easy Transactions.</p>
         </div>
   
         <!-- Quick Links -->
         <div class="footer-section">
           <h3>Quick Links</h3>
-          <!-- <ul>
-            <li><nuxt-link to="/" class="routerMove"><i class="fa fa-home"></i>Home</nuxt-link></li>
-            <li><nuxt-link to="/" class="routerMove"><i class="fa fa-user"></i>About Us</nuxt-link></li>
-            <li><nuxt-link to="/" class="routerMove"><i class="fa fa-bell"></i>Terms and Conditions</nuxt-link></li>
-            <li><nuxt-link to="/" class="routerMove"><i class="fa fa-heart"></i>Offers</nuxt-link></li>
-          </ul> -->
+          <ul>
+            <li><nuxt-link to="/Privacy-Policy" class="routerMove">🔒Privacy Policy</nuxt-link></li>
+            <li><nuxt-link to="/Terms-Conditions" class="routerMove">📜Terms and Conditions</nuxt-link></li>
+            <!-- <li><nuxt-link to="/" class="routerMove"><i class="fa fa-bell"></i>Terms and Conditions</nuxt-link></li>
+            <li><nuxt-link to="/" class="routerMove"><i class="fa fa-heart"></i>Offers</nuxt-link></li> -->
+          </ul>
         </div>
   
         <!-- Support & Help -->
         <div class="footer-section">
           <h3>Support</h3>
           <ul>
-            <li><a href="tel:09032327228">09032327228</a></li>
-            <li><a href="tel:08107812435">08107812435</a></li>
-            <li><a href="tel:09053347772">09053347772</a></li>
+            <li><a href="tel:07081106695">07081106695</a></li>
+            <li><a href="tel:08068383977">08068383977</a></li>
+            <li><a href="tel:09053347772">08035935364</a></li>
           </ul>
         </div>
   
@@ -41,7 +41,7 @@
       <!-- Copyright -->
       <div class="footer-bottom">
         <p>&copy; {{ new Date().getFullYear() }} kodun kopo kope. All rights reserved.</p>
-        <p><a href="mailto:info@angelsheight.org">info@kodunkopokope.org</a></p>
+        <p><a href="mailto:toluwalasecooperative2021@gmail.com">toluwalasecooperative2021@gmail.com</a></p>
         <p>Designed by <a href="https://abtech-two.vercel.app">ABTech</a></p>
       </div>
     </footer>

@@ -8,7 +8,7 @@
             </h2>
             <br>
             <p>
-                Your Trusted Cooperative Bank for Savings, Loans and easy Transactions.
+                Your Trusted Cooperative Multi-Purpose Society for Savings, Loans and easy Transactions.
             </p>
             <!-- <div class="announcement">
                 <h2>Admission is Open</h2>
