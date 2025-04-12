@@ -10,6 +10,7 @@
           <li @click="activeTab = 'newMember'" :class="{ active: activeTab === 'newMember' }">🏠 New Member Reg.</li>
           <li @click="activeTab = 'searchMember'" :class="{ active: activeTab === 'searchMember' }">🏠 Search Member</li>
           <li @click="activeTab = 'registeredMember'" :class="{ active: activeTab === 'registeredMember' }">📩 Registered Members</li>
+          <li @click="activeTab = 'approvedLoans'" :class="{ active: activeTab === 'approvedLoans' }">💵 Approved Loans</li>
           <li @click="activeTab = 'loanRequests'" :class="{ active: activeTab === 'loanRequests' }">👤 Loan Requests</li>
           <li @click="activeTab = 'deposits'" :class="{ active: activeTab === 'deposits' }">🧾 Deposits</li>
           <li @click="activeTab = 'accountUpdate'" :class="{ active: activeTab === 'accountUpdate' }">💎 Account Update</li>
@@ -318,6 +319,31 @@
               </div>
             </div>
         </transition>
+
+        <!-- APPROVED LOANS -->
+         <section v-if="activeTab === 'approvedLoans'">
+          <div class="transactionDet">
+            <h1>APPROVED LOANS</h1>
+            <div class="searchBox">
+              <input type="text" placeholder="Input Customer's Id" class="contactInput" v-model="approvedLoanId">
+              <button @click="fetchApprovedLoan" :disabled="admin.isLoading">{{ admin.isLoading ? 'Fetching...' : 'Fetch' }}</button>
+            </div>
+            <div class="displayQuaters classical" v-if="admin.recentLoann">
+              <p>Name: {{ admin.recentLoann.surname + " " +  admin.recentLoann.firstname}}</p>
+              <p>Principal: {{ admin.recentLoann.loanAmount }}</p>
+              <p>Remaining Balance: {{formatCurrency(admin.recentLoann.loanBalance)}}</p>
+              <p>Duration: {{ admin.recentLoann.loanPeriod }}</p>
+              <p>Type: {{ admin.recentLoann.loanType }}</p>
+              <p>Monthly Repayment: {{ formatCurrency(admin.loanRepaymentSchedule) }}</p>
+              <p>Monthly Deduction: {{ formatCurrency(convertCurrency(admin.recentLoann.loanAmount) / 3) }}</p>
+              <div class="searchBox">
+                <input type="text" placeholder="Reduction Amount" class="contactInput" v-model="reduceAmount">
+                <p>{{ reduceMessage }}</p>
+                <button @click="reduceLoan(admin.recentLoann.loanBalance)">{{ admin.isLoading ? 'Reducting...' : 'Reduce' }}</button>
+              </div>
+            </div>
+          </div>
+         </section>
       </main>
     </div>
   </template>
@@ -337,7 +363,7 @@
       layout: 'admin',
        middleware: ['admin']
     })
-    //const activeTab = ref('deposits');
+    // const activeTab = ref('approvedLoans');
     const activeTab = ref('home');
     
     // GENERATE REGISTRATION ID
@@ -690,7 +716,48 @@ const makeWithdraw = async () => {
     adminDetails.value.email = admin.loggedAdmin.email
   }
 
+  const approvedLoanId = ref('')
+  const errorMessage = ref('')
+  // SEARCH FOR CURRENT APPROVED LOAN
+  const fetchApprovedLoan = async () => {
+    if(approvedLoanId.value == ''){
+      errorMessage.value = 'Id Cannot Be Empty'
+      return
+    }
 
+    await admin.checkLastLoan(approvedLoanId.value)
+
+  }
+
+// CONVERT PRINCIPAL LOAN TO NUMBER
+const convertCurrency = (principalFetched) => {
+    if (!principalFetched || typeof principalFetched !== 'string') {
+        return 0;
+    }
+      
+    let numericString = principalFetched.replace(/^[A-Z]{3}\s+/, '');
+    
+    return parseFloat(numericString.replace(/,/g, ''));
+}
+
+// DEDUCTING LOANBALANCE AFTER PAYMENT
+const reduceMessage = ref('')
+const reduceAmount = ref('')
+const reduceLoan = async (balance) => {
+  if(approvedLoanId.value == ''){
+    reduceMessage.value = 'Customer ID is absent, Please Search Again'
+    return
+  }
+  reduceMessage.value = ''
+  if(reduceAmount.value == ''){
+    reduceMessage.value = 'Please Enter Reduction Amount'
+    return
+  }
+  reduceMessage.value = ''
+  await admin.reduceLoanBalance(approvedLoanId.value, reduceAmount.value, balance)
+  reduceAmount.value = ''
+  reduceMessage.value = 'Reduction Successful'
+}
 
 
 
@@ -725,6 +792,30 @@ onMounted(async () => {
   </script>
   
   <style scoped>
+
+  .displayQuaters{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    justify-content: center;
+    /* align-items: center; */
+  }
+
+  .searchBox{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .searchBox button{
+    width: 100px;
+    height: 30px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+  }
   .dashboard {
     display: flex;
     height: 100vh;

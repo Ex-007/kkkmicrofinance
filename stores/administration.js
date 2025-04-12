@@ -13,6 +13,8 @@ export const useAdminStore = defineStore('admin', () => {
     const depositRequests = ref([])
     const selectedDeposit = ref(null)
     const canOut = ref(false)
+    const recentLoann = ref(null)
+    const loanRepaymentSchedule = ref([])
 
 
     // FETCH THE SIGNED IN USER
@@ -477,11 +479,151 @@ const selectDeposit = async(userId) => {
         }
     }
 
+    // FETCH APPROVED LOANS
+    const checkLastLoan = async (identity) => {
+        isLoading.value = true
+        error.value = null
+        const client = useSupabaseClient()
+        try {
+            const { data: recentLoanData, error: recentLoanError } = await client  
 
+                .from('LOANREQUESTS')  
+                .select('*')  
+                .eq('registrationId', identity)
+                .eq('status', 'APPROVED') 
+                .order('created_at', { ascending: false })  
+                .limit(1)
+        
+                if (recentLoanError) throw recentLoanError  
+                if (recentLoanData.length === 0) {  
+                    throw new Error('No loan data found for the provided email.')  
+                }
+                recentLoann.value = recentLoanData[0]
 
+                const principalFetched = recentLoanData[0].loanAmount
+                const principal = convertCurrency(principalFetched)
+                const durationM = recentLoanData[0].loanPeriod
+                const durationMonths = duration(durationM)
+                const annualInterestRate = 2
 
+                await calculateRepayment(principal, annualInterestRate, durationMonths)
+        } catch (err) {
+            error.value = err.message
+        }finally{
+            isLoading.value = false
+        }
 
+    }
 
+        // CONVERT CURRENCY TO NUMBER
+        const convertCurrency = (principalFetched) => {
+            if (!principalFetched || typeof principalFetched !== 'string') {
+                return 0;
+            }
+              
+            let numericString = principalFetched.replace(/^[A-Z]{3}\s+/, '');
+            
+            return parseFloat(numericString.replace(/,/g, ''));
+        }
+        // EXTRACT THE NUMBER FROM DURATION
+        const duration = (durationM) => {
+            if (!durationM || typeof durationM !== 'string') {
+                return 0;
+            }
+            const match = durationM.match(/^\d+/);
+            if (match) {
+                return parseInt(match[0], 10);
+            }
+    
+            return 0;
+        }
+
+ // CALCULATE THE LOAN REPAYMENT
+        const calculateRepayment = async (principal, annualInterestRate, durationMonths) => {
+    isLoading.value = true;
+    error.value = null;
+    try {
+        const monthlyInterestRate = annualInterestRate / 100;
+        const monthlyPayment = principal * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, durationMonths) / 
+                      (Math.pow(1 + monthlyInterestRate, durationMonths) - 1);
+        
+        // Generate amortization schedule
+        let remainingBalance = principal;
+        const schedule = [];
+        
+        for (let month = 1; month <= durationMonths; month++) {
+            const interestPayment = remainingBalance * monthlyInterestRate;
+            let principalPayment;
+            
+            
+            if (month === durationMonths) {
+                principalPayment = remainingBalance;
+                
+                const finalMonthlyPayment = principalPayment + interestPayment;
+                
+                schedule.push({
+                    month,
+                    payment: finalMonthlyPayment,
+                    principalPayment,
+                    interestPayment,
+                    remainingBalance: 0
+                });
+            } else {
+                
+                principalPayment = monthlyPayment - interestPayment;
+                remainingBalance -= principalPayment;
+                
+                schedule.push({
+                    month,
+                    payment: monthlyPayment,
+                    principalPayment,
+                    interestPayment,
+                    remainingBalance: Math.max(0, remainingBalance)
+                });
+            }
+        }
+        
+        loanRepaymentSchedule.value = monthlyPayment;
+        // console.log(schedule)
+        
+        const actualTotalPayment = schedule.reduce((sum, month) => sum + month.payment, 0);
+        // console.log(monthlyPayment)
+        return {
+            monthlyPayment,
+            totalPayment: actualTotalPayment,
+            totalInterest: actualTotalPayment - principal,
+            schedule
+        };
+    } catch (err) {
+        error.value = err.message;
+    }
+        };
+
+        // REDUCE LOAN BALANCE
+        const reduceLoanBalance = async (approvedLoanId, reduceAmount, balance) => {
+            isLoading.value = true
+            error.value = null
+            const client = useSupabaseClient()
+            try {
+                let newBalance  = balance - reduceAmount
+                const {data:reduceData, error:reduceError} = await client
+                .from('LOANREQUESTS')
+                .update({
+                    loanBalance: newBalance
+                })
+                .eq('registrationId', approvedLoanId)
+                if(reduceError) throw reduceError
+
+                const userIdentification = approvedLoanId
+                const depositAmount = reduceAmount
+                const type = 'Loan Repayment'
+                await updateCustomerTransHistory(userIdentification, depositAmount, type)
+            } catch (err) {
+                error.value = err.message
+            }finally{
+                isLoading.value = false
+            }
+        }
 
     return{
         isLoading,
@@ -510,6 +652,10 @@ const selectDeposit = async(userId) => {
         viewDepositRequests,
         selectDeposit,
         selectedDeposit,
-        approveDeposit
+        approveDeposit,
+        checkLastLoan,
+        recentLoann,
+        loanRepaymentSchedule,
+        reduceLoanBalance
     }
 })

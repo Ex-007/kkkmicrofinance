@@ -327,26 +327,46 @@ const ineligible = ref('')
 const noteligible = ref(false)
 const createdAt = ref('2025-01-01')
 // CHECKING LOAN ELIGIBILITY
-// const requestLoan = () => {
+// const requestLoan = async () => {
 //     let registrationDate = new Date(createdAt.value);
 //     let currentDate = new Date();
 //     let differenceInMs = currentDate - registrationDate;
 //     let differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
 //     let requiredDays = 90;
 
-//     if (differenceInDays >= requiredDays) {
-//         openLoanModal.value = true
-//     } else {
+//     CHECK IF THE CUSTOMER'S LAST LOAN IS STILL PENDING OR FULLY PAID
+//     const loanPropCheck = await customer.checkLastLoan()
+//     const loanStatusCheck = loanPropCheck.loanStat
+//     const loanBalanceCheck = loanPropCheck.principal
+
+//     if(differenceInDays < requiredDays){
 //         let daysRemaining = Math.ceil(requiredDays - differenceInDays);
 //         noteligible.value = true
 //         ineligible.value = `Not yet eligible. ${daysRemaining} days remaining.`;
 //         setTimeout(() => {
 //             noteligible.value = false
 //         }, 2000);
+//         return
+//     }else if(loanStatusCheck == 'PENDING'){
+//         noteligible.value = true
+//         ineligible.value = 'Your last loan is Still Pending...'
+//         setTimeout(() => {
+//             noteligible.value = false
+//         }, 2000);
+//         return
+//     }else if(loanBalanceCheck > 0){
+//         noteligible.value = true
+//         ineligible.value = 'Your last loan is not yet Balanced...'
+//         setTimeout(() => {
+//             noteligible.value = false
+//         }, 2000);
+//         return
+//     }else{
+//         openLoanModal.value = true
 //     }
 // }
 
-const requestLoan = () => {
+const requestLoan = async() => {
     let registrationDate = new Date(cusInfo.value.createdAt);
     let currentDate = new Date();
     
@@ -359,16 +379,36 @@ const requestLoan = () => {
     let differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
     let requiredDays = 90;
 
-    if (differenceInDays >= requiredDays) {
-        router.push('/loan-application');
-    } else {
-        let daysRemaining = Math.ceil(requiredDays - differenceInDays);
-        noteligible.value = true;
-        ineligible.value = `Not yet eligible. ${daysRemaining} days remaining.`;
-        setTimeout(() => {
-            noteligible.value = false;
-        }, 2000);
-    }
+    // CHECK IF THE CUSTOMER'S LAST LOAN IS STILL PENDING OR FULLY PAID
+    const loanPropCheck = await customer.checkLastLoan()
+    const loanStatusCheck = loanPropCheck.loanStat
+    const loanBalanceCheck = loanPropCheck.principal
+
+        if(differenceInDays < requiredDays){
+            let daysRemaining = Math.ceil(requiredDays - differenceInDays);
+            noteligible.value = true
+            ineligible.value = `Not yet eligible. ${daysRemaining} days remaining.`;
+            setTimeout(() => {
+                noteligible.value = false
+            }, 2000);
+            return
+        }else if(loanStatusCheck == 'PENDING'){
+            noteligible.value = true
+            ineligible.value = 'Your last loan is Still Pending...'
+            setTimeout(() => {
+                noteligible.value = false
+            }, 2000);
+            return
+        }else if(loanBalanceCheck > 0){
+            noteligible.value = true
+            ineligible.value = 'Your last loan is not yet Balanced...'
+            setTimeout(() => {
+                noteligible.value = false
+            }, 2000);
+            return
+        }else{
+            openLoanModal.value = true
+        }
 };
 
 // UPLOADING GUARANTOR'S FORM
@@ -519,21 +559,6 @@ const distributeFund = async () => {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // ONMOUNTED FUNCTION
 onMounted(async () => {
     await customer.signinUser()
@@ -646,8 +671,8 @@ onMounted(async () => {
         justify-content: center;
         align-items: center;
         text-align: center;
-        color: white;
-        background-color: red;
+        color: red;
+        background-color: rgb(255, 255, 255);
         height: 30px;
         text-align-last: center;
         margin: 5px;

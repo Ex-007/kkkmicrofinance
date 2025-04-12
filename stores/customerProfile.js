@@ -12,7 +12,6 @@ export const useCustomerStore = defineStore('customerPro', () => {
     const allLoans = ref([])
     const mostRecentLoan = ref(null)
     const loanRepaymentSchedule = ref([])
-    const pendingLoan = ref(false)
     const depositUpload = ref(false)
     let channel = null
 
@@ -88,13 +87,6 @@ export const useCustomerStore = defineStore('customerPro', () => {
           .subscribe((status) => {
           })
       }
-
-
-
-
-
-
-
 
     // SIGNOUT 
     const logOut = async () => {
@@ -603,6 +595,38 @@ const uploadGuarantorImage = async () => {
         }
     }
 
+    // CHECK IF THE LAST LOAN IS PENDING OR APPROVED, IF FULLY PAID OR NOT YET
+    const checkLastLoan = async () => {
+        isLoading.value = true
+        error.value = null
+        const client = useSupabaseClient()
+        let regEmail = user.value.email
+        try {
+            const { data: recentLoanData, error: recentLoanError } = await client  
+                .from('LOANREQUESTS')  
+                .select('*')  
+                .eq('email', regEmail)  
+                .order('created_at', { ascending: false })  
+                .limit(1)
+        
+                if (recentLoanError) throw recentLoanError  
+                if (recentLoanData.length === 0) {  
+                    throw new Error('No loan data found for the provided email.')  
+                }
+
+                const principalFetched = recentLoanData[0].loanAmount
+                const principal = convertCurrency(principalFetched)
+                const loanStat = recentLoanData[0].status
+                return{
+                    loanStat, principal
+                }
+        } catch (err) {
+            error.value = err.message
+        }finally{
+            isLoading.value = false
+        }
+
+    }
 
 
 
@@ -643,7 +667,8 @@ const uploadGuarantorImage = async () => {
         setDepositPhoto,
         depositUpload,
         uploadDepositFile,
-        distributeBalance
+        distributeBalance,
+        checkLastLoan
     }
 
 
