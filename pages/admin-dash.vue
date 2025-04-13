@@ -122,6 +122,10 @@
                 <p>Education: {{ searchView.eduQualify }}</p>
                 <p>Phone Number: {{ searchView.phone }}</p>
                 <p>Email: {{ searchView.email }}</p>
+                <p>Saving Balance: {{ formatCurrency(searchView.accountBalance) }}</p>
+                <p>Shares Balance: {{ formatCurrency(searchView.shareBalance) }}</p>
+                <p>Investment Balance: {{ formatCurrency(searchView.investmentBalance) }}</p>
+                <p>Minutes/Fine Balance: {{ formatCurrency(searchView.minutes) }}</p>
                 <p>Employer's Name: {{ searchView.employerName }}</p>
                 <p>Employer's Address: {{ searchView.employerAddress }}</p>
                 <p>Employer's Location: {{ searchView.employerLocation }}</p>
