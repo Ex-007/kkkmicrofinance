@@ -564,12 +564,20 @@ const guarantorFilename = computed(() =>
 
   // CUSTOMER'S ACCOUNT UPDATE
   // FORMAT THE ACCOUNT BALANCE TO NIGERIAN NAIRA
+// const formatCurrency = (amount) => {
+//     return new Intl.NumberFormat('en-US', {
+//         style: 'currency',
+//         currency: 'NGN',
+//     }).format(amount);
+// };
+
 const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'NGN',
-    }).format(amount);
+    return `NGN${Number(amount).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    })}`;
 };
+
 
 
 // DEPOSIT AND WITHDRAW BOX
@@ -643,6 +651,7 @@ const makeDeposit = async () => {
     depositConfig.value.depositAmount = ''
     setTimeout(() => {
       depositV.value.pop = false
+      depositBox.value = false
     }, 2000);
 
   }else if(depositConfig.value.depositType == 'Fine-Minutes'){
@@ -653,6 +662,7 @@ const makeDeposit = async () => {
     depositV.value.message = `Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Added the Minutes and Fines Account`
     depositConfig.value.depositAmount = ''
     setTimeout(() => {
+      depositBox.value = false
       depositV.value.pop = false
     }, 2000);
   }else{
@@ -663,6 +673,7 @@ const makeDeposit = async () => {
     depositV.value.message = `Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Made`
     depositConfig.value.depositAmount = ''
     setTimeout(() => {
+      depositBox.value = false
       depositV.value.pop = false
     }, 2000);
   }

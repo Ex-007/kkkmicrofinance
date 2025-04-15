@@ -31,14 +31,17 @@
                         <li>
                             <h4>Main Loan</h4>
                             <ul class="outerClass">
-                                <li>Members may apply for a main loan after 3 months of active membership.</li>
+                                <li>Members may apply for a main loan after 6 months of active membership.</li>
                                 <li>Loan amount is capped at three times (3x) the current balance in the member’s savings account.</li>
+                                <li>Repayment is Spread Over 6 Month.</li>
                             </ul>
                         </li>
                         <li>
                             <h4>Soft Loan</h4>
                             <ul class="outerClass">
+                                <li>Members may apply for a soft loan after 6 months of active membership.</li>
                                 <li>Members may apply for a soft loan of up to 70% of their current savings.</li>
+                                <li>Repayment is Spread Over 3 Month.</li>
                             </ul>
                         </li>
                     </ol>

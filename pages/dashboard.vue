@@ -325,7 +325,7 @@ const formatTime = (dateString) => {
 
 const ineligible = ref('')
 const noteligible = ref(false)
-const createdAt = ref('2025-01-01')
+// const createdAt = ref('2025-01-01')
 // CHECKING LOAN ELIGIBILITY
 // const requestLoan = async () => {
 //     let registrationDate = new Date(createdAt.value);
@@ -377,7 +377,7 @@ const requestLoan = async() => {
 
     let differenceInMs = currentDate - registrationDate;
     let differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
-    let requiredDays = 90;
+    let requiredDays = 180;
 
     // CHECK IF THE CUSTOMER'S LAST LOAN IS STILL PENDING OR FULLY PAID
     const loanPropCheck = await customer.checkLastLoan()

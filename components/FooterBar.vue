@@ -13,8 +13,6 @@
           <ul>
             <li><nuxt-link to="/Privacy-Policy" class="routerMove">🔒Privacy Policy</nuxt-link></li>
             <li><nuxt-link to="/Terms-Conditions" class="routerMove">📜Terms and Conditions</nuxt-link></li>
-            <!-- <li><nuxt-link to="/" class="routerMove"><i class="fa fa-bell"></i>Terms and Conditions</nuxt-link></li>
-            <li><nuxt-link to="/" class="routerMove"><i class="fa fa-heart"></i>Offers</nuxt-link></li> -->
           </ul>
         </div>
   
@@ -41,7 +39,7 @@
       <!-- Copyright -->
       <div class="footer-bottom">
         <p>&copy; {{ new Date().getFullYear() }} kodun kopo kope. All rights reserved.</p>
-        <p><a href="mailto:toluwalasecooperative2021@gmail.com">toluwalasecooperative2021@gmail.com</a></p>
+        <p><a href="mailto:admin@kkktoluwalase.org">admin@kkktoluwalase.org</a></p>
         <p>Designed by <a href="https://abtech-two.vercel.app">ABTech</a></p>
       </div>
     </footer>
