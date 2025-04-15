@@ -226,8 +226,8 @@
                     <li>Address: {{ admin.selectedLoan.address }}</li>
                     <li>Email: {{ admin.selectedLoan.email }}</li>
                     <li>Position: {{ admin.selectedLoan.position }}</li>
-                    <li>Home Town: {{ admin.selectedLoan.phone }}</li>
-                    <li>Phone: {{ admin.selectedLoan.businessAddress }}</li>
+                    <li>Phone : {{ admin.selectedLoan.phone }}</li>
+                    <li>Business Address: {{ admin.selectedLoan.businessAddress }}</li>
                     <li>Employer's Name: {{ admin.selectedLoan.employerName }}</li>
                     <li>Employer's Phone Number: {{ admin.selectedLoan.employerPhone }}</li>
                     <li>Loan Amount: {{ admin.selectedLoan.loanAmount }}</li>
@@ -242,8 +242,8 @@
                     </div>
                     <p>{{ statusMessage }}</p>
                     <div class="appD">
-                      <button @click="loanApproval(admin.selectedLoan.id)" :disabled="admin.isLoading">{{admin.isLoading ? 'Approving' : "Approve"}}</button>
-                      <button @click="loanDisapproval(admin.selectedLoan.id)" :disabled="admin.isLoading">{{admin.isLoading ? 'Disapproving' : "Disapprove"}}</button>
+                      <button @click="loanApproval(admin.selectedLoan.id, admin.selectedLoan.loanAmount, admin.selectedLoan.phone, admin.selectedLoan.email)" :disabled="admin.isLoading">{{admin.isLoading ? 'Approving' : "Approve"}}</button>
+                      <button @click="loanDisapproval(admin.selectedLoan.id, admin.selectedLoan.loanAmount, admin.selectedLoan.phone, admin.selectedLoan.email)" :disabled="admin.isLoading">{{admin.isLoading ? 'Disapproving' : "Disapprove"}}</button>
                     </div>
 
                 </ul>
@@ -585,6 +585,24 @@ const depositV = ref({
   message: ''
 })
 
+// FORMAT PHONE NUMBER TO THE LOCAL PHONE NUMBER
+function formatPhoneNumber(number) {
+  const digitsOnly = number.replace(/\D/g, '');
+
+  if (digitsOnly.length === 11 && digitsOnly.startsWith("0")) {
+    return "234" + digitsOnly.slice(1);
+  }
+
+  if (digitsOnly.length === 13 && digitsOnly.startsWith("234")) {
+    return digitsOnly;
+  }
+
+  if (digitsOnly.length === 10) {
+    return "234" + digitsOnly;
+  }
+  return null;
+}
+
 const makeDeposit = async () => {
 
   //FOR WHITESPACE CHECKING
@@ -598,7 +616,11 @@ const makeDeposit = async () => {
   //FOR SAVINGS
   if(depositConfig.value.depositType == 'Savings'){
     const type = 'Savings'
-    await admin.depositMoney(searchView.value.reg_identity, searchView.value.accountBalance, depositConfig.value.depositAmount, type)
+    const to = formatPhoneNumber(searchView.value.phone)
+    const balance = searchView.value.accountBalance + depositConfig.value.depositAmount
+    const email = searchView.value.email
+    const message = `Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Made. Your New Balance is ${formatCurrency(balance)}. Thanks for being part of the Society...`
+    await admin.depositMoney(searchView.value.reg_identity, searchView.value.accountBalance, depositConfig.value.depositAmount, type, to, message, email)
     depositV.value.pop = true
     depositV.value.message = `Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Made`
     depositConfig.value.depositAmount = ''
@@ -667,10 +689,22 @@ const makeWithdraw = async () => {
     admin.selectLoan(formId)
   }
 
+
+
+
+
+
+
   const statusMessage = ref('')
   // LOAN APPROVAL
-  const loanApproval = (identity) => {
-    admin.approveLoan(identity)
+  const loanApproval = (identity, loanAmount, phone, email) => {
+    const phoneNumber = formatPhoneNumber(phone)
+    const message = `Congratulations from KKK Toluwalase Cooperative Multipurpose Society!
+      Your loan request of ${loanAmount} has been officially approved. Kindly check your registered account or contact us for next steps.
+      Email: admin@kkktoluwalase.org.
+      Phone Number: 08035935364 or 07081106695
+      Thank you for trusting us — your growth is our priority. 💼✨`;
+    admin.approveLoan(identity, message, phoneNumber, email)
     statusMessage.value = 'Loan Approved'
     setTimeout(() => {
       statusMessage.value = ''
@@ -678,8 +712,14 @@ const makeWithdraw = async () => {
   }
 
   // LOAN DISAPPROVAL
-  const loanDisapproval = (identity) => {
-    admin.disapproveLoan(identity)
+  const loanDisapproval = (identity, loanAmount, phone) => {
+    const phoneNumber = formatPhoneNumber(phone)
+    const message = `From KKK Toluwalase Cooperative Multipurpose Society!
+      Sorry, your loan request of ${loanAmount} has been disapproved. Kindly check your registered account or contact us for more enquiries.
+      Email: admin@kkktoluwalase.org.
+      Phone Number: 08035935364 or 07081106695
+      Thank you for trusting us — your growth is our priority. 💼✨`;
+    admin.disapproveLoan(identity, message, phoneNumber)
     statusMessage.value = 'Loan Rejected'
     setTimeout(() => {
       statusMessage.value = ''

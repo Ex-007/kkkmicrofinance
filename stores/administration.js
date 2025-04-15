@@ -170,7 +170,7 @@ export const useAdminStore = defineStore('admin', () => {
      
     // ACCOUNT UPDATE
     //  DEPOSIT MONEY
-    const depositMoney = async(userIdentification, accountBalance, depositAmount, type) => {
+    const depositMoney = async(userIdentification, accountBalance, depositAmount, type, to, message, email) => {
         isLoading.value = true
         error.value = null
         const client = useSupabaseClient()
@@ -189,6 +189,11 @@ export const useAdminStore = defineStore('admin', () => {
                 .eq('reg_identity', userIdentification)
                 if(depositError) throw depositError
                 await updateCustomerTransHistory(userIdentification, depositAmount, type)
+                await sendSms(to, message)
+                const subject = 'New Deposit'
+                const text = message
+                const destination = email
+                await sendEmail({ to:destination, subject, text })
             }else if(type == 'Fine-Minutes'){
                 let newBalance = accountBalance + depositAmount
                 const {data:depositData, error:depositError} = await client
@@ -368,9 +373,10 @@ export const useAdminStore = defineStore('admin', () => {
      }
 
     //  LOAN APPROVAL
-    const approveLoan = async(identity) => {
+    const approveLoan = async(identity, message, phoneNumber, email) => {
         isLoading.value = false
         error.value = null
+        // console.log(message, phoneNumber)
         const client = useSupabaseClient()
         try {
             const {data:approvalData, error:approvalError} = await client
@@ -381,6 +387,12 @@ export const useAdminStore = defineStore('admin', () => {
             .eq('id', identity)
 
             if(approvalError) throw approvalError
+            await sendSms(phoneNumber, message)
+
+            const to = email
+            const subject = 'Loan Approval'
+            const text = message
+            await sendEmail({ to, subject, text })
         } catch (err) {
             error.value = err.message
             console.log(err.message)
@@ -390,7 +402,7 @@ export const useAdminStore = defineStore('admin', () => {
     }
 
     //  LOAN APPROVAL
-    const disapproveLoan = async(identity) => {
+    const disapproveLoan = async(identity, message, phoneNumber, email) => {
         isLoading.value = false
         error.value = null
         const client = useSupabaseClient()
@@ -403,6 +415,11 @@ export const useAdminStore = defineStore('admin', () => {
             .eq('id', identity)
 
             if(disapprovalError) throw disapprovalError
+            await sendSms(phoneNumber, message)
+            const to = email
+            const subject = 'Loan Disapproval'
+            const text = message
+            await sendEmail({ to, subject, text })
         } catch (err) {
             error.value = err.message
             console.log(err.message)
@@ -618,6 +635,66 @@ const selectDeposit = async(userId) => {
                 const depositAmount = reduceAmount
                 const type = 'Loan Repayment'
                 await updateCustomerTransHistory(userIdentification, depositAmount, type)
+            } catch (err) {
+                error.value = err.message
+            }finally{
+                isLoading.value = false
+            }
+        }
+        // SEND SMS
+        const sendSms = async (to, message, senderName = 'Sendchamp', route = 'non_dnd') => {
+            isLoading.value = false
+            error.value = null
+            try {
+                const response = await $fetch('/api/send-sms', {
+                    method: 'POST',
+                    body:{
+                        to,
+                        message,
+                        sender: senderName,
+                        route
+                    }
+                })
+                if(!response.success){
+                    error.value = response.error
+                    throw new Error(response.error)
+                }
+
+                // console.log('SMS', response.data)
+                return response.data
+            } catch (err) {
+                error.value = err.message
+                // console.log(err.message)
+                throw err
+            }finally{
+                isLoading.value = false
+            }
+        }
+
+        // SEND EMAIL
+        const sendEmail = async({ to, subject, text }) => {
+            isLoading.value = true
+            error.value = null
+            console.log(to, subject, text)
+            try {
+                const {data, error} = await useFetch('/api/send-email', {
+                    method: 'POST',
+                    body: {
+                        to,
+                        from : 'KKK-Toluwalase@kkktoluwalase.org',
+                        subject,
+                        text
+                    }
+                })
+
+                if (error.value) {
+                    throw new Error(error.value.data?.error || 'Failed to send email');
+                }
+        
+                if (data.value?.error) {
+                throw new Error(data.value.error);
+                }
+                return data.value;
             } catch (err) {
                 error.value = err.message
             }finally{
