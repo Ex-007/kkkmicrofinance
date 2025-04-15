@@ -14,13 +14,13 @@
     const router = useRoute()
 
     const seoData = ref({
-        title: 'KKK Cooperative Bank',
-        description : 'KKK Cooperative Bank.',
-        url : 'https://kkktoluwalase.vercel.app',
+        title: 'KKK Cooperative Multi-Purpose Society',
+        description : 'KKK Cooperative Multi-Purpose Society.',
+        url : 'https://kkktoluwalase.org',
         image : '/icons/icon-512.png',
-        siteName : 'KKK Cooperative Bank',
+        siteName : 'KKK Cooperative Multi-Purpose Society',
         type : 'website',
-        twitterHandle : '@angelsheight',
+        twitterHandle : '@kkkcooperative',
         keywords : 'Cooperative, Savings, Loans, Withdrawal, Deposit, Fast, Secured, Transparent'
     })
 

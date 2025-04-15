@@ -236,9 +236,10 @@
                     <li>Loan Purpose: {{ admin.selectedLoan.loanPurpose }}</li>
                     <li>Loan Status: {{ admin.selectedLoan.status }}</li>
                     <div class="imagePassport">
-                      <a :href="admin.selectedLoan.guarantor" :download="getFilename(admin.selectedLoan.guarantor)">
-                        <img :src="admin.selectedLoan.guarantor" alt="loan guarantor" class="profilePicture" />
-                      </a>
+                      <a :href="guarantorHref" :download="guarantorFilename">
+                      <img :src="guarantorSrc" alt="loan guarantor" class="profilePicture" />
+                    </a>
+
                     </div>
                     <p>{{ statusMessage }}</p>
                     <div class="appD">
@@ -370,6 +371,22 @@
     // const activeTab = ref('approvedLoans');
     const activeTab = ref('home');
     
+
+    const defaultImage = '/img/profilepicture.jpeg'
+
+const guarantorSrc = computed(() =>
+  admin.selectedLoan?.guarantor?.trim() ? admin.selectedLoan.guarantor : defaultImage
+)
+
+const guarantorHref = computed(() =>
+  admin.selectedLoan?.guarantor?.trim() ? admin.selectedLoan.guarantor : defaultImage
+)
+
+const guarantorFilename = computed(() =>
+  getFilename(admin.selectedLoan?.guarantor || defaultImage)
+)
+
+
     // GENERATE REGISTRATION ID
     const generation = ref('')
     const generationSection = ref(false)
