@@ -1,8 +1,12 @@
-import axios from 'axios';
+import axios from 'axios'
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig();
-  const body = await readBody(event);
+  if (getMethod(event) !== 'POST') {
+    throw createError({ statusCode: 405, statusMessage: 'Method Not Allowed' })
+  }
+
+  const config = useRuntimeConfig()
+  const body = await readBody(event)
 
   if (!body?.to || !body?.message) {
     return {
@@ -19,10 +23,10 @@ export default defineEventHandler(async (event) => {
       route: body.route || 'non_dnd',
     }, {
       headers: {
-        'Authorization': `Bearer ${config.sendchampKey}`,
-        'Content-Type': 'application/json'
-      }
-    });
+        Authorization: `Bearer ${config.sendchampKey}`,
+        'Content-Type': 'application/json',
+      },
+    })
 
     return {
       success: true,
@@ -34,4 +38,4 @@ export default defineEventHandler(async (event) => {
       error: error.response?.data?.message || error.message || 'SMS sending failed',
     }
   }
-});
+})
