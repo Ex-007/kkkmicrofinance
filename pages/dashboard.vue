@@ -374,41 +374,57 @@ const requestLoan = async() => {
         ineligible.value = "Invalid registration date.";
         return;
     }
-
+    
     let differenceInMs = currentDate - registrationDate;
     let differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
     let requiredDays = 180;
-
-    // CHECK IF THE CUSTOMER'S LAST LOAN IS STILL PENDING OR FULLY PAID
-    const loanPropCheck = await customer.checkLastLoan()
-    const loanStatusCheck = loanPropCheck.loanStat
-    const loanBalanceCheck = loanPropCheck.principal
-
-        if(differenceInDays < requiredDays){
-            let daysRemaining = Math.ceil(requiredDays - differenceInDays);
-            noteligible.value = true
-            ineligible.value = `Not yet eligible. ${daysRemaining} days remaining.`;
-            setTimeout(() => {
-                noteligible.value = false
-            }, 2000);
-            return
-        }else if(loanStatusCheck == 'PENDING'){
-            noteligible.value = true
-            ineligible.value = 'Your last loan is Still Pending...'
-            setTimeout(() => {
-                noteligible.value = false
-            }, 2000);
-            return
-        }else if(loanBalanceCheck > 0){
-            noteligible.value = true
-            ineligible.value = 'Your last loan is not yet Balanced...'
-            setTimeout(() => {
-                noteligible.value = false
-            }, 2000);
-            return
-        }else{
-            openLoanModal.value = true
-        }
+    
+    // First check if the user meets the registration duration requirement
+    if(differenceInDays < requiredDays){
+        let daysRemaining = Math.ceil(requiredDays - differenceInDays);
+        noteligible.value = true;
+        ineligible.value = `Not yet eligible. ${daysRemaining} days remaining.`;
+        setTimeout(() => {
+            noteligible.value = false;
+        }, 2000);
+        return;
+    }
+    
+    // Check if the user has any previous loans
+    const loanPropCheck = await customer.checkLastLoan();
+    
+    // If there's no loan record or loanPropCheck is undefined, proceed to loan request
+    if (!loanPropCheck || !loanPropCheck.loanStat) {
+        console.log('No previous loan record found');
+        openLoanModal.value = true;
+        return;
+    }
+    
+    const loanStatusCheck = loanPropCheck.loanStat;
+    const loanBalanceCheck = loanPropCheck.principal || 0; // Default to 0 if undefined
+    
+    // Check if last loan is pending
+    if(loanStatusCheck === 'PENDING'){
+        noteligible.value = true;
+        ineligible.value = 'Your last loan is Still Pending...';
+        setTimeout(() => {
+            noteligible.value = false;
+        }, 2000);
+        return;
+    }
+    
+    // Check if last loan has outstanding balance
+    if(loanBalanceCheck > 0){
+        noteligible.value = true;
+        ineligible.value = 'Your last loan is not yet Balanced...';
+        setTimeout(() => {
+            noteligible.value = false;
+        }, 2000);
+        return;
+    }
+    
+    // If all checks pass, open the loan modal
+    openLoanModal.value = true;
 };
 
 // UPLOADING GUARANTOR'S FORM
