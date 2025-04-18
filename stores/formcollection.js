@@ -25,16 +25,13 @@ export const useFormStore = defineStore ('form', () => {
         employerLocation: '',
         state: '',
         localGvt: '',
+        password: '',
 
         // NEXT OF KIN
         nextKinOneSurname : '',
         nextKinOneFirstname: '',
         nextKinOneRelationship: '',
         nextKinOnePhone: '',
-        nextKinTwoSurname: '',
-        nextKinTwoFirstname: '',
-        nextKinTwoRelationship: '',
-        nextKinTwoPhone: ''
     })
 
     const isLoading = ref(false)
@@ -144,61 +141,97 @@ const checkReg = async () => {
     }
 }
 
-    // REGISTER THE MEMBER
-    const registerUser = async () => {
-        isLoading.value = true
-        error.value = null
-        canProceed.value = false
-        const client = useSupabaseClient()
-        try {
-            // UPLOADING THE FILES
-            await uploadFiles()
+// REGISTER THE MEMBER
+const registerUser = async () => {
+    isLoading.value = true
+    error.value = null
+    canProceed.value = false
+    const client = useSupabaseClient()
+    try {
+        // UPLOADING THE FILES
+        await uploadFiles()
 
-            // UPLOADING THE OTHER DETAILS
-            const {data:saveDate, error:saveError} = await client
-            .from('REGISTEREDUSERS')
-            .insert({
-                passportUrl: registrationData.passportUrl,
-                surname: registrationData.surname,
-                firstname: registrationData.firstname,
-                middlename: registrationData.middlename,
-                occupation: registrationData.occupation,
-                dateOfBirth: registrationData.dateOfBirth,
-                gender: registrationData.gender,
-                homeAddress: registrationData.homeAddress,
-                homeTown: registrationData.homeTown,
-                maritalStat: registrationData.maritalStat,
-                eduQualify: registrationData.eduQualify,
-                phone: registrationData.phone,
-                email: registrationData.email,
-                reg_identity: registrationData.paymentId,
-                employerName: registrationData.employerName,
-                employerAddress: registrationData.employerAddress,
-                employerLocation: registrationData.employerLocation,
-                state: registrationData.state,
-                localGvt: registrationData.localGvt,
-                nextKinOneSurname: registrationData.nextKinOneSurname,
-                nextKinOneFirstname: registrationData.nextKinOneFirstname,
-                nextKinOneRelationship: registrationData.nextKinOneRelationship,
-                nextKinOnePhone: registrationData.nextKinOnePhone,
-                nextKinTwoSurname: registrationData.nextKinTwoSurname,
-                nextKinTwoFirstname: registrationData.nextKinTwoFirstname,
-                nextKinTwoRelationship: registrationData.nextKinTwoRelationship,
-                nextKinTwoPhone: registrationData.nextKinTwoPhone,
-            })
-            .select()
+        // UPLOADING THE OTHER DETAILS
+        const {data:saveDate, error:saveError} = await client
+        .from('REGISTEREDUSERS')
+        .insert({
+            passportUrl: registrationData.passportUrl,
+            surname: registrationData.surname,
+            firstname: registrationData.firstname,
+            middlename: registrationData.middlename,
+            occupation: registrationData.occupation,
+            dateOfBirth: registrationData.dateOfBirth,
+            gender: registrationData.gender,
+            homeAddress: registrationData.homeAddress,
+            homeTown: registrationData.homeTown,
+            maritalStat: registrationData.maritalStat,
+            eduQualify: registrationData.eduQualify,
+            phone: registrationData.phone,
+            email: registrationData.email,
+            reg_identity: registrationData.paymentId,
+            employerName: registrationData.employerName,
+            employerAddress: registrationData.employerAddress,
+            employerLocation: registrationData.employerLocation,
+            state: registrationData.state,
+            localGvt: registrationData.localGvt,
+            nextKinOneSurname: registrationData.nextKinOneSurname,
+            nextKinOneFirstname: registrationData.nextKinOneFirstname,
+            nextKinOneRelationship: registrationData.nextKinOneRelationship,
+            nextKinOnePhone: registrationData.nextKinOnePhone,
+        })
+        .select()
 
-            if(saveError) throw saveError
-            canProceed.value = true
-            return saveDate
-        } catch (err) {
-            error.value = err.message
-            console.log(err.message)
-            throw error
-        } finally{
-            isLoading.value = false
-        }
+        if(saveError) throw saveError
+
+        await registration()
+        canProceed.value = true
+        return saveDate
+    } catch (err) {
+        error.value = err.message
+        console.log(err.message)
+        throw error
+    } finally{
+        isLoading.value = false
     }
+}
+
+// REGISTER MEMBERS FOR AUTHENTICATION
+const registration = async() => {
+    isLoading.value = true
+    error.value = null
+    const client = useSupabaseClient()
+    try {
+        const {data:authData, error:signUpError} = await client.auth.signUp({
+            email : registrationData.email,
+            password : registrationData.password,
+            options:{
+                emailRedirectTo: `${window.location.origin}/Confirm`,
+                data:{
+                    Phone: registrationData.phone,
+                    Email: registrationData.email,
+                    Lastname: registrationData.surname,
+                    Firstname: registrationData.firstname,
+                    Middlename: registrationData.middlename,
+                    role:'member'
+                }
+            }
+        })
+        if(signUpError) throw signUpError
+    } catch (err) {
+        error.value = err.message
+        console.log(err.message)
+    } finally{
+        isLoading.value = false
+    }
+}
+
+
+
+
+
+
+
+
 
     return{
         registrationData,

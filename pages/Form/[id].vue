@@ -17,7 +17,7 @@
                     <h3>Please upload your passport</h3>
                     <label for="passport"><i class="fa fa-file" style="font-size: 40px; cursor: pointer;"></i></label>
                     <input type="file" id="passport" style="display: none;" @change="handlePassportPhoto"
-                        accept="image/*" required>
+                        accept="image/*">
                     <div v-if="passportPreviewUrl" class="preview">
                         <img :src="passportPreviewUrl" alt="Passport Preview" width="100" />
                     </div>
@@ -88,8 +88,8 @@
                 </select>
 
                 <!-- EDUCATIONAL QUALIFICATION -->
-                <label for="maritalStat">Educational Qualification:</label>
-                <select id="maritalStat" class="contactInput" v-model="store.registrationData.eduQualify">
+                <label for="eduQual">Educational Qualification:</label>
+                <select id="eduQual" class="contactInput" v-model="store.registrationData.eduQualify">
                     <option>Primary School Leaving Certificate</option>
                     <option>O'Level</option>
                     <option>OND</option>
@@ -103,6 +103,12 @@
                 <label for="emailAddress">Email Address:</label>
                 <input type="email" id="emailAddress" class="contactInput" v-model="store.registrationData.email"
                     required>
+
+                <!-- PASSWORD SECTION -->
+                 <label for="password">Password:</label>
+                 <input :type="passwordVisible ? 'text' : 'password'" id="password" class="contactInput" v-model="store.registrationData.password" required>
+                 <p></p>
+                 <button @click.prevent="togglePasswordVisibility" type="button">{{ passwordVisible ? 'Hide' : 'Show' }} Password </button>
 
                 <!-- PHONE NUMBER -->
                 <label for="phone">Phone Number:</label>
@@ -146,33 +152,10 @@
                 <label for="phoneNextOne">Phone Number:</label>
                 <input type="text" id="phoneNextOne" class="contactInput" v-model="store.registrationData.nextKinOnePhone"
                     required>
-
-                    <!-- SECOND NEXT OF KIN -->
-
-                    <h1>Second Next of Kin</h1>
-                <!-- SURNAME -->
-                <label for="surnameNextTwo">Surname:</label>
-                <input type="text" id="surnameNextTwo" class="contactInput" v-model="store.registrationData.nextKinTwoSurname"
-                    required>
-
-                <!-- FIRSTNAME -->
-                <label for="firstnameNextTwo">Firstname:</label>
-                <input type="text" id="firstnameNextTwo" class="contactInput" v-model="store.registrationData.nextKinTwoFirstname"
-                    required>
-
-                <!-- RELATIONSHIP -->
-                <label for="relationshipNextTwo">Relationship:</label>
-                <input type="text" id="relationshipNextTwo" class="contactInput" v-model="store.registrationData.nextKinTwoRelationship"
-                    required>
-
-                <!-- PHONE NUMBER -->
-                <label for="phoneNextTwo">Phone Number:</label>
-                <input type="text" id="phoneNextTwo" class="contactInput" v-model="store.registrationData.nextKinTwoPhone"
-                    required>
             </div>
-
             <div class="stepA buttonSign">
-                <h5 v-if="noInput" class="error-message">{{ errorMessage }}</h5>
+                <h5 class="error-message">{{ errorMessage }}</h5>
+                <!-- <h5 v-if="validationErrors" class="error-message">{{ validationErrors }}</h5> -->
                 <button type="submit" :disabled="store.isLoading">{{ store.isLoading ? 'Registering...' : 'Register'
                     }}</button>
             </div>
@@ -182,7 +165,7 @@
         <div v-if="formSubmitted" class="success-container">
             <div class="success-message">
                 <h2>Registration Successful!</h2>
-                <p>Your form has been successfully submitted and saved to our database.</p>
+                <p>Your form has been successfully submitted. Check Email For Confirmation</p>
                 <div class="print-actions">
                     <button @click="printForm" class="print-button">Print Registration Form</button>
                     <button @click="goToHome" class="home-button">Return Home</button>
@@ -337,6 +320,14 @@
     const noInput = ref(false)
     const errorMessage = ref('')
 
+    // MAKE PASSWORD VISIBLE OR NOT
+    const passwordVisible = ref(false)
+    const togglePasswordVisibility = () => {
+        passwordVisible.value = !passwordVisible.value
+    }
+
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,40}$/
+
     const registrationId = route.params.id
     const passportPreviewUrl = ref('')
     const successMessage = ref('')
@@ -357,13 +348,6 @@
             selectedLGA.value = ""; 
         }
     });
-
-// Generate a random registration ID
-// const generateRegistrationId = () => {
-//     const timestamp = new Date().getTime().toString().slice(-6)
-//     const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0')
-//     return `REG-${timestamp}-${random}`
-// }
 
 // Format date for display
 const formatDate = (dateString) => {
@@ -419,65 +403,79 @@ watch(() => store.canProceed, (newVal) => {
 });
 
     // VALIDATE FORM INPUT
+// VALIDATE FORM INPUT
 const validateForm = () => {
-  const errors = []
+  // Reset error message
+  errorMessage.value = ""
   
   // Check if passport photo is uploaded
   if (!store.registrationData.passportPhoto) {
-    errors.push("Please upload your passport photograph")
+    errorMessage.value = "Please upload your passport photograph"
+    // Focus on the label to draw attention to the upload area
+    document.querySelector('label[for="passport"]').focus();
+    return false
+  }
+
+  // Check password pattern
+  if (!passwordPattern.test(store.registrationData.password)) {
+    errorMessage.value = 'Password must be at least 8 characters long, include an UPPER CASE, a lower case, and a special character'
+    return false
   }
   
-  // Check personal information fields
-  if (!store.registrationData.surname) errors.push("Surname is required")
-  if (!store.registrationData.firstname) errors.push("Firstname is required")
-  if (!store.registrationData.middlename) errors.push("Middlename is required")
-  if (!store.registrationData.occupation) errors.push("Occupation is required")
-  if (!store.registrationData.dateOfBirth) errors.push("Date of birth is required")
-  if (!store.registrationData.gender) errors.push("Gender is required")
-  if (!store.registrationData.homeAddress) errors.push("Current home address is required")
-  if (!store.registrationData.homeTown) errors.push("Home Town is required")
-  if (!store.registrationData.maritalStat) errors.push("Marital Status is required")
-  if (!store.registrationData.eduQualify) errors.push("Educational Qualification is required")
-  if (!store.registrationData.phone) errors.push("Phone Number is required")
-  if (!store.registrationData.email) errors.push("Email Address is required")
-  if (!store.registrationData.employerName) errors.push("Employer's Name is required")
-  if (!store.registrationData.employerAddress) errors.push("Employer's Address is required")
-  if (!store.registrationData.employerLocation) errors.push("Employer's Location is required")  
-  if (!store.registrationData.nextKinOneSurname) errors.push("Next of Kin Surname is required")
-  if (!store.registrationData.nextKinOneFirstname) errors.push("Next of Kin Firstname is required")
-  if (!store.registrationData.nextKinOneRelationship) errors.push("Next of Kin Relationship is required")
-  if (!store.registrationData.nextKinOnePhone) errors.push("Next of Kin Phone Number is required")
-  if (!store.registrationData.nextKinTwoSurname) errors.push("Next of Kin Surname is required")
-  if (!store.registrationData.nextKinTwoFirstname) errors.push("Next of Kin Firstname is required")
-  if (!store.registrationData.nextKinTwoRelationship) errors.push("Next of Kin Relationship is required")
-  if (!store.registrationData.nextKinTwoPhone) errors.push("Next of Kin Phone Number is required")
-  if (!selectedState.value) errors.push("State of Origin is required")
-  if (!selectedLGA.value) errors.push("Local Government is required")
+  // Required field validations
+  const requiredFields = [
+    { field: store.registrationData.surname, message: "Surname is required" },
+    { field: store.registrationData.firstname, message: "Firstname is required" },
+    { field: store.registrationData.middlename, message: "Middlename is required" },
+    { field: store.registrationData.occupation, message: "Occupation is required" },
+    { field: store.registrationData.dateOfBirth, message: "Date of Birth is required" },
+    { field: store.registrationData.gender, message: "Gender is required" },
+    { field: store.registrationData.homeAddress, message: "Current Home Address is required" },
+    { field: store.registrationData.homeTown, message: "Home Town is required" },
+    { field: store.registrationData.maritalStat, message: "Marital Status is required" },
+    { field: store.registrationData.eduQualify, message: "Educational Qualification is required" },
+    { field: store.registrationData.phone, message: "Phone Number is required" },
+    { field: store.registrationData.email, message: "Email is required" },
+    { field: store.registrationData.employerName, message: "Employer's name is required" },
+    { field: store.registrationData.employerAddress, message: "Employer's Address is required" },
+    { field: store.registrationData.employerLocation, message: "Employer's Location is required" },
+    { field: store.registrationData.nextKinOneSurname, message: "Next of Kin Surname is required" },
+    { field: store.registrationData.nextKinOneFirstname, message: "Next of Kin Firstname is required" },
+    { field: store.registrationData.nextKinOneRelationship, message: "Next of Kin Relationship is required" },
+    { field: store.registrationData.nextKinOnePhone, message: "Next of Kin Phone number is required" },
+    { field: selectedState.value, message: "State of Origin is required" },
+    { field: selectedLGA.value, message: "Local Government is required" }
+  ]
 
-  validationErrors.value = errors
-  return errors.length === 0
+  // Check each required field
+  for (const { field, message } of requiredFields) {
+    if (!field) {
+      errorMessage.value = message
+      return false
+    }
+  }
+
+  // All validations passed
+  return true
 }
 
 // SUBMIT FORM DETAILS
+// SUBMIT FORM DETAILS
 const submitRegistration = async () => {
-    showValidationErrors.value = true
     store.registrationData.paymentId = registrationId
     store.registrationData.state = selectedState.value
     store.registrationData.localGvt = selectedLGA.value
 
-    if(!validateForm()){
-        window.scrollTo({top:0, behavior: 'smooth'})
+    if (!validateForm()) {
+        window.scrollTo({top: 0, behavior: 'smooth'})
         return
     }
 
-    // const chosenState = selectedState.value
-    // const chosenLGA = selectedLGA.value
-
+    // Proceed with submission since validation passed
     try {
         await store.checkId()
-
-    } catch (error) {
-        console.error('Registration failed:', error)
+    } catch (err) {
+        errorMessage.value = err.message
     }
 }
 
@@ -733,6 +731,11 @@ h5{
 @media (max-width: 768px){
     h1{
         font-size: 19px;
+    }
+    .error-message{
+        font-size: 12px;
+        text-align: center;
+        text-align-last: center;
     }
 }
 </style>

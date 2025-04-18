@@ -17,7 +17,7 @@ export const useMemberauthStore = defineStore('membersauth', () => {
         const client = useSupabaseClient()
         try {
             const {data: queryData, error: queryError} = await client
-            .from('REGISTEREDUSERS')
+            .from('REGISTRATIONID')
             .select('*')
             .eq('email', RegisterDetails.email)
             .single()
@@ -34,7 +34,7 @@ export const useMemberauthStore = defineStore('membersauth', () => {
 
             incoming.value = queryData
             // IF THE EMAIL IS FOUND, REGISTER THE MEMBER
-            await registration(RegisterDetails)
+            await checkIdEmail(RegisterDetails)
             canProceed.value = true
         } catch (err) {
             error.value = err.message
@@ -42,6 +42,44 @@ export const useMemberauthStore = defineStore('membersauth', () => {
             isLoading.value = false
         }
     }
+
+    // CHECK IF THE EMAIL IS ALREADY REGISTERED AMONG FORM MEMBERS
+        const checkIdEmail = async (RegisterDetails) => {
+            isLoading.value = true
+            error.value = null
+            const client = useSupabaseClient()
+            try {
+                const {data: queryData, error: queryError} = await client
+                .from('REGISTEREDUSERS')
+                .select('*')
+                .eq('email', RegisterDetails.email)
+                .single()
+    
+                // CHECK IF THE REGISTERER EXISTS IN THE REGISTERED PAGE
+                if (queryError) {
+                    if (queryError.code === 'PGRST116') {
+                        error.value = 'You have already Registered as a member'
+                        isLoading.value = false
+                        return
+                    }
+                    throw queryError
+                }
+    
+                incoming.value = queryData
+                // IF THE EMAIL IS FOUND, REGISTER THE MEMBER
+                await registration(RegisterDetails)
+                canProceed.value = true
+            } catch (err) {
+                error.value = err.message
+            } finally{
+                isLoading.value = false
+            }
+        }
+
+
+
+
+
 
     // REGISTER MEMBERS
     const registration = async(RegisterDetails) => {

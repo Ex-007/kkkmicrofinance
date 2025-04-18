@@ -9,7 +9,7 @@
         </div>
 
         <!-- REGISTRATION FOR STUDENT -->
-        <div class="page" v-if="registerVisible">
+        <!-- <div class="page" v-if="registerVisible">
             <h5 v-if="registerE">{{ registerError }}</h5>
             <input type="text" class="contactInput" placeholder="Please input your Firstname" v-model="RegisterDetails.firstname">
             <input type="text" class="contactInput" placeholder="Please input your Lastname" v-model="RegisterDetails.lastname">
@@ -26,7 +26,7 @@
             </div>
             <h3>Already Have an account? <span @click="toggleSign">Sign In</span></h3>
             <h3 @click="forgotP" class="forgotBut">Forgot Password?</h3>
-        </div>
+        </div> -->
 
         <!-- SIGN IN FOR ADMIN AND STUDENTS -->
         <div class="page" v-if="loginVisible">
@@ -37,7 +37,7 @@
                 <button @click.prevent="togglePasswordVisibility" type="button">{{ passwordVisible ? 'Hide' : 'Show' }} Password </button>
                 <button @click="loginUser" :disabled="auth.isLoading">{{ auth.isLoading ? 'signing in...' : 'Sign in' }}</button>
             </div>
-            <h3>Don't have an account? <span @click="toggleRegister">Register</span></h3>
+            <h3 @click="forgotP" class="forgotBut">Forgot Password?</h3>
         </div>
 
         <!-- FORGOT PASSWORD -->
@@ -45,7 +45,7 @@
             <h5 v-if="loginE">{{ loginError }}</h5>
             <input type="email" class="contactInput" placeholder="Please input your email" v-model="resetEmail">
             <button @click="confirmForgotEmail">Confirm</button>
-            <h3 @click="toggleRegister" class="forgotBut">Go back to Sign In</h3>
+            <h3 @click="toggleSign" class="forgotBut">Go back to Sign In</h3>
         </div>
 
         <!-- <i class="fa fa-user"></i> -->
