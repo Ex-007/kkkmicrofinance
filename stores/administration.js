@@ -642,7 +642,7 @@ const selectDeposit = async(userId) => {
             }
         }
         // SEND SMS
-        const sendSms = async (to, message, senderName = 'Schamp', route = 'non_dnd') => {
+        const sendSms = async (to, message, senderName = 'KKK-Society', route = 'non_dnd') => {
             isLoading.value = false
             error.value = null
             try {
