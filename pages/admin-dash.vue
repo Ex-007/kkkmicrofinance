@@ -644,7 +644,7 @@ const makeDeposit = async () => {
     const to = formatPhoneNumber(searchView.value.phone)
     const balance = searchView.value.accountBalance + depositConfig.value.depositAmount
     const email = searchView.value.email
-    const message = `Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Made. Your New Balance is ${formatCurrency(balance)}. Thanks for being part of the Society...`
+    const message = `kkk-Multipurpose... Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Made. Your New Balance is ${formatCurrency(balance)}. Thanks for being part of the KKK Society...`
     await admin.depositMoney(searchView.value.reg_identity, searchView.value.accountBalance, depositConfig.value.depositAmount, type, to, message, email)
     depositV.value.pop = true
     depositV.value.message = `Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Made`
@@ -731,7 +731,7 @@ const makeWithdraw = async () => {
       Your loan request of ${loanAmount} has been officially approved. Kindly check your registered account or contact us for next steps.
       Email: admin@kkktoluwalase.org.
       Phone Number: 08035935364 or 07081106695
-      Thank you for trusting us — your growth is our priority. 💼✨`;
+      Thank you for trusting us — your growth is our priority.`;
     admin.approveLoan(identity, message, phoneNumber, email)
     statusMessage.value = 'Loan Approved'
     setTimeout(() => {
