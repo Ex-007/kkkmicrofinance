@@ -3,9 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offline Page</title>
+    <title>KKK Toluwalase Offline Page</title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        .heading{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgb(255, 255, 255);
+            color: rgb(255, 0, 0);
+            gap: 10px;
+            padding: 10px;
+            border: 2px solid red;
+        }
+        .heading>h2{
+            background-color: red;
+            color: white;
+            padding: 10px;
+            border-radius: 30px;
+            border: 2px solid white;
+            outline: 2px solid red;
+            font-family: Poppins;
+            font-size: 15px;
+        }
+        .guideThrough{
+            background-color: red;
+            color: white;
+            line-height: 20px;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            font-family: Inter;
+        }
+        .guideThrough ul{
+            color: red;
+            background-color: white;
+            margin: 0 10px;
+            border-radius: 20px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        ul li{
+            text-align: left;
+            list-style-type: none;
+            font-family: Inter;
+        }
+        .firstBody{
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin: 5px 0;
+        }
+        .firstBody>h3{
+            text-align: center;
+            background-color: red;
+            color: white;
+            padding: 10px;
+            font-family: poppins;
+            text-align-last: center;
+            font-size: 15px;
+        }
+        .whatTheySaying{
+            color: white;
+            background-color: red;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .details{
+            color: rgb(255, 0, 0);
+            background-color: rgb(255, 255, 255);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            border-radius: 20px;
+            margin: 5px;
+            padding: 5px;
+        }
+        .details>h5{
+            text-align: end;
+            font-style: italic;
+        }
+        .customerSay>h3{
+            text-align: center;
+            font-family: poppins;
+            background-color: red;
+            color: white;
+            margin: 10px;
+            padding: 5px;
+        }
+        footer{
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background-color: rgb(28, 21, 21);
+            color: white;
+        }
+        a{
+            color: white;
+            text-decoration: none;
+            font-style: italic;
+        }
+        .footer-section{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align-last: center;
+        }
+        .footer-bottom{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align-last: center;
+        }
+        .secondFooter{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            gap: 10px;
+        }
+        @media (max-width: 768px){
+            .secondFooter{
+                display: flex;
+                justify-content: center;
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        .firstBody>p{
+            text-align: center;
+            background-color: red;
+            color: white;
+            padding: 5px;
+        }
+        .firstBody>p>a{
+            color: rgb(206, 200, 20);
+        }
+    </style>
 </head>
 <body>
-    <h1>This is the Offline Page</h1>
+    <div class="heading">
+        <div class="imgDiv">
+            <img src="/public/img/kkklogo.png" alt="KKK logo" width="60">
+        </div>
+        <h2>KKK Toluwalase</h2>
+    </div>
+    <div class="otherBody">
+        <div class="firstBody">
+
+            <h3>Welcome to KKK Toluwalase Cooperative Multi-Purpose Society.</h3>
+            <p>If You're viewing this page, it means you're either offline or you've exhausted your data... <a href="https://www.kkktoluwalase.org">Click me to return to the main page</a> or continue reading what i have in store for you.</p>
+        </div>
+        <div class="guideThrough">
+            <h4>Here, You have access to the following...</h4>
+            <ul>
+                <li><strong>Easy Savings</strong> where you can Save Money Securely With Interest Rates.</li>
+                <li><strong>Quick Loans</strong> where you can Get an almost instant loans with low interest rates.</li>
+                <li><strong>Secure Savings</strong> where you can Save your money with confidence without no hassle and an interest.</li>
+            </ul>
+            <h4 style="font-family: cursive; font-style: italic;">...and more in store.</h4>
+        </div>
+    </div>
+    <div class="customerSay">
+        <h3>Here's What Our Customers are Saying...</h3>
+        <div class="whatTheySaying">
+            <div class="details">
+                <p>"As a small business owner, securing loans from a traditional banks was always a struggle. But, with KKK Cooperative Multi-Purpose Society, i recieved quick and hassle-free financing that helped me expand my store. Their Customer service is top notch, and their repayment plans is flexible."</p>
+                <h5>~Aisha Bello, Retail Store Owner</h5>
+            </div>
+            <div class="details">
+                <p>"Farming is unpredictable, and access to credit is crucial. Thanks to KKK Cooperative Multi-Purpose Society, i was able to purchase high-quality seeds and equipments. Today, my farm is thriving, and i can provide for my family with ease."</p>
+                <h5>~Emeka Nwosu, Cassava Farmer.</h5>
+            </div>
+            <div class="details">
+                <p>"I needed a small loan to start my fashion business while in school, and KKK Cooperative Multi-Purpose Society believed in my dream. Their support helped me get my first set of materials, and now, my designs are gaining recognition!"</p>
+                <h5>~Mary Jonson, Student & Fashion Designer.</h5>
+            </div>
+            <div class="details">
+                <p>"Before, saving money was difficult for me as a trader, but their daily savings plan has changed my life. I can now manage my finances better and even access loans when needed. KKK Cooperative Multi-Purpose Society truly empowers small businesses."</p>
+                <h5>~Mama Nkechi, Market Trader.</h5>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <div class="firstFoot">
+            <div class="footer-section">
+                <h2 class="logo">Kodun Kopo Kope</h2>
+                <p>...Your Trusted Cooperative Multi-Purpose Society for Savings, Loans and Easy Transactions.</p>
+              </div>
+        </div>
+        <div class="secondFooter">
+            <div class="footer-section">
+                <h3>Support</h3>
+                <ul>
+                    <li><a href="tel:07081106695">07081106695</a></li>
+                    <li><a href="tel:08068383977">08068383977</a></li>
+                    <li><a href="tel:09053347772">08035935364</a></li>
+                </ul>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; kodun kopo kope. All rights reserved.</p>
+                <p><a href="mailto:toluwalasecooperative2021@gmail.com">toluwalasecooperative2021@gmail.com</a></p>
+                <p>Designed by <a href="https://abtech-two.vercel.app">ABTech</a></p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
