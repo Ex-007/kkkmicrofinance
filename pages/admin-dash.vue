@@ -253,7 +253,7 @@
         </section>
 
         <!-- UPDATE USERS/CUSTOMERS ACCOUNT BALANCE -->
-        <section v-if="activeTab === 'accountUpdate'">
+        <section v-if="activeTab === 'openAccount'">
           <div class="transactionDet">
             <h1>UPDATE CUSTOMER'S ACCOUNT BALANCE</h1>
             <div class="logRegistrationId">
@@ -325,6 +325,16 @@
             </div>
         </transition>
 
+
+        <transition name="fade">
+            <div class="loanPop updatess" v-if="activeTab === 'accountUpdate'">
+              <h3>Enter Password</h3>
+              <input type="text" class="contactInput" placeholder="Enter Password" v-model="accountPass">
+              <p class="error-class">{{ errorTxt }}</p>
+              <button @click="openAcct">Proceed</button>
+            </div>
+        </transition>
+
         <!-- APPROVED LOANS -->
          <section v-if="activeTab === 'approvedLoans'">
           <div class="transactionDet">
@@ -363,13 +373,29 @@
     // KKK-djGzG6yQJi65m22
     // KKK-3DwxWw8sUluZH7D
 
+    const generated = 'djGzG6yQJi65m22'
+    const accountPass = ref('')
+    const errorTxt = ref('')
+
+    const openAcct = () => {
+      errorTxt.value = ''
+      if(accountPass.value == generated){
+        activeTab.value = 'openAccount'
+        accountPass.value = ''
+      }else{
+        errorTxt.value = 'You Have Entered an Incorrect Password'
+        accountPass.value = ''
+      }
+      accountPass.value = ''
+    }
     // ROUTE GUARD
     definePageMeta({
       layout: 'admin',
-       middleware: ['admin']
+      middleware: ['admin']
     })
     // const activeTab = ref('approvedLoans');
     const activeTab = ref('home');
+
     
 
     const defaultImage = '/img/profilepicture.jpeg'
@@ -562,23 +588,12 @@ const guarantorFilename = computed(() =>
   }
 
 
-  // CUSTOMER'S ACCOUNT UPDATE
-  // FORMAT THE ACCOUNT BALANCE TO NIGERIAN NAIRA
-// const formatCurrency = (amount) => {
-//     return new Intl.NumberFormat('en-US', {
-//         style: 'currency',
-//         currency: 'NGN',
-//     }).format(amount);
-// };
-
 const formatCurrency = (amount) => {
     return `NGN${Number(amount).toLocaleString(undefined, {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     })}`;
 };
-
-
 
 // DEPOSIT AND WITHDRAW BOX
 const depositBox = ref(false)
@@ -1322,6 +1337,23 @@ input[type="number"]{
       display: flex;
       flex-direction: column;
       font-size: 13px;
+    }
+
+    .updatess button{
+      border: none;
+      border-radius: 0;
+      width: 100px;
+      height: 30px;
+      cursor: pointer;
+      border-radius: 30px;
+    }
+    .error-class{
+      color: red;
+      font-family: sans-serif;
+    }
+    .updatess h3{
+      color: white;
+      font-family: poppins;
     }
 
 </style>
