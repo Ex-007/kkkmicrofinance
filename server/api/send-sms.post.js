@@ -19,8 +19,8 @@ export default defineEventHandler(async (event) => {
     const response = await axios.post('https://api.sendchamp.com/api/v1/sms/send', {
       to: [body.to],
       message: body.message,
-      sender_name: body.sender || 'Toluwalase',
-      route: body.route || 'non_dnd',
+      sender_name: body.sender || 'Schamp',
+      route: body.route || 'dnd',
     }, {
       headers: {
         Authorization: `Bearer ${config.sendchampKey}`,
