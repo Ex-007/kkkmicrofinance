@@ -66,6 +66,24 @@ export const useAdminStore = defineStore('admin', () => {
         }
     }
 
+    // FORMAT PHONE NUMBER
+    function formatPhoneNumber(number) {
+      const digitsOnly = number.replace(/\D/g, "");
+
+      if (digitsOnly.length === 11 && digitsOnly.startsWith("0")) {
+        return "234" + digitsOnly.slice(1);
+      }
+
+      if (digitsOnly.length === 13 && digitsOnly.startsWith("234")) {
+        return digitsOnly;
+      }
+
+      if (digitsOnly.length === 10) {
+        return "234" + digitsOnly;
+      }
+      return null;
+    }
+
     // REGISTER NEW MEMBERS
     const registerNewMember = async (customerRegInfo) => {
         isLoading.value = true
@@ -83,6 +101,17 @@ export const useAdminStore = defineStore('admin', () => {
             })
             .single()
             if(regError) throw regError
+
+            const to = formatPhoneNumber(customerRegInfo.phoneNumber)
+            const emailTo = customerRegInfo.email
+            const webAccess = 'https://www.kkktoluwalase.org/Join-us'
+            const message = `Welcome to KKK Toluwalase. Your unique ID is ${customerRegInfo.registrationID}.
+            Fill your form here ${webAccess}`
+            const subject = 'Registration Details'
+            const text = `Welcome to KKK Toluwalase Cooperative Multi-Purpose Society. Your unique ID is ${customerRegInfo.registrationID}.
+            Fill your form using your unique id through ${webAccess}`
+            await sendSms(to, message)
+            await sendEmail({ to:emailTo, subject, text })
         } catch (err) {
             error.value = err.message
             console.log(err.message)
@@ -532,175 +561,184 @@ const selectDeposit = async(userId) => {
 
     }
 
-        // CONVERT CURRENCY TO NUMBER
-        const convertCurrency = (principalFetched) => {
-            if (!principalFetched || typeof principalFetched !== 'string') {
-                return 0;
-            }
-              
-            let numericString = principalFetched.replace(/^[A-Z]{3}\s+/, '');
-            
-            return parseFloat(numericString.replace(/,/g, ''));
-        }
-        // EXTRACT THE NUMBER FROM DURATION
-        const duration = (durationM) => {
-            if (!durationM || typeof durationM !== 'string') {
-                return 0;
-            }
-            const match = durationM.match(/^\d+/);
-            if (match) {
-                return parseInt(match[0], 10);
-            }
-    
+    // CONVERT CURRENCY TO NUMBER
+    const convertCurrency = (principalFetched) => {
+        if (!principalFetched || typeof principalFetched !== 'string') {
             return 0;
         }
+            
+        let numericString = principalFetched.replace(/^[A-Z]{3}\s+/, '');
+        
+        return parseFloat(numericString.replace(/,/g, ''));
+    }
+
+    // EXTRACT THE NUMBER FROM DURATION
+    const duration = (durationM) => {
+        if (!durationM || typeof durationM !== 'string') {
+            return 0;
+        }
+        const match = durationM.match(/^\d+/);
+        if (match) {
+            return parseInt(match[0], 10);
+        }
+
+        return 0;
+    }
 
  // CALCULATE THE LOAN REPAYMENT
-        const calculateRepayment = async (principal, annualInterestRate, durationMonths) => {
-    isLoading.value = true;
-    error.value = null;
-    try {
+    const calculateRepayment = async (
+        principal,
+        annualInterestRate,
+        durationMonths
+    ) => {
+        isLoading.value = true;
+        error.value = null;
+        try {
         const monthlyInterestRate = annualInterestRate / 100;
-        const monthlyPayment = principal * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, durationMonths) / 
-                      (Math.pow(1 + monthlyInterestRate, durationMonths) - 1);
-        
+        const monthlyPayment =
+            (principal *
+            monthlyInterestRate *
+            Math.pow(1 + monthlyInterestRate, durationMonths)) /
+            (Math.pow(1 + monthlyInterestRate, durationMonths) - 1);
+
         // Generate amortization schedule
         let remainingBalance = principal;
         const schedule = [];
-        
+
         for (let month = 1; month <= durationMonths; month++) {
             const interestPayment = remainingBalance * monthlyInterestRate;
             let principalPayment;
-            
-            
+
             if (month === durationMonths) {
-                principalPayment = remainingBalance;
-                
-                const finalMonthlyPayment = principalPayment + interestPayment;
-                
-                schedule.push({
-                    month,
-                    payment: finalMonthlyPayment,
-                    principalPayment,
-                    interestPayment,
-                    remainingBalance: 0
-                });
+            principalPayment = remainingBalance;
+
+            const finalMonthlyPayment = principalPayment + interestPayment;
+
+            schedule.push({
+                month,
+                payment: finalMonthlyPayment,
+                principalPayment,
+                interestPayment,
+                remainingBalance: 0,
+            });
             } else {
-                
-                principalPayment = monthlyPayment - interestPayment;
-                remainingBalance -= principalPayment;
-                
-                schedule.push({
-                    month,
-                    payment: monthlyPayment,
-                    principalPayment,
-                    interestPayment,
-                    remainingBalance: Math.max(0, remainingBalance)
-                });
+            principalPayment = monthlyPayment - interestPayment;
+            remainingBalance -= principalPayment;
+
+            schedule.push({
+                month,
+                payment: monthlyPayment,
+                principalPayment,
+                interestPayment,
+                remainingBalance: Math.max(0, remainingBalance),
+            });
             }
         }
-        
+
         loanRepaymentSchedule.value = monthlyPayment;
         // console.log(schedule)
-        
-        const actualTotalPayment = schedule.reduce((sum, month) => sum + month.payment, 0);
+
+        const actualTotalPayment = schedule.reduce(
+            (sum, month) => sum + month.payment,
+            0
+        );
         // console.log(monthlyPayment)
         return {
             monthlyPayment,
             totalPayment: actualTotalPayment,
             totalInterest: actualTotalPayment - principal,
-            schedule
+            schedule,
         };
-    } catch (err) {
+        } catch (err) {
         error.value = err.message;
-    }
-        };
-
-        // REDUCE LOAN BALANCE
-        const reduceLoanBalance = async (approvedLoanId, reduceAmount, balance) => {
-            isLoading.value = true
-            error.value = null
-            const client = useSupabaseClient()
-            try {
-                let newBalance  = balance - reduceAmount
-                const {data:reduceData, error:reduceError} = await client
-                .from('LOANREQUESTS')
-                .update({
-                    loanBalance: newBalance
-                })
-                .eq('registrationId', approvedLoanId)
-                if(reduceError) throw reduceError
-
-                const userIdentification = approvedLoanId
-                const depositAmount = reduceAmount
-                const type = 'Loan Repayment'
-                await updateCustomerTransHistory(userIdentification, depositAmount, type)
-            } catch (err) {
-                error.value = err.message
-            }finally{
-                isLoading.value = false
-            }
         }
-        // SEND SMS
-        const sendSms = async (to, message, senderName = 'Schamp', route = 'dnd') => {
+    };
+
+    // REDUCE LOAN BALANCE
+    const reduceLoanBalance = async (approvedLoanId, reduceAmount, balance) => {
+        isLoading.value = true
+        error.value = null
+        const client = useSupabaseClient()
+        try {
+            let newBalance  = balance - reduceAmount
+            const {data:reduceData, error:reduceError} = await client
+            .from('LOANREQUESTS')
+            .update({
+                loanBalance: newBalance
+            })
+            .eq('registrationId', approvedLoanId)
+            if(reduceError) throw reduceError
+
+            const userIdentification = approvedLoanId
+            const depositAmount = reduceAmount
+            const type = 'Loan Repayment'
+            await updateCustomerTransHistory(userIdentification, depositAmount, type)
+        } catch (err) {
+            error.value = err.message
+        }finally{
             isLoading.value = false
-            error.value = null
-            try {
-                const response = await $fetch('/api/send-sms', {
-                    method: 'POST',
-                    body:{
-                        to,
-                        message,
-                        sender: senderName,
-                        route
-                    }
-                })
-                if(!response.success){
-                    error.value = response.error
-                    throw new Error(response.error)
-                }
-
-                // console.log('SMS', response.data)
-                return response.data
-            } catch (err) {
-                error.value = err.message
-                // console.log(err.message)
-                throw err
-            }finally{
-                isLoading.value = false
-            }
         }
+    }
 
-        // SEND EMAIL
-        const sendEmail = async({ to, subject, text }) => {
-            isLoading.value = true
-            error.value = null
-            console.log(to, subject, text)
-            try {
-                const {data, error} = await useFetch('/api/send-email', {
-                    method: 'POST',
-                    body: {
-                        to,
-                        from : 'KKK-Toluwalase@kkktoluwalase.org',
-                        subject,
-                        text
-                    }
-                })
-
-                if (error.value) {
-                    throw new Error(error.value.data?.error || 'Failed to send email');
+    // SEND SMS
+    const sendSms = async (to, message, senderName = 'Schamp', route = 'dnd') => {
+        isLoading.value = false
+        error.value = null
+        try {
+            const response = await $fetch('/api/send-sms', {
+                method: 'POST',
+                body:{
+                    to,
+                    message,
+                    sender: senderName,
+                    route
                 }
-        
-                if (data.value?.error) {
-                throw new Error(data.value.error);
-                }
-                return data.value;
-            } catch (err) {
-                error.value = err.message
-            }finally{
-                isLoading.value = false
+            })
+            if(!response.success){
+                error.value = response.error
+                throw new Error(response.error)
             }
+
+            // console.log('SMS', response.data)
+            return response.data
+        } catch (err) {
+            error.value = err.message
+            // console.log(err.message)
+            throw err
+        }finally{
+            isLoading.value = false
         }
+    }
+
+    // SEND EMAIL
+    const sendEmail = async({ to, subject, text }) => {
+        isLoading.value = true
+        error.value = null
+        try {
+            const {data, error} = await useFetch('/api/send-email', {
+                method: 'POST',
+                body: {
+                    to,
+                    from : 'KKK-Toluwalase@kkktoluwalase.org',
+                    subject,
+                    text
+                }
+            })
+
+            if (error.value) {
+                throw new Error(error.value.data?.error || 'Failed to send email');
+            }
+    
+            if (data.value?.error) {
+            throw new Error(data.value.error);
+            }
+            return data.value;
+        } catch (err) {
+            error.value = err.message
+        }finally{
+            isLoading.value = false
+        }
+    }
 
     return{
         isLoading,

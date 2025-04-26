@@ -29,14 +29,14 @@
 
     // SEO METADATA
     const seoData = ref({
-        title: 'KKK microfinance Bank | Join Us',
-        description : 'Angels Height college of health technology offers top rated courses like Environmental Health Technology, Community Health Extension Worker (CHEW) Junior, Community Health Extension Worker (CHEW) Senior, Dental Therapy, Pharmacy Technician, Opticianry Dispensary, Public Health Technology, Health Assistant Medical, Health Technician, Computer Science Technology, Nutrition and Dietetics, Medical Laboratory Technician, Orthopedic Plaster Card. Join us for a rewarding career in healthcare.',
-        url : 'https://angelsheight.org',
-        image : '/img/angelsImage.jpg',
-        siteName : 'Angels Height College of Health Technology',
+        title: 'KKK Cooperative Multi-Purpose Society',
+        description : 'KKK Cooperative Multi-Purpose Society.',
+        url : 'https://kkktoluwalase.org',
+        image : '/icons/icon-512.png',
+        siteName : 'KKK Cooperative Multi-Purpose Society',
         type : 'website',
-        twitterHandle : '@angelsheight',
-        keywords : 'Environmental Health Technology, Community Health Extension Worker (CHEW) Junior, Community Health Extension Worker (CHEW) Senior, Dental Therapy, Pharmacy Technician, Opticianry Dispensary, Public Health Technology, Health Assistant Medical, Health Technician, Computer Science Technology, Nutrition and Dietetics, Medical Laboratory Technician, Orthopedic Plaster Card, best health technology college in Nigeria'
+        twitterHandle : '@kkkcooperative',
+        keywords : 'Cooperative, Savings, Loans, Withdrawal, Deposit, Fast, Secured, Transparent'
     })
 
     useHead(() => ({

@@ -32,7 +32,6 @@
         <!-- DEPOSIT RECEIPTS -->
         <section v-if="activeTab === 'deposits'">
             <div class="newly">
-              <!-- <h1>Registered Students</h1> -->
               <div class="left listFormStudents">
                 <ul>
                   <li
@@ -417,8 +416,8 @@ const guarantorFilename = computed(() =>
     const generation = ref('')
     const generationSection = ref(false)
     const generatedId = () => {
-      const length = 15
-      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      const length = 10
+      const characters = '0123456789';
         let result = '';
       
         for (let i = 0; i < length; i++) {
@@ -427,7 +426,7 @@ const guarantorFilename = computed(() =>
         }
       
         generationSection.value = true
-        generation.value = 'KKK-' + result
+        generation.value = result
     }
 
     // COPY THE CONTENTS OF THE REG ID
@@ -454,6 +453,16 @@ const guarantorFilename = computed(() =>
       display: false,
       message: ''
     })
+
+
+
+
+
+
+
+
+
+
 
     // SAVE REG ID
     const saveReg = async () => {
