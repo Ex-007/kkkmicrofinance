@@ -668,7 +668,8 @@ const uploadGuarantorImage = async () => {
         depositUpload,
         uploadDepositFile,
         distributeBalance,
-        checkLastLoan
+        checkLastLoan,
+        fetchDetails
     }
 
 

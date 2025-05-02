@@ -221,11 +221,6 @@ const fillLoanApp = () => {
     router.push(`/loan/${registrationId}`)
 }
 
-// DEFINE THE PAGE META
-// definePageMeta({
-//     layout: 'custom'
-// })
-
 
 // CUSTOMER INFORMATION
 const cusInfo = ref({
@@ -528,6 +523,7 @@ const fundsMovement = ref({
 
 const distributeFund = async () => {
     const accountBalance = cusInfo.value.accountBalance
+    const email = cusInfo.value.email
     if(fundsMovement.value.amount == ''){
         fundsMovement.value.open = true
         fundsMovement.value.message = 'Amount cannot be empty'
@@ -537,7 +533,7 @@ const distributeFund = async () => {
     fundsMovement.value.message = ''
     if(fundsMovement.value.amount > accountBalance){
         fundsMovement.value.open = true
-        fundsMovement.value.message = 'The Amount You\re trying to move is greater than your balance. Please reduce it and try again'
+        fundsMovement.value.message = 'The Amount You are trying to move is greater than your balance. Please reduce it and try again'
         return
     }
     fundsMovement.value.open = false
@@ -556,6 +552,10 @@ const distributeFund = async () => {
             moveOpen.value = false
 
         }, 2000);
+
+        await customer.fetchDetails(email)
+        await attachSearchDetails()
+        await allTransactions(email)
         return
     }else{
         let balance = cusInfo.value.investment
@@ -570,6 +570,9 @@ const distributeFund = async () => {
             fundsMovement.value.open = false
             moveOpen.value = false
         }, 2000);
+        await customer.fetchDetails(email)
+        await attachSearchDetails()
+        await allTransactions(email)
         return
     }
 }

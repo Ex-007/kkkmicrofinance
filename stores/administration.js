@@ -754,7 +754,6 @@ const selectDeposit = async(userId) => {
             const {data, error} = await client
             .from('REGISTEREDUSERS')
             .select('*')
-            // .select('accountBalance', 'investment', 'shares', 'minutes')
 
             if(error) throw error
             console.log(data)
@@ -763,7 +762,6 @@ const selectDeposit = async(userId) => {
             let totalShares = 0
             let totalMinutes = 0
             data.forEach(element => {
-                // const eachSavings = element.accountBalance
                 totalSavings += element.accountBalance
                 totalInvestment += element.investment
                 totalShares += element.shares
