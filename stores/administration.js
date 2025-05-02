@@ -15,6 +15,10 @@ export const useAdminStore = defineStore('admin', () => {
     const canOut = ref(false)
     const recentLoann = ref(null)
     const loanRepaymentSchedule = ref([])
+    const tSavings = ref('')
+    const tInvestment = ref('')
+    const tShares = ref('')
+    const tMinutes = ref('')
 
 
     // FETCH THE SIGNED IN USER
@@ -36,6 +40,7 @@ export const useAdminStore = defineStore('admin', () => {
     
             if (loggedUserData && loggedUserData.user) {
                 loggedAdmin.value = loggedUserData.user.user_metadata
+                await fetchTotal()
                 await viewDepositRequests()
                 return loggedUserData.user 
             } else {
@@ -740,6 +745,45 @@ const selectDeposit = async(userId) => {
         }
     }
 
+    // FETCH TOTAL SAVINGS, INVESTMENTS, SHARES AND FINES
+    const fetchTotal = async() => {
+        isLoading.value = true
+        error.value = null
+        const client = useSupabaseClient()
+        try {
+            const {data, error} = await client
+            .from('REGISTEREDUSERS')
+            .select('*')
+            // .select('accountBalance', 'investment', 'shares', 'minutes')
+
+            if(error) throw error
+            console.log(data)
+            let totalSavings = 0
+            let totalInvestment = 0
+            let totalShares = 0
+            let totalMinutes = 0
+            data.forEach(element => {
+                // const eachSavings = element.accountBalance
+                totalSavings += element.accountBalance
+                totalInvestment += element.investment
+                totalShares += element.shares
+                totalMinutes += element.minutes
+            })
+
+            tSavings.value = totalSavings
+            tInvestment.value = totalInvestment
+            tShares.value = totalShares
+            tMinutes.value = totalMinutes
+
+            console.log(totalSavings)
+        } catch (err) {
+            error.value = err.message
+            console.log(err.message)
+        }finally{
+            isLoading.value = false
+        }
+    }
+
     return{
         isLoading,
         error,
@@ -771,6 +815,10 @@ const selectDeposit = async(userId) => {
         checkLastLoan,
         recentLoann,
         loanRepaymentSchedule,
-        reduceLoanBalance
+        reduceLoanBalance,
+        tSavings,
+        tInvestment,
+        tShares,
+        tMinutes
     }
 })

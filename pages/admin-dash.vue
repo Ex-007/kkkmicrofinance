@@ -26,6 +26,11 @@
               <h3>Name : {{adminDetails.adminName}}</h3>
               <h3>Phone Number : {{adminDetails.phoneNumber}}</h3>
               <h3>Email : {{adminDetails.email}}</h3>
+              <br><br>
+              <h3>Total Savings: {{ formatCurrency(admin.tSavings) }}</h3>
+              <h3>Total Investment: {{ formatCurrency(admin.tInvestment) }}</h3>
+              <h3>Total Shares: {{ formatCurrency(admin.tShares) }}</h3>
+              <h3>Total Minutes/Fines: {{ formatCurrency(admin.tMinutes) }}</h3>
             </div>
         </section>
 

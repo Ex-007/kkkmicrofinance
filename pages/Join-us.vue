@@ -4,7 +4,7 @@
             <div class="payMake">
                 <h3>Thank You for proceeding to Join us...</h3>
                 <p>Please input your Reg. Id below to continue with your registration if you have paid for the form fee.</p>
-                <p>If You haven't paid, please reach the management through <a href="mailto:tolorunlasecooperative2021@gmail.com">kkk microfinance</a></p>
+                <p>If You haven't paid, please reach the management through <a href="mailto:tolorunlasecooperative2021@gmail.com">KKK Toluwalase</a></p>
             </div>
             <h5 v-if="noInput">{{ errorMessage }}</h5>
             <h5 class="successful" v-if="successfully">Welcome {{ successMessage }}, waiting for redirect...</h5>
@@ -31,7 +31,7 @@
     const seoData = ref({
         title: 'KKK Cooperative Multi-Purpose Society',
         description : 'KKK Cooperative Multi-Purpose Society.',
-        url : 'https://kkktoluwalase.org',
+        url : 'https://www.kkktoluwalase.org',
         image : '/icons/icon-512.png',
         siteName : 'KKK Cooperative Multi-Purpose Society',
         type : 'website',
