@@ -45,6 +45,7 @@ export const useCustomerStore = defineStore('customerPro', () => {
                 await fetchMostRecentLoan(loggedEmail)
                 await fetchAllLoans(loggedEmail)
                 await listenToUserDetails(loggedEmail)
+                await checkGuarantorFile()
                 return loggedUserData.user
             } else {
                 return null
@@ -628,6 +629,41 @@ const uploadGuarantorImage = async () => {
 
     }
 
+    const checkGuarantorFile = async () => {
+        isLoading.value = true
+        error.value = null
+        const client = useSupabaseClient()
+        let regEmail = user.value.email
+        try {
+            const {data, error} = await client
+            .from('LOANREQUESTS')  
+            .select('*')  
+            .eq('email', regEmail)  
+            .order('created_at', { ascending: false })  
+            .limit(1)
+
+            if (error) throw error;
+            if (data.length === 0) {
+                throw new Error(
+                "No loan data found for the provided email."
+                );
+            }
+
+            if(!data[0].guarantor){
+                // console.log('No data')
+                return false
+            }
+
+            return true
+
+        } catch (err) {
+            error.value = err.message
+            console.log(err.message)
+        }finally{
+            isLoading.value = false
+        }
+    }
+
 
 
 
@@ -669,7 +705,8 @@ const uploadGuarantorImage = async () => {
         uploadDepositFile,
         distributeBalance,
         checkLastLoan,
-        fetchDetails
+        fetchDetails,
+        checkGuarantorFile
     }
 
 

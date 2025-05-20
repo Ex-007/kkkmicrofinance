@@ -11,13 +11,17 @@
   },
   "dependencies": {
     "@pinia/nuxt": "^0.9.0",
+    "apexcharts": "^4.7.0",
     "axios": "^1.8.4",
+    "firebase": "^11.7.1",
+    "firebase-admin": "^13.4.0",
     "font-awesome": "^4.7.0",
     "nuxt": "^3.15.4",
     "resend": "^4.2.0",
     "swiper": "^11.2.6",
     "vue": "latest",
-    "vue-router": "latest"
+    "vue-router": "latest",
+    "vue3-apexcharts": "^1.8.0"
   },
   "description": "This is the main website of KKK Cooperative",
   "version": "1.0.0",

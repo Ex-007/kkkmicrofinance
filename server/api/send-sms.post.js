@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     const response = await axios.post('https://api.sendchamp.com/api/v1/sms/send', {
       to: [body.to],
       message: body.message,
-      sender_name: 'Toluwalase',
+      sender_name: 'Schamp',
       route: 'dnd',
     }, {
       headers: {

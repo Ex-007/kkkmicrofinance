@@ -7,13 +7,14 @@
         </div>
         <ul>
           <li @click="activeTab = 'home'" :class="{ active: activeTab === 'home' }">🏠 Home</li>
-          <li @click="activeTab = 'newMember'" :class="{ active: activeTab === 'newMember' }">🏠 New Member Reg.</li>
+          <li @click="activeTab = 'newMember'" :class="{ active: activeTab === 'newMember' }">🧍🏾‍♂️New Member Reg.</li>
           <li @click="activeTab = 'searchMember'" :class="{ active: activeTab === 'searchMember' }">🏠 Search Member</li>
           <li @click="activeTab = 'registeredMember'" :class="{ active: activeTab === 'registeredMember' }">📩 Registered Members</li>
           <li @click="activeTab = 'approvedLoans'" :class="{ active: activeTab === 'approvedLoans' }">💵 Approved Loans</li>
           <li @click="activeTab = 'loanRequests'" :class="{ active: activeTab === 'loanRequests' }">👤 Loan Requests</li>
           <li @click="activeTab = 'deposits'" :class="{ active: activeTab === 'deposits' }">🧾 Deposits</li>
           <li @click="activeTab = 'accountUpdate'" :class="{ active: activeTab === 'accountUpdate' }">💎 Account Update</li>
+          <li @click="activeTab = 'notification'" :class="{ active: activeTab === 'notification' }"> 🔔Notification</li>
           <li @click="logout">🚪 Logout</li>
         </ul>
       </aside>
@@ -22,6 +23,7 @@
       <main class="content">
         <!-- HOME -->
         <section v-if="activeTab === 'home'">
+          <div class="homeCharts">
             <div class="homeDetails">
               <h3>Name : {{adminDetails.adminName}}</h3>
               <h3>Phone Number : {{adminDetails.phoneNumber}}</h3>
@@ -32,6 +34,15 @@
               <h3>Total Shares: {{ formatCurrency(admin.tShares) }}</h3>
               <h3>Total Minutes/Fines: {{ formatCurrency(admin.tMinutes) }}</h3>
             </div>
+
+            <div class="main">
+                <apexchart
+                type="bar"
+                :options="admin.linechartOptions"
+                :series="admin.linechartSeries"
+                />
+            </div>
+          </div>
         </section>
 
         <!-- DEPOSIT RECEIPTS -->
@@ -194,10 +205,6 @@
                     <li>NoK-1 Firstname: {{ admin.selectedUser.nextKinOneFirstname }}</li>
                     <li>NoK-1 Relationship: {{ admin.selectedUser.nextKinOneRelationship }}</li>
                     <li>NoK-1 Phone Number: {{ admin.selectedUser.nextKinOnePhone }}</li>
-                    <li>NoK-2 Surname: {{ admin.selectedUser.nextKinTwoSurname }}</li>
-                    <li>NoK-2 Firstname: {{ admin.selectedUser.nextKinTwoFirstname }}</li>
-                    <li>NoK-2 Relationship: {{ admin.selectedUser.nextKinTwoRelationship }}</li>
-                    <li>NoK-2 Phone Number: {{ admin.selectedUser.nextKinTwoPhone }}</li>
                 </ul>
               </div>
           </div>
@@ -221,7 +228,7 @@
               </div>
               <div class="right user-details" v-if="admin.selectedLoan">
                 <ul>
-                    <h1>lOAN Details</h1>
+                    <h1>loan Details</h1>
                     <li>Registration ID: {{ admin.selectedLoan.registrationId }}</li>
                     <li>Surname: {{ admin.selectedLoan.surname }}</li>
                     <li>Firstname: {{ admin.selectedLoan.firstname }}</li>
@@ -319,8 +326,9 @@
                   <label for="types">Deposit Type</label>
                   <select id="types" class="contactInput" v-model="depositConfig.depositType">
                       <option>Savings</option>
+                      <option>Shares</option>
+                      <option>Investments</option>
                       <option>Fine-Minutes</option>
-                      <!-- <option>Shares</option> -->
                   </select>
                   <input type="number" class="contactInput" placeholder="Enter Amount" required min="0" oninput="this.value = Math.abs(this.value)" v-model="depositConfig.depositAmount">
                   <p v-if="depositV.pop">{{ depositV.message }}</p>
@@ -363,6 +371,50 @@
             </div>
           </div>
          </section>
+
+         <!-- NOTIFICATION -->
+         <section v-if="activeTab === 'notification'">
+                <div class="overall">
+        <h1>This is the admin page for sending notifications</h1>
+
+            <div class="formField" v-if="multiple">
+            <h3>Multiple Users</h3>
+            <input type="text" placeholder="Title" v-model="notiDetails.title">
+            <textarea v-model="notiDetails.message" placeholder="Message"></textarea>
+            <select v-model="notiDetails.type">
+                <option>All User</option>
+                <!-- <option>TV Subscribers</option>
+                <option>Education Subscribers</option> -->
+            </select>
+            <p v-if="notiDetails.show">{{ notiDetails.messageE }}</p>
+            <button @click="sendNotification">send</button>
+            <p>Send to a single <span @click="singleC">User?</span></p>
+        </div>
+        
+
+        <div class="formField" v-if="single">
+            <h3>Single User</h3>
+            <input type="text" placeholder="Title" v-model="singleUse.title">
+            <textarea v-model="singleUse.message" placeholder="Message"></textarea>
+            <input type="text" placeholder="User ID" v-model="singleUse.userID">
+            <p v-if="singleUse.show">{{ singleUse.messageE }}</p>
+            <button @click="sendSingle">send</button>
+            <p>Send to multiple <span @click="multipleC">Users?</span></p>
+        </div>
+
+
+        <!-- NOTIFICATION POP-UP -->
+        <transition name="fade">
+            <div class="menuP" v-if="notification.notifier">
+                <div class="notification">
+                    <h2>{{ notification.newNotification.title }}</h2>
+                    <p>{{ notification.newNotification.body }}</p>
+                </div>
+            </div>
+        </transition>
+
+    </div>
+         </section>
       </main>
     </div>
   </template>
@@ -370,12 +422,22 @@
   <script setup>
   import { ref, watch, onMounted  } from 'vue';
   import {useAdminStore} from '@/stores/administration'
+  import {useNotificationStore} from '@/stores/notification'
+  const notification = useNotificationStore()
   import{useRoute, useRouter} from 'vue-router'
   const router = useRouter()
   const admin = useAdminStore()
+  const multiple = ref(true)
+  const single = ref(false)
 
-    // KKK-djGzG6yQJi65m22
-    // KKK-3DwxWw8sUluZH7D
+  const singleC = () => {
+    multiple.value = false
+    single.value = true
+  }
+  const multipleC = () => {
+      single.value = false
+      multiple.value = true
+  }
 
     const generated = 'djGzG6yQJi65m22'
     const accountPass = ref('')
@@ -399,8 +461,6 @@
     })
     // const activeTab = ref('approvedLoans');
     const activeTab = ref('home');
-
-    
 
     const defaultImage = '/img/profilepicture.jpeg'
 
@@ -552,7 +612,8 @@ const guarantorFilename = computed(() =>
       accountBalance: '',
       shareBalance: '',
       investmentBalance: '',
-      minutes: ''
+      minutes: '',
+      id: ''
     })
 
 
@@ -592,6 +653,7 @@ const guarantorFilename = computed(() =>
       searchView.value.shareBalance = admin.searchingData.shares
       searchView.value.investmentBalance = admin.searchingData.investment
       searchView.value.minutes = admin.searchingData.minutes
+      searchView.value.id = admin.searchingData.id
 
     }
 
@@ -682,29 +744,59 @@ const makeDeposit = async () => {
       depositV.value.pop = false
       depositBox.value = false
     }, 2000);
+      await admin.searchMember(searchMemBar.value)
+      await attachSearchDetails()
 
   }else if(depositConfig.value.depositType == 'Fine-Minutes'){
     const type = 'Fine-Minutes'
     await admin.depositMoney(searchView.value.reg_identity, searchView.value.minutes, depositConfig.value.depositAmount, type)
           
     depositV.value.pop = true
-    depositV.value.message = `Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Added the Minutes and Fines Account`
+    depositV.value.message = `Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Added to the Minutes and Fines Account`
     depositConfig.value.depositAmount = ''
     setTimeout(() => {
       depositBox.value = false
       depositV.value.pop = false
     }, 2000);
-  }else{
-    const type = 'Investments'
-    await admin.depositMoney(searchView.value.reg_identity, searchView.value.investmentBalance, depositConfig.value.depositAmount, type)
+
+      await admin.searchMember(searchMemBar.value)
+      await attachSearchDetails()
+  }else if(depositConfig.value.depositType == 'Shares'){
+    const type = 'Shares'
+    const to = formatPhoneNumber(searchView.value.phone)
+    const balance = searchView.value.shareBalance + depositConfig.value.depositAmount
+    const email = searchView.value.email
+    const message = `kkk-Multipurpose... Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Made. Your New Balance is ${formatCurrency(balance)}. Thanks for being part of the KKK Society...`
+    await admin.depositMoney(searchView.value.reg_identity, searchView.value.accountBalance, depositConfig.value.depositAmount, type, to, message, email)
           
     depositV.value.pop = true
-    depositV.value.message = `Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Made`
+    depositV.value.message = `Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Added to the Shares Account`
     depositConfig.value.depositAmount = ''
     setTimeout(() => {
       depositBox.value = false
       depositV.value.pop = false
     }, 2000);
+
+      await admin.searchMember(searchMemBar.value)
+      await attachSearchDetails()
+  }else{
+    const type = 'Investments'
+    const to = formatPhoneNumber(searchView.value.phone)
+    const balance = searchView.value.investmentBalance + depositConfig.value.depositAmount
+    const email = searchView.value.email
+    const message = `kkk-Multipurpose... Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Made. Your New Balance is ${formatCurrency(balance)}. Thanks for being part of the KKK Society...`
+    await admin.depositMoney(searchView.value.reg_identity, searchView.value.accountBalance, depositConfig.value.depositAmount, type, to, message, email)
+          
+    depositV.value.pop = true
+    depositV.value.message = `Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Made to the investment account`
+    depositConfig.value.depositAmount = ''
+    setTimeout(() => {
+      depositBox.value = false
+      depositV.value.pop = false
+    }, 2000);
+
+      await admin.searchMember(searchMemBar.value)
+      await attachSearchDetails()
   }
 }
 
@@ -754,7 +846,7 @@ const makeWithdraw = async () => {
 
   const statusMessage = ref('')
   // LOAN APPROVAL
-  const loanApproval = (identity, loanAmount, phone, email) => {
+  const loanApproval = async (identity, loanAmount, phone, email) => {
     const phoneNumber = formatPhoneNumber(phone)
     const message = `Congratulations from KKK Toluwalase Cooperative Multipurpose Society!
       Your loan request of ${loanAmount} has been officially approved. Kindly check your registered account or contact us for next steps.
@@ -766,6 +858,7 @@ const makeWithdraw = async () => {
     setTimeout(() => {
       statusMessage.value = ''
     }, 2000);
+    await admin.selectLoan(identity)
   }
 
   // LOAN DISAPPROVAL
@@ -860,6 +953,94 @@ const reduceLoan = async (balance) => {
   reduceMessage.value = 'Reduction Successful'
 }
 
+// SEND NOTIFICATION TO MULTIPLE USERS
+const notiDetails = ref({
+    type: 'All User',
+    title: '',
+    message: '',
+    show: '',
+    messageE: ''
+})
+
+const sendNotification = async () => {
+    if (notiDetails.value.message == '' || notiDetails.value.title == '') {
+        notiDetails.value.show = true
+        notiDetails.value.messageE = 'No field should be left empty'
+        return
+    }
+    notiDetails.value.show = false
+    notiDetails.value.messageE = ''
+    await notification.sendNotification(notiDetails.value)
+    notiDetails.value.show = true
+    notiDetails.value.messageE = 'Message Sent'
+    clearInput()
+
+    setTimeout(() => {
+        notiDetails.value.show = false
+        notiDetails.value.messageE = ''
+    }, 2000);
+}
+const clearInput = () => {
+    notiDetails.value.message = ''
+    notiDetails.value.title = ''
+}
+
+
+// SEND NOTIFICATION TO A SINGLE USER
+const singleUse = ref({
+    userID: '',
+    title: '',
+    message: '',
+    show: '',
+    messageE: ''
+})
+
+const sendSingle = async () => {
+    if(singleUse.value.title == '' || singleUse.value.message == '' || singleUse.value.userID == ''){
+        singleUse.value.show = true
+        singleUse.value.messageE = 'No field should be left empty'
+        return
+    }
+
+    singleUse.value.show = false
+    singleUse.value.messageE = ''
+
+    await notification.sendNotification(singleUse.value)
+
+    if(notification.error == 'noToken'){
+        singleUse.value.show = true
+        singleUse.value.messageE = "User Doesn't Exist"
+        return
+    }
+
+    singleUse.value.show = true
+    singleUse.value.messageE = 'Message Sent'
+
+    singleUse.value.message = ''
+    singleUse.value.userID = ''
+    singleUse.value.title = ''
+
+    setTimeout(() => {
+        singleUse.value.show = false
+        singleUse.value.messageE = ''
+        singleUse.value.message = ''
+        singleUse.value.userID = ''
+        singleUse.value.title = ''
+    }, 2000);
+}
+
+// CHARTS
+    // const linechartSeries = ref([
+    //     {
+    //         name: "Sales",
+    //         data: [11, 20, 30, 20, 50, 30]
+    //     }
+    // ])
+    // const linechartOptions = ref({
+    //     xaxis: {
+    //         categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June']
+    //     }
+    // })
 
 
 
@@ -869,7 +1050,7 @@ const reduceLoan = async (balance) => {
 
 
 
-
+//6772751459
 
 // LOGOUT
 const logout = () => {
@@ -1368,6 +1549,103 @@ input[type="number"]{
     .updatess h3{
       color: white;
       font-family: poppins;
+    }
+        .overall{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+    }
+    .overall h1{
+      color: white;
+    }
+
+    .menuP {
+    position: absolute;
+    top: 10px;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: rgb(160, 112, 112, 0.9);
+    padding: 10px 0;
+    border-radius: 10px;
+    width: 300px;
+    color: white;
+}
+.notification h2{
+    text-decoration: underline;
+    font-size: 17px;
+    font-family: Tagesschrift, sans-serif;
+}
+.notification p{
+    font-size: 14px;
+    font-family: Tagesschrift, sans-serif;
+}
+    .formField>input, .formField>select{
+        width: 200px;
+        height: 30px;
+        border-radius: 10px;
+        padding: 5px;
+        border: none;
+    }
+    .formField>textarea{
+        border: none;
+        border-radius: 10px;
+        height: 60px;
+        width: 200px;
+        padding: 5px;
+        resize: none;
+    }
+    .formField{
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin-bottom: 10px;
+        border: 2px solid white;
+        padding: 5px;
+        border-radius: 10px;
+    }
+    .formField p{
+        color: white;
+    }
+    .formField span{
+        color: rgb(225, 255, 0);
+        cursor: pointer;
+    }
+    .formField>button{
+        border-radius: 10px;
+        height: 30px;
+        border: none;
+        cursor: pointer;
+    }
+    .formField>button:hover{
+        background-color: red;
+        color: white;
+    }
+    .formField p{
+      text-align: center;
+      font-size: 13px;
+    }
+    .formField h3{
+      color: white;
+    }
+        .main{
+        background-color: white;
+        border-radius: 20px;
+        padding: 5px;
+        width: 350px;
+        margin-top: 20px;
+    }
+    .main h2{
+        font-size: 10px;
+        text-align: center;
+        margin: 10px;
+        color:white;
+        background-color: #007bff;
+        padding: 4px;
     }
 
 </style>

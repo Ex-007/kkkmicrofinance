@@ -12,31 +12,31 @@
             </div>
 
             <!-- ACCOUNT BALANCE -->
-             <div class="accountBalance">
+            <div class="accountBalance">
                 <h2>Account Balance</h2>
                 <h3>{{ formatCurrency(customer.user.accountBalance) }}</h3>
-             </div>
+            </div>
 
-             <!-- MENU ITEMS -->
-              <transition name="fade">
-    
-                  <div class="menuP" v-if="menuItem">
-                     <ul>
-                         <li><nuxt-link to="/profile">Profile</nuxt-link></li>
-                         <li @click="openAccount">Accounts</li>
-                         <li @click="openFunds">Save</li>
-                         <li><nuxt-link to="/transHistory">Transaction History</nuxt-link></li>
-                         <li><nuxt-link to="/loan-status">Loans</nuxt-link></li>
-                         <li><nuxt-link to="/customer-support">Customer Support</nuxt-link></li>
-                         <li @click="logout">{{customer.isLoading ? 'exiting' : 'logout'}}</li>
-                         <li class="closeMenu" @click="closeMenu"><i class="fa fa-times"></i></li>
-                     </ul>
-                  </div>
-              </transition>
+            <!-- MENU ITEMS -->
+            <transition name="fade">
 
-              <!-- OTHER ACCOUNTS -->
-              <transition name="fade">
-                  <div class="loanPop" v-if="account">
+                <div class="menuP" v-if="menuItem">
+                    <ul>
+                        <li><nuxt-link to="/profile">Profile</nuxt-link></li>
+                        <li @click="openAccount">Accounts</li>
+                        <!-- <li @click="openFunds">Save</li> -->
+                        <li><nuxt-link to="/transHistory">Transaction History</nuxt-link></li>
+                        <li><nuxt-link to="/loan-status">Loans</nuxt-link></li>
+                        <li><nuxt-link to="/customer-support">Customer Support</nuxt-link></li>
+                        <li @click="logout">{{ customer.isLoading ? 'exiting' : 'logout' }}</li>
+                        <li class="closeMenu" @click="closeMenu"><i class="fa fa-times"></i></li>
+                    </ul>
+                </div>
+            </transition>
+
+            <!-- OTHER ACCOUNTS -->
+            <transition name="fade">
+                <div class="loanPop" v-if="account">
                     <div class="separate">
                         <h3>Accounts</h3>
                         <p class="closeLoanInput" @click="closeAccount"><i class="fa fa-times"></i></p>
@@ -46,12 +46,12 @@
                         <h3>Investments: {{ formatCurrency(cusInfo.investment) }}</h3>
                         <h3>Shares: {{ formatCurrency(cusInfo.shares) }}</h3>
                     </div>
-                  </div>
-              </transition>
+                </div>
+            </transition>
 
-              <!-- SAVE TO OTHER ACCOUNTS -->
-              <transition name="fade">
-                  <div class="loanPop" v-if="moveOpen">
+            <!-- SAVE TO OTHER ACCOUNTS -->
+            <transition name="fade">
+                <div class="loanPop" v-if="moveOpen">
                     <div class="separate">
                         <h3>Move Funds</h3>
                         <p class="closeLoanInput" @click="closeFunds"><i class="fa fa-times"></i></p>
@@ -63,19 +63,20 @@
                             <option>Shares</option>
                         </select>
                         <label for="amountMoving">Amount</label>
-                        <input type="number" class="contactInput" placeholder="Input Amount" min="0" oninput="this.value = Math.abs(this.value)" v-model="fundsMovement.amount">
+                        <input type="number" class="contactInput" placeholder="Input Amount" min="0"
+                            oninput="this.value = Math.abs(this.value)" v-model="fundsMovement.amount">
                         <p class="movingFundd" v-if="fundsMovement.open">{{ fundsMovement.message }}</p>
                         <button @click="distributeFund">Move</button>
                     </div>
-                  </div>
-              </transition>
+                </div>
+            </transition>
 
 
 
 
-              <!-- DEPOSIT ACCOUNTS -->
-              <transition name="fade">
-                  <div class="loanPop depositting" v-if="depositt">
+            <!-- DEPOSIT ACCOUNTS -->
+            <transition name="fade">
+                <div class="loanPop depositting" v-if="depositt">
                     <div class="separate">
                         <h3>Deposit</h3>
                         <p class="closeLoanInput" @click="closeDeposit"><i class="fa fa-times"></i></p>
@@ -92,24 +93,25 @@
                             <img :src="depositPreviewUrl" alt="Deposit Preview" width="100" />
                         </div>
                         <p>{{ depositMessage }}</p>
-                        <button @click="uploadDeposit" :disabled="customer.isLoading">{{customer.isLoading ? 'Uploading...' : 'Upload'}}</button>
+                        <button @click="uploadDeposit" :disabled="customer.isLoading">{{ customer.isLoading ?
+                            'Uploading...' : 'Upload'}}</button>
                     </div>
-                  </div>
-              </transition>
-        
+                </div>
+            </transition>
 
-              <!-- LOAN APPLICATION POPUP -->
-             <transition name="fade">
-                 <div class="loanPop" v-if="openLoanModal">
+
+            <!-- LOAN APPLICATION POPUP -->
+            <transition name="fade">
+                <div class="loanPop" v-if="openLoanModal">
                     <p class="closeLoanInput" @click="closeAppSub"><i class="fa fa-times"></i></p>
                     <button @click="submitLoanApp">Submit Guarantor's Form</button>
                     <button @click="fillLoanApp">Fill Loan Application Form</button>
-                 </div>
-             </transition>
+                </div>
+            </transition>
 
-             <!-- SUBMIT LOAN APPLICATION -->
-             <transition name="fade">
-                 <div class="loanPop" v-if="submitLoanInput">
+            <!-- SUBMIT LOAN APPLICATION -->
+            <transition name="fade">
+                <div class="loanPop" v-if="submitLoanInput">
                     <p class="closeLoanInput" @click="closeLoanInput"><i class="fa fa-times"></i></p>
                     <p>Please Submit The Guarantor's Form.</p>
                     <input type="file" class="contactInput" @change="handlePassportPhoto" accept="image/*" required>
@@ -117,21 +119,32 @@
                         <img :src="passportPreviewUrl" alt="Passport Preview" width="100" />
                     </div>
                     <p>{{ photoUploaded }}</p>
-                    <button @click="uploadApp" :disabled="customer.isLoading">{{customer.isLoading ? 'Upload...' : 'Upload'}}</button>
-                 </div>
-             </transition>
+                    <button @click="uploadApp" :disabled="customer.isLoading">{{ customer.isLoading ? 'Upload...' :
+                        'Upload'}}</button>
+                </div>
+            </transition>
+
+            <!-- NOTIFICATION POP-UP -->
+            <transition name="fade">
+                <div class="menuP" v-if="notification.notifier">
+                    <div class="notificationn">
+                        <h2>{{ notification.newNotification.title }}</h2>
+                        <p>{{ notification.newNotification.body }}</p>
+                    </div>
+                </div>
+            </transition>
 
 
 
-             <!-- DEPOSIT AND LOAN REQUESTS -->
-             <p class="notEligible" v-if="noteligible">{{ ineligible }}</p>
-              <div class="depositAndLoanReq">
-                  <button @click="depositMoney">Deposit</button>
-                <button @click='requestLoan'>Request Loan</button>
-              </div>
+            <!-- DEPOSIT AND LOAN REQUESTS -->
+            <p class="notEligible" v-if="noteligible">{{ ineligible }}</p>
+            <div class="depositAndLoanReq">
+                <button @click="depositMoney">Deposit</button>
+                <button @click='requestLoan'>Loan</button>
+            </div>
 
-              <!-- LOAN INFORMATION -->
-               <!-- <div class="loanInformation">
+            <!-- LOAN INFORMATION -->
+            <!-- <div class="loanInformation">
                     <h1>Current Loan Information</h1>
                     <div class="current">
                     <div class="header">
@@ -149,33 +162,35 @@
                 </div> -->
 
 
-               <!-- RECENT TRANSACTIONS -->
-                <div class="recentTrx">
-                    <h1>Recent Transactions</h1>
-                    <div class="transactions">
-                        <div v-for="(details, index) in customer.recentTransact" :key="index" class="typeDate">
-                            <div class="paymentAndDate">
-                                <h2>{{ details.type }}</h2>
-                                <p>{{ formatDate(details.date) }} <span>{{ formatTime(details.date) }}</span></p>
-                            </div>
-                            <div class="amount">
-                                <h3>{{ formatCurrency(details.amount) }}</h3> 
-                            </div>
+            <!-- RECENT TRANSACTIONS -->
+            <div class="recentTrx">
+                <h1>Recent Transactions</h1>
+                <div class="transactions">
+                    <div v-for="(details, index) in customer.recentTransact" :key="index" class="typeDate">
+                        <div class="paymentAndDate">
+                            <h2>{{ details.type }}</h2>
+                            <p>{{ formatDate(details.date) }} <span>{{ formatTime(details.date) }}</span></p>
+                        </div>
+                        <div class="amount">
+                            <h3>{{ formatCurrency(details.amount) }}</h3>
                         </div>
                     </div>
-                    <div v-if="customer.recentTransact.length === 0">
-                        <h2>No recent transactions available.</h2>
-                    </div>
                 </div>
+                <div v-if="customer.recentTransact.length === 0">
+                    <h2>No recent transactions available.</h2>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import{ref, watch, onMounted} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import{useCustomerStore} from '@/stores/customerProfile'
+import { ref, watch, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useCustomerStore } from '@/stores/customerProfile'
 const customer = useCustomerStore()
+import { useNotificationStore } from '@/stores/notification'
+const notification = useNotificationStore()
 const router = useRouter()
 
 // ROUTE GUARD
@@ -361,45 +376,52 @@ const noteligible = ref(false)
 //     }
 // }
 
-const requestLoan = async() => {
-    let registrationDate = new Date(cusInfo.value.createdAt);
-    let currentDate = new Date();
-    
-    if (isNaN(registrationDate)) {
-        ineligible.value = "Invalid registration date.";
-        return;
-    }
-    
-    let differenceInMs = currentDate - registrationDate;
-    let differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
-    let requiredDays = 180;
-    
+const requestLoan = async () => {
+    // let registrationDate = new Date(cusInfo.value.createdAt);
+    // let currentDate = new Date();
+
+    // if (isNaN(registrationDate)) {
+    //     ineligible.value = "Invalid registration date.";
+    //     return;
+    // }
+
+    // let differenceInMs = currentDate - registrationDate;
+    // let differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
+    // let requiredDays = 180;
+
     // First check if the user meets the registration duration requirement
-    if(differenceInDays < requiredDays){
-        let daysRemaining = Math.ceil(requiredDays - differenceInDays);
-        noteligible.value = true;
-        ineligible.value = `Not yet eligible. ${daysRemaining} days remaining.`;
-        setTimeout(() => {
-            noteligible.value = false;
-        }, 2000);
-        return;
-    }
-    
+    // if(differenceInDays < requiredDays){
+    //     let daysRemaining = Math.ceil(requiredDays - differenceInDays);
+    //     noteligible.value = true;
+    //     ineligible.value = `Not yet eligible. ${daysRemaining} days remaining.`;
+    //     setTimeout(() => {
+    //         noteligible.value = false;
+    //     }, 2000);
+    //     return;
+    // }
+
     // Check if the user has any previous loans
     const loanPropCheck = await customer.checkLastLoan();
-    
+
     // If there's no loan record or loanPropCheck is undefined, proceed to loan request
     if (!loanPropCheck || !loanPropCheck.loanStat) {
         console.log('No previous loan record found');
         openLoanModal.value = true;
         return;
     }
-    
+
     const loanStatusCheck = loanPropCheck.loanStat;
-    const loanBalanceCheck = loanPropCheck.principal || 0; // Default to 0 if undefined
-    
+    const loanBalanceCheck = loanPropCheck.principal || 0;
+    const guarantorFile = await customer.checkGuarantorFile()
+
+    // Check if last loan is pending and guarantor form is not present
+    if (loanStatusCheck === 'PENDING' && !guarantorFile) {
+        openLoanModal.value = true;
+        return;
+    }
+
     // Check if last loan is pending
-    if(loanStatusCheck === 'PENDING'){
+    if (loanStatusCheck === 'PENDING' && guarantorFile) {
         noteligible.value = true;
         ineligible.value = 'Your last loan is Still Pending...';
         setTimeout(() => {
@@ -407,9 +429,9 @@ const requestLoan = async() => {
         }, 2000);
         return;
     }
-    
+
     // Check if last loan has outstanding balance
-    if(loanBalanceCheck > 0){
+    if (loanBalanceCheck > 0) {
         noteligible.value = true;
         ineligible.value = 'Your last loan is not yet Balanced...';
         setTimeout(() => {
@@ -417,13 +439,13 @@ const requestLoan = async() => {
         }, 2000);
         return;
     }
-    
+
     // If all checks pass, open the loan modal
     openLoanModal.value = true;
 };
 
 // UPLOADING GUARANTOR'S FORM
-const passportPreviewUrl = ref('') 
+const passportPreviewUrl = ref('')
 // HANDLE GUARANTOR'S FILE UPLOAD
 const handlePassportPhoto = (event) => {
     const file = event.target.files[0]
@@ -491,7 +513,7 @@ const handleDepositPhoto = (event) => {
     }
 }
 const uploadDeposit = () => {
-    if(depositType.value == ''){
+    if (depositType.value == '') {
         depositMessage.value = 'Please Select Deposit Type'
         return
     }
@@ -524,21 +546,21 @@ const fundsMovement = ref({
 const distributeFund = async () => {
     const accountBalance = cusInfo.value.accountBalance
     const email = cusInfo.value.email
-    if(fundsMovement.value.amount == ''){
+    if (fundsMovement.value.amount == '') {
         fundsMovement.value.open = true
         fundsMovement.value.message = 'Amount cannot be empty'
         return
     }
     fundsMovement.value.open = false
     fundsMovement.value.message = ''
-    if(fundsMovement.value.amount > accountBalance){
+    if (fundsMovement.value.amount > accountBalance) {
         fundsMovement.value.open = true
         fundsMovement.value.message = 'The Amount You are trying to move is greater than your balance. Please reduce it and try again'
         return
     }
     fundsMovement.value.open = false
     fundsMovement.value.message = ''
-    if(fundsMovement.value.type == 'Shares'){
+    if (fundsMovement.value.type == 'Shares') {
         const balance = cusInfo.value.shares
         let newBalance = balance + fundsMovement.value.amount
         fundsMovement.value.open = true
@@ -557,7 +579,7 @@ const distributeFund = async () => {
         await attachSearchDetails()
         await allTransactions(email)
         return
-    }else{
+    } else {
         let balance = cusInfo.value.investment
         let newBalance = balance + fundsMovement.value.amount
         fundsMovement.value.open = true
@@ -582,379 +604,450 @@ const distributeFund = async () => {
 onMounted(async () => {
     await customer.signinUser()
     await attachSearchDetails()
+    await notification.checkWho()
 })
 
 </script>
 
 
 <style scoped>
+/* PROFILE PICTURE, NAME AND LOGOUT */
+.namePicture {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px 0;
+    border-bottom: 4px solid white;
+    padding: 0 10px;
+}
 
-    /* PROFILE PICTURE, NAME AND LOGOUT */
-    .namePicture{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin: 5px 0;
-        border-bottom: 4px solid white;
-        padding: 0 10px;
-    }
-    .imageName{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-        color: white;
-    }
-    .imageName img{
-        width: 70px;
-        height: 70px;
-        border-radius: 50%;
-    }
-    .namePicture button, .depositAndLoanReq button{
-        width: 100px;
-        height: 30px;
-        background-color: #f1f1f1;
-        border-radius: 20px;
-        cursor: pointer;
-        border: none;
-        color: #d10000;
-    }
-    .namePicture button:hover, .depositAndLoanReq button:hover{
-        background-color: #d10000;
-        color: white;
-        border: 2px solid #d10000;
-        outline: 3px solid white;
-    }
+.imageName {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    color: white;
+}
 
-    /* ACCOUNT BALANCE */
-    .accountBalance{
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        margin: 20px 0;
-        color: white;
-        padding: 0 0 10px 0;
-        border-bottom: 4px solid white;
-    }
+.imageName img {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+}
 
-    /* DEPOSIT AND LOAN REQUEST BUTTON */
-    .depositAndLoanReq{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 10px;
-    }
+.namePicture button,
+.depositAndLoanReq button {
+    width: 100px;
+    height: 30px;
+    background-color: #f1f1f1;
+    border-radius: 20px;
+    cursor: pointer;
+    border: none;
+    color: #d10000;
+}
 
-    /* LOAN INFORMATION */
+.namePicture button:hover,
+.depositAndLoanReq button:hover {
+    background-color: #d10000;
+    color: white;
+    border: 2px solid #d10000;
+    outline: 3px solid white;
+}
+
+/* ACCOUNT BALANCE */
+.accountBalance {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    color: white;
+    padding: 0 0 10px 0;
+    border-bottom: 4px solid white;
+}
+
+/* DEPOSIT AND LOAN REQUEST BUTTON */
+.depositAndLoanReq {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+/* LOAN INFORMATION */
+.steps {
+    margin: 10px 5px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 5px;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.step:hover {
+    transform: translateY(-10px);
+}
+
+.step h3,
+.step p {
+    color: #616dad;
+    text-align: center;
+    text-align-last: center;
+}
+
+.step p {
+    font-size: 20px;
+    font-weight: bolder;
+}
+
+.step h3 {
+    font-size: 25px;
+    font-weight: bolder;
+    color: rgb(0, 60, 255);
+}
+
+.notEligible {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: red;
+    background-color: rgb(255, 255, 255);
+    height: 30px;
+    text-align-last: center;
+    margin: 5px;
+}
+
+/* Media Query for Mobile */
+@media (max-width: 768px) {
     .steps {
-        margin: 10px 5px;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 5px;
-    }
-    
-    .step {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 5px;
-        background: #ffffff;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease-in-out;
-    }
-    
-    .step:hover {
-        transform: translateY(-10px);
+        grid-template-columns: 1fr 1fr;
     }
 
-    .step h3, .step p{
-        color: #616dad;
-        text-align: center;
-        text-align-last: center;
-    }
-    .step p{
-        font-size: 20px;
-        font-weight: bolder;
-    }
-    .step h3{
+    .recentTrx h1 {
         font-size: 25px;
-        font-weight: bolder;
-        color: rgb(0, 60, 255);
-    }
-    .notEligible{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        color: red;
-        background-color: rgb(255, 255, 255);
-        height: 30px;
-        text-align-last: center;
-        margin: 5px;
     }
 
-      /* Media Query for Mobile */
-  @media (max-width: 768px) {
-    .steps {
-      grid-template-columns: 1fr 1fr;
-    }
-    .recentTrx h1{
-        font-size: 25px;
-    }
-    .step h3{
+    .step h3 {
         font-size: 20px;
     }
-    .loanInformation h1{
+
+    .loanInformation h1 {
         font-size: 25px;
     }
-        .paymentAndDate h2{
+
+    .paymentAndDate h2 {
         font-size: 12px;
     }
-    .current{
+
+    .current {
         font-size: 13px;
     }
-            .pendingLoan h3, .rejectedLoan h3{
-            font-size: 17px;
-        }
-        .loanHeading button{
-            font-size: 12px;
-            padding: 0 4px;
-        }
-        .amount h3{
-            font-size: 13px;
-        }
-  }
 
-    /* TRANSACTIONS HISTORY */
-    .recentTrx{
-        margin: 20px 0;
-        padding: 0 10px;
-    }
-    .transactions{
-        display: flex;
-        justify-content: space-between;
-        flex-direction: column;
-        margin: 5px 0;
-        gap: 10px;
-    }
-    .typeDate{
-        display: flex;
-        justify-content: space-between;
-        /* align-items: center; */
-        margin: 5px 0;
-        border-bottom: 4px solid white;
-        gap: 10px;
-    }
-    .transactions h2{
-        font-size: 20px;
-        color: rgb(116, 250, 68);
-    }
-    .transactions h3{
-        font-size: 20px;
-        color: white;
-    }
-    .paymentAndDate p{
-        color: white;
-    }
-    .paymentAndDate h2{
-        font-size: 14px;
-    }
-    .recentTrx h1{
-        text-align: center;
-        color: white;
-    }
-    .loanInformation h1{
-        text-align: center;
-        color: white;
-    }
-    .amount h3{
-            font-size: 14px;
-        }
-    /* MENU ICON */
-    .menuIcon{
-        color: white;
-        cursor: pointer;
-        font-size: 30px;
+    .pendingLoan h3,
+    .rejectedLoan h3 {
+        font-size: 17px;
     }
 
-    /* THE MENU CONTENTS */
-    .menuP{
-        position: absolute;
-        top: 10px;
-        right: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        background-color: #6897a7;
-        padding: 10px 0;
-        border-radius: 10px;
-        box-shadow: inset 10px 6px 50px rgb(26, 49, 195);
-        width: 300px;
+    .loanHeading button {
+        font-size: 12px;
+        padding: 0 4px;
     }
 
-    .menuP ul{
-        display: flex;
-        justify-content: center;
-        flex-direction: column;
-        gap: 10px;
+    .amount h3 {
+        font-size: 13px;
     }
-    .menuP ul li{
-        list-style-type: none;
-        color: white;
-        cursor: pointer;
-    }
-    .menuP ul a{
-        text-decoration: none;
-        color: white;
-    }
+}
+
+/* TRANSACTIONS HISTORY */
+.recentTrx {
+    margin: 20px 0;
+    padding: 0 10px;
+}
+
+.transactions {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    margin: 5px 0;
+    gap: 10px;
+}
+
+.typeDate {
+    display: flex;
+    justify-content: space-between;
+    /* align-items: center; */
+    margin: 5px 0;
+    border-bottom: 4px solid white;
+    gap: 10px;
+}
+
+.transactions h2 {
+    font-size: 20px;
+    color: rgb(116, 250, 68);
+}
+
+.transactions h3 {
+    font-size: 20px;
+    color: white;
+}
+
+.paymentAndDate p {
+    color: white;
+}
+
+.paymentAndDate h2 {
+    font-size: 14px;
+}
+
+.recentTrx h1 {
+    text-align: center;
+    color: white;
+}
+
+.loanInformation h1 {
+    text-align: center;
+    color: white;
+}
+
+.amount h3 {
+    font-size: 14px;
+}
+
+/* MENU ICON */
+.menuIcon {
+    color: white;
+    cursor: pointer;
+    font-size: 30px;
+}
+
+/* THE MENU CONTENTS */
+.menuP {
+    position: absolute;
+    top: 10px;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #6897a7;
+    padding: 10px 0;
+    border-radius: 10px;
+    box-shadow: inset 10px 6px 50px rgb(26, 49, 195);
+    width: 300px;
+}
+
+.menuP ul {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.menuP ul li {
+    list-style-type: none;
+    color: white;
+    cursor: pointer;
+}
+
+.menuP ul a {
+    text-decoration: none;
+    color: white;
+}
 
 
-    .closeMenu i{
-        color: red;
-    }
+.closeMenu i {
+    color: red;
+}
 
-    .loanPop{
-        position: absolute;
-        top: 100px;
-        right: 50px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        background-color: #6897a7;
-        padding: 10px 0;
-        border-radius: 10px;
-        box-shadow: inset 10px 6px 50px rgb(26, 49, 195);
-        width: 300px;
-        gap: 10px;
-        margin: 0 auto;
-        z-index: 1;
-    }
-    .loanPop button{
-        height: 30px;
-        background-color: #f1f1f1;
-        border-radius: 20px;
-        cursor: pointer;
-        border: none;
-        color: #616dad;
-        padding: 0 5px;
-    }
-    .loanPop button:hover{
-        background-color: #616dad;
-        color: white;
-        border: 2px solid #616dad;
-        outline: 3px solid white;
-    }
-    .loanPop p{
-        text-align: center;
-        color: white;
-    }
+.loanPop {
+    position: absolute;
+    top: 100px;
+    right: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #6897a7;
+    padding: 10px 0;
+    border-radius: 10px;
+    box-shadow: inset 10px 6px 50px rgb(26, 49, 195);
+    width: 300px;
+    gap: 10px;
+    margin: 0 auto;
+    z-index: 1;
+}
 
-    .fade-enter-active, .fade-leave-active {
-        transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-    }
+.loanPop button {
+    height: 30px;
+    background-color: #f1f1f1;
+    border-radius: 20px;
+    cursor: pointer;
+    border: none;
+    color: #616dad;
+    padding: 0 5px;
+}
 
-    .fade-enter-from, .fade-leave-to {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
+.loanPop button:hover {
+    background-color: #616dad;
+    color: white;
+    border: 2px solid #616dad;
+    outline: 3px solid white;
+}
 
-    .fade-enter-to, .fade-leave-from {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.loanPop p {
+    text-align: center;
+    color: white;
+}
 
-    .contactInput{
-      width: 150px;
-      border-radius: 10px;
-      height: 35px;
-      border: none;
-      outline: none;
-      padding: 10px;
-      box-shadow: inset 10px 6px 50px rgb(192, 192, 196);
-  }
-  .closeLoanInput{
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.fade-enter-to,
+.fade-leave-from {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.contactInput {
+    width: 150px;
+    border-radius: 10px;
+    height: 35px;
+    border: none;
+    outline: none;
+    padding: 10px;
+    box-shadow: inset 10px 6px 50px rgb(192, 192, 196);
+}
+
+.closeLoanInput {
     color: red;
     cursor: pointer;
-  }
-  .preview {
-        margin-top: 10px;
-        border: 1px solid #ddd;
-        padding: 5px;
-        display: inline-block;
-        border-radius: 4px;
-    }
-        .current{
-        display: flex;
-        justify-content: center;
-        flex-direction: column;
-        gap: 10px;
-        background-color: #37a187;
-        margin: 5px;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: inset 10px 6px 50px rgb(30, 39, 95);
-        color: white;
-    }
+}
 
-    .separate{
-        display: flex;
-        justify-content: space-between;
-        gap: 100px;
-        color: white;
-    }
-        .pendingLoan{
-        text-align: center;
-        background-color: yellow;
-    }
-    .rejectedLoan{
-        background-color: red;
-        text-align: center;
-    }
+.preview {
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    padding: 5px;
+    display: inline-block;
+    border-radius: 4px;
+}
 
-    .depositting{
-        border: none;
-        gap: 5px;
-    }
-    .depositting button{
-        border: none;
-        border-radius: 0;
-        width: 100px;
-        cursor: pointer;
-    }
+.current {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #37a187;
+    margin: 5px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: inset 10px 6px 50px rgb(30, 39, 95);
+    color: white;
+}
 
-    .otherDetails{
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 5px;
-        color: white;
-    }
-    .otherDetails button{
-        height: 25px;
-    }
-    .toOtherAccts{
-        display: flex;
-        flex-direction: column;
-        color: white;
-        gap: 5px;
-    }
-    .movingFundd{
-        text-align: center;
-        text-align-last: center;
-        background-color: #37a187;
-        margin: 5px;
-        padding: 5px;
-        border-radius: 10px;
-        box-shadow: inset 10px 6px 50px rgb(30, 39, 95);
-        color: white;
-    }
+.separate {
+    display: flex;
+    justify-content: space-between;
+    gap: 100px;
+    color: white;
+}
 
+.pendingLoan {
+    text-align: center;
+    background-color: yellow;
+}
 
+.rejectedLoan {
+    background-color: red;
+    text-align: center;
+}
+
+.depositting {
+    border: none;
+    gap: 5px;
+}
+
+.depositting button {
+    border: none;
+    border-radius: 0;
+    width: 100px;
+    cursor: pointer;
+}
+
+.otherDetails {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    color: white;
+}
+
+.otherDetails button {
+    height: 25px;
+}
+
+.toOtherAccts {
+    display: flex;
+    flex-direction: column;
+    color: white;
+    gap: 5px;
+}
+
+.movingFundd {
+    text-align: center;
+    text-align-last: center;
+    background-color: #37a187;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    box-shadow: inset 10px 6px 50px rgb(30, 39, 95);
+    color: white;
+}
+
+.menuP {
+    position: absolute;
+    top: 10px;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: rgb(160, 112, 112, 0.9);
+    padding: 10px 0;
+    border-radius: 10px;
+    width: 300px;
+}
+
+.notificationn h2 {
+    text-decoration: underline;
+    font-size: 17px;
+    font-family: Tagesschrift, sans-serif;
+    text-align: center;
+}
+
+.notificationn p {
+    font-size: 14px;
+    font-family: Tagesschrift, sans-serif;
+    text-align: center;
+}
 </style>

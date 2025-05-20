@@ -1,4 +1,3 @@
-// plugins/sw.client.ts
 export default defineNuxtPlugin(() => {
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {

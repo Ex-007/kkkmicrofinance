@@ -20,6 +20,64 @@ export const useAdminStore = defineStore('admin', () => {
     const tShares = ref('')
     const tMinutes = ref('')
 
+    const registrationData = ref([])
+      // Chart data
+  const linechartSeries = ref([
+    {
+      name: "Registered Users",
+      data: []
+    }
+  ])
+
+    const linechartOptions = ref({
+    chart: {
+      height: 350,
+      type: 'bar',
+      zoom: {
+        enabled: false
+      }
+    },
+    dataLabels: {
+      enabled: false
+    },
+    stroke: {
+      curve: 'straight',
+      width: 3
+    },
+    title: {
+      text: 'KKK User Registrations by Month',
+      align: 'center'
+    },
+    grid: {
+      row: {
+        colors: ['#f3f3f3', 'transparent'],
+        opacity: 0.5
+      },
+    },
+    xaxis: {
+      categories: [],
+    }
+  })
+  const monthNames = computed(() => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    return months
+  })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // FETCH THE SIGNED IN USER
     const signinUser = async () => {
@@ -40,6 +98,7 @@ export const useAdminStore = defineStore('admin', () => {
     
             if (loggedUserData && loggedUserData.user) {
                 loggedAdmin.value = loggedUserData.user.user_metadata
+                await fetchUserRegistrations()
                 await fetchTotal()
                 await viewDepositRequests()
                 return loggedUserData.user 
@@ -228,6 +287,19 @@ export const useAdminStore = defineStore('admin', () => {
                 const text = message
                 const destination = email
                 await sendEmail({ to:destination, subject, text })
+            }else if(type == 'Shares'){
+                let newBalance = accountBalance + depositAmount
+                const {data:depositData, error:depositError} = await client
+                .from('REGISTEREDUSERS')
+                .update({shares: newBalance})
+                .eq('reg_identity', userIdentification)
+                if(depositError) throw depositError
+                await updateCustomerTransHistory(userIdentification, depositAmount, type)
+                await sendSms(to, message)
+                const subject = 'New Deposit'
+                const text = message
+                const destination = email
+                await sendEmail({ to:destination, subject, text })
             }else if(type == 'Fine-Minutes'){
                 let newBalance = accountBalance + depositAmount
                 const {data:depositData, error:depositError} = await client
@@ -244,6 +316,11 @@ export const useAdminStore = defineStore('admin', () => {
                 .eq('reg_identity', userIdentification)
                 if(depositError) throw depositError
                 await updateCustomerTransHistory(userIdentification, depositAmount, type)
+                await sendSms(to, message)
+                const subject = 'New Deposit'
+                const text = message
+                const destination = email
+                await sendEmail({ to:destination, subject, text })
             }
         } catch (err) {
             error.value = err.message
@@ -251,6 +328,7 @@ export const useAdminStore = defineStore('admin', () => {
             isLoading.value = false
         }
     }
+
 
     //  WITHDRAW MONEY
     const withdrawMoney = async(userIdentification, accountBalance, withdrawAmount, type) => {
@@ -756,7 +834,6 @@ const selectDeposit = async(userId) => {
             .select('*')
 
             if(error) throw error
-            console.log(data)
             let totalSavings = 0
             let totalInvestment = 0
             let totalShares = 0
@@ -773,7 +850,6 @@ const selectDeposit = async(userId) => {
             tShares.value = totalShares
             tMinutes.value = totalMinutes
 
-            console.log(totalSavings)
         } catch (err) {
             error.value = err.message
             console.log(err.message)
@@ -781,6 +857,46 @@ const selectDeposit = async(userId) => {
             isLoading.value = false
         }
     }
+
+    // FOR CHARTS MONTHLY REGISTERED USERS
+  const fetchUserRegistrations = async() => {
+    isLoading.value = true
+    error.value = null
+    const client = useSupabaseClient()
+    
+    try {
+      const { data, error: supabaseError } = await client
+        .from('REGISTEREDUSERS')
+        .select('created_at')
+        
+      if (supabaseError) throw supabaseError
+      
+      if (data) {
+        registrationData.value = data
+        processChartData()
+      }
+    } catch (err) {
+      error.value = err.message
+      console.error('Error fetching user registrations:', err.message)
+    } finally {
+      isLoading.value = false
+    }
+  }
+  
+  const processChartData = () => {
+    const currentYear = new Date().getFullYear()
+    const monthlyCounts = Array(12).fill(0)
+    registrationData.value.forEach(user => {
+      const createdAt = new Date(user.created_at)
+      const userYear = createdAt.getFullYear()
+      if (userYear === currentYear) {
+        const month = createdAt.getMonth() // 0-11
+        monthlyCounts[month]++
+      }
+    })
+    linechartSeries.value[0].data = monthlyCounts
+    linechartOptions.value.xaxis.categories = monthNames.value
+  }
 
     return{
         isLoading,
@@ -817,6 +933,10 @@ const selectDeposit = async(userId) => {
         tSavings,
         tInvestment,
         tShares,
-        tMinutes
+        tMinutes,
+            registrationData,
+    linechartSeries,
+    linechartOptions,
+    fetchUserRegistrations,
     }
 })
