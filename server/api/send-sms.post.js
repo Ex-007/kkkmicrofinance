@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   if (!body?.to || !body?.message) {
     return {
       success: false,
-      error: 'Missing "to" or "message" in request body..',
+      error: 'Missing "to" or "message" in request body....',
     }
   }
 
