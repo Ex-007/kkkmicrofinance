@@ -125,14 +125,14 @@
             </transition>
 
             <!-- NOTIFICATION POP-UP -->
-            <transition name="fade">
+            <!-- <transition name="fade">
                 <div class="menuP" v-if="notification.notifier">
                     <div class="notificationn">
                         <h2>{{ notification.newNotification.title }}</h2>
                         <p>{{ notification.newNotification.body }}</p>
                     </div>
                 </div>
-            </transition>
+            </transition> -->
 
 
 
@@ -189,8 +189,8 @@ import { ref, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCustomerStore } from '@/stores/customerProfile'
 const customer = useCustomerStore()
-import { useNotificationStore } from '@/stores/notification'
-const notification = useNotificationStore()
+// import { useNotificationStore } from '@/stores/notification'
+// const notification = useNotificationStore()
 const router = useRouter()
 
 // ROUTE GUARD
@@ -604,7 +604,7 @@ const distributeFund = async () => {
 onMounted(async () => {
     await customer.signinUser()
     await attachSearchDetails()
-    await notification.checkWho()
+    // await notification.checkWho()
 })
 
 </script>
@@ -1038,7 +1038,7 @@ onMounted(async () => {
     width: 300px;
 }
 
-.notificationn h2 {
+/* .notificationn h2 {
     text-decoration: underline;
     font-size: 17px;
     font-family: Tagesschrift, sans-serif;
@@ -1049,5 +1049,5 @@ onMounted(async () => {
     font-size: 14px;
     font-family: Tagesschrift, sans-serif;
     text-align: center;
-}
+} */
 </style>

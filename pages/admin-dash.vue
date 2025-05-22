@@ -14,7 +14,7 @@
           <li @click="activeTab = 'loanRequests'" :class="{ active: activeTab === 'loanRequests' }">👤 Loan Requests</li>
           <li @click="activeTab = 'deposits'" :class="{ active: activeTab === 'deposits' }">🧾 Deposits</li>
           <li @click="activeTab = 'accountUpdate'" :class="{ active: activeTab === 'accountUpdate' }">💎 Account Update</li>
-          <li @click="activeTab = 'notification'" :class="{ active: activeTab === 'notification' }"> 🔔Notification</li>
+          <!-- <li @click="activeTab = 'notification'" :class="{ active: activeTab === 'notification' }"> 🔔Notification</li> -->
           <li @click="logout">🚪 Logout</li>
         </ul>
       </aside>
@@ -35,13 +35,13 @@
               <h3>Total Minutes/Fines: {{ formatCurrency(admin.tMinutes) }}</h3>
             </div>
 
-            <div class="main">
+            <!-- <div class="main">
                 <apexchart
                 type="bar"
                 :options="admin.linechartOptions"
                 :series="admin.linechartSeries"
                 />
-            </div>
+            </div> -->
           </div>
         </section>
 
@@ -373,7 +373,7 @@
          </section>
 
          <!-- NOTIFICATION -->
-         <section v-if="activeTab === 'notification'">
+         <!-- <section v-if="activeTab === 'notification'">
                 <div class="overall">
         <h1>This is the admin page for sending notifications</h1>
 
@@ -383,8 +383,6 @@
             <textarea v-model="notiDetails.message" placeholder="Message"></textarea>
             <select v-model="notiDetails.type">
                 <option>All User</option>
-                <!-- <option>TV Subscribers</option>
-                <option>Education Subscribers</option> -->
             </select>
             <p v-if="notiDetails.show">{{ notiDetails.messageE }}</p>
             <button @click="sendNotification">send</button>
@@ -403,7 +401,6 @@
         </div>
 
 
-        <!-- NOTIFICATION POP-UP -->
         <transition name="fade">
             <div class="menuP" v-if="notification.notifier">
                 <div class="notification">
@@ -414,7 +411,7 @@
         </transition>
 
     </div>
-         </section>
+         </section> -->
       </main>
     </div>
   </template>
@@ -422,8 +419,6 @@
   <script setup>
   import { ref, watch, onMounted  } from 'vue';
   import {useAdminStore} from '@/stores/administration'
-  import {useNotificationStore} from '@/stores/notification'
-  const notification = useNotificationStore()
   import{useRoute, useRouter} from 'vue-router'
   const router = useRouter()
   const admin = useAdminStore()
@@ -954,80 +949,80 @@ const reduceLoan = async (balance) => {
 }
 
 // SEND NOTIFICATION TO MULTIPLE USERS
-const notiDetails = ref({
-    type: 'All User',
-    title: '',
-    message: '',
-    show: '',
-    messageE: ''
-})
+// const notiDetails = ref({
+//     type: 'All User',
+//     title: '',
+//     message: '',
+//     show: '',
+//     messageE: ''
+// })
 
-const sendNotification = async () => {
-    if (notiDetails.value.message == '' || notiDetails.value.title == '') {
-        notiDetails.value.show = true
-        notiDetails.value.messageE = 'No field should be left empty'
-        return
-    }
-    notiDetails.value.show = false
-    notiDetails.value.messageE = ''
-    await notification.sendNotification(notiDetails.value)
-    notiDetails.value.show = true
-    notiDetails.value.messageE = 'Message Sent'
-    clearInput()
+// const sendNotification = async () => {
+//     if (notiDetails.value.message == '' || notiDetails.value.title == '') {
+//         notiDetails.value.show = true
+//         notiDetails.value.messageE = 'No field should be left empty'
+//         return
+//     }
+//     notiDetails.value.show = false
+//     notiDetails.value.messageE = ''
+//     await notification.sendNotification(notiDetails.value)
+//     notiDetails.value.show = true
+//     notiDetails.value.messageE = 'Message Sent'
+//     clearInput()
 
-    setTimeout(() => {
-        notiDetails.value.show = false
-        notiDetails.value.messageE = ''
-    }, 2000);
-}
-const clearInput = () => {
-    notiDetails.value.message = ''
-    notiDetails.value.title = ''
-}
+//     setTimeout(() => {
+//         notiDetails.value.show = false
+//         notiDetails.value.messageE = ''
+//     }, 2000);
+// }
+// const clearInput = () => {
+//     notiDetails.value.message = ''
+//     notiDetails.value.title = ''
+// }
 
 
 // SEND NOTIFICATION TO A SINGLE USER
-const singleUse = ref({
-    userID: '',
-    title: '',
-    message: '',
-    show: '',
-    messageE: ''
-})
+// const singleUse = ref({
+//     userID: '',
+//     title: '',
+//     message: '',
+//     show: '',
+//     messageE: ''
+// })
 
-const sendSingle = async () => {
-    if(singleUse.value.title == '' || singleUse.value.message == '' || singleUse.value.userID == ''){
-        singleUse.value.show = true
-        singleUse.value.messageE = 'No field should be left empty'
-        return
-    }
+// const sendSingle = async () => {
+//     if(singleUse.value.title == '' || singleUse.value.message == '' || singleUse.value.userID == ''){
+//         singleUse.value.show = true
+//         singleUse.value.messageE = 'No field should be left empty'
+//         return
+//     }
 
-    singleUse.value.show = false
-    singleUse.value.messageE = ''
+//     singleUse.value.show = false
+//     singleUse.value.messageE = ''
 
-    await notification.sendNotification(singleUse.value)
+//     await notification.sendNotification(singleUse.value)
 
-    if(notification.error == 'noToken'){
-        singleUse.value.show = true
-        singleUse.value.messageE = "User Doesn't Exist"
-        return
-    }
+//     if(notification.error == 'noToken'){
+//         singleUse.value.show = true
+//         singleUse.value.messageE = "User Doesn't Exist"
+//         return
+//     }
 
-    singleUse.value.show = true
-    singleUse.value.messageE = 'Message Sent'
+//     singleUse.value.show = true
+//     singleUse.value.messageE = 'Message Sent'
 
-    singleUse.value.message = ''
-    singleUse.value.userID = ''
-    singleUse.value.title = ''
+//     singleUse.value.message = ''
+//     singleUse.value.userID = ''
+//     singleUse.value.title = ''
 
-    setTimeout(() => {
-        singleUse.value.show = false
-        singleUse.value.messageE = ''
-        singleUse.value.message = ''
-        singleUse.value.userID = ''
-        singleUse.value.title = ''
-    }, 2000);
-}
+//     setTimeout(() => {
+//         singleUse.value.show = false
+//         singleUse.value.messageE = ''
+//         singleUse.value.message = ''
+//         singleUse.value.userID = ''
+//         singleUse.value.title = ''
+//     }, 2000);
+// }
 
 // CHARTS
     // const linechartSeries = ref([
@@ -1575,7 +1570,7 @@ input[type="number"]{
     width: 300px;
     color: white;
 }
-.notification h2{
+/* .notification h2{
     text-decoration: underline;
     font-size: 17px;
     font-family: Tagesschrift, sans-serif;
@@ -1583,7 +1578,7 @@ input[type="number"]{
 .notification p{
     font-size: 14px;
     font-family: Tagesschrift, sans-serif;
-}
+} */
     .formField>input, .formField>select{
         width: 200px;
         height: 30px;
