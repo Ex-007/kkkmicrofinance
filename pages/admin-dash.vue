@@ -434,6 +434,8 @@
       multiple.value = true
   }
 
+  // 6772751459
+
     const generated = 'djGzG6yQJi65m22'
     const accountPass = ref('')
     const errorTxt = ref('')
@@ -762,7 +764,7 @@ const makeDeposit = async () => {
     const balance = searchView.value.shareBalance + depositConfig.value.depositAmount
     const email = searchView.value.email
     const message = `kkk-Multipurpose... Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Made. Your New Balance is ${formatCurrency(balance)}. Thanks for being part of the KKK Society...`
-    await admin.depositMoney(searchView.value.reg_identity, searchView.value.accountBalance, depositConfig.value.depositAmount, type, to, message, email)
+    await admin.depositMoney(searchView.value.reg_identity, searchView.value.shareBalance, depositConfig.value.depositAmount, type, to, message, email)
           
     depositV.value.pop = true
     depositV.value.message = `Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Added to the Shares Account`
@@ -780,7 +782,7 @@ const makeDeposit = async () => {
     const balance = searchView.value.investmentBalance + depositConfig.value.depositAmount
     const email = searchView.value.email
     const message = `kkk-Multipurpose... Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Made. Your New Balance is ${formatCurrency(balance)}. Thanks for being part of the KKK Society...`
-    await admin.depositMoney(searchView.value.reg_identity, searchView.value.accountBalance, depositConfig.value.depositAmount, type, to, message, email)
+    await admin.depositMoney(searchView.value.reg_identity, searchView.value.investmentBalance, depositConfig.value.depositAmount, type, to, message, email)
           
     depositV.value.pop = true
     depositV.value.message = `Savings of ${formatCurrency(depositConfig.value.depositAmount)} Successfully Made to the investment account`
