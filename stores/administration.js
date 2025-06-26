@@ -345,30 +345,74 @@ export const useAdminStore = defineStore('admin', () => {
 
 
     //  WITHDRAW MONEY
-    const withdrawMoney = async(userIdentification, accountBalance, withdrawAmount, type) => {
+    const withdrawMoney = async(userIdentification, accountBalance, withdrawal) => {
         isLoading.value = true
         error.value = null
         const client = useSupabaseClient()
+        let withdrawAmount = withdrawal.withdrawalAmount
+        let type = withdrawal.withdrawalType
         try {
-            if(withdrawAmount <= 0){
-                error.value = 'Withdrawal amount must be greater than 0'
-                isLoading.value = false
-                return
-            }
             let newBalance = accountBalance - withdrawAmount
-            const {data:depositData, error:depositError} = await client
-            .from('REGISTEREDUSERS')
-            .update({accountBalance: newBalance})
-            .eq('reg_identity', userIdentification)
 
-            if(depositError) throw depositError
-            await updateWithdrawTransHistory(userIdentification, withdrawAmount, type)
+            // WITHDRAWAL FOR SAVINGS
+            if(type === 'Savings'){
+                const{data:savingsData, error:savingsError} = await client
+                .from('REGISTEREDUSERS')
+                .update({accountBalance: newBalance})
+                .eq('reg_identity', userIdentification)
+
+                if(savingsError) throw savingsError
+            }else if(type === 'Shares'){
+                const{data:sharesData, error:sharesError} = await client
+                .from('REGISTEREDUSERS')
+                .update({shares: newBalance})
+                .eq('reg_identity', userIdentification)
+
+                if(sharesError) throw sharesError
+            }else if(type === 'Investments'){
+                const{data:investmentData, error:investmentError} = await client
+                .from('REGISTEREDUSERS')
+                .update({investment: newBalance})
+                .eq('reg_identity', userIdentification)
+
+                if(investmentError) throw investmentError
+            }else{
+                const{data:fineData, error:fineError} = await client
+                .from('REGISTEREDUSERS')
+                .update({minutes: newBalance})
+                .eq('reg_identity', userIdentification)
+
+                if(fineError) throw fineError
+            }
+
+            console.log('All done')
+
+            return{
+                success: true,
+                message: 'Withdrawal successful'
+            }
         } catch (err) {
             error.value = err.message
+            console.log(err.message)
+
+            return{
+                success: false,
+                message: err.message
+            }
         }finally{
             isLoading.value = false
         }
     }
+
+
+
+
+
+
+
+
+
+
 
     // UPDATE TRANSACTION hISTORY
     const updateCustomerTransHistory = async(userIdentification, depositAmount, type) => {

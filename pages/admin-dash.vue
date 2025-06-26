@@ -305,17 +305,17 @@
               </div>
 
               <!-- WITHDRAW CASH -->
-              <div class="logRegistrationId" v-if="withdrawBox">
+              <!-- <div class="logRegistrationId" v-if="withdrawBox">
                 <h3>Withdraw Money</h3>
                 <input type="number" class="contactInput" placeholder="Enter Amount to Withdraw" min="0" oninput="this.value = Math.abs(this.value)" v-model="withdrawAmount">
                 <p v-if="withdrawV.pop">{{ withdrawV.message }}</p>
                 <button @click="makeWithdraw">Withdraw</button>
-              </div>
+              </div> -->
             </div>
           </div>
         </section>
 
-                <!-- OTHER ACCOUNTS -->
+                <!-- DEPOSIT ACCOUNTS -->
         <transition name="fade">
             <div class="loanPop depositting" v-if="depositBox">
               <div class="separate">
@@ -333,6 +333,28 @@
                   <input type="number" class="contactInput" placeholder="Enter Amount" required min="0" oninput="this.value = Math.abs(this.value)" v-model="depositConfig.depositAmount">
                   <p v-if="depositV.pop">{{ depositV.message }}</p>
                   <button @click="makeDeposit" :disabled="admin.isLoading">{{admin.isLoading ? 'Depositing...' : 'Deposit'}}</button>
+              </div>
+            </div>
+        </transition>
+
+        <!-- WITHDRAWAL ACCOUNTS -->
+        <transition name="fade">
+            <div class="loanPop depositting" v-if="withdrawBox">
+              <div class="separate">
+                  <h3>Withdraw</h3>
+                  <p class="closeLoanInput" @click="closeWithdrawal"><i class="fa fa-times"></i></p>
+              </div>
+              <div class="otherDetails">
+                  <label for="types">Withdrawal Type</label>
+                  <select id="types" class="contactInput" v-model="withdrawalBB.withdrawalType">
+                      <option>Savings</option>
+                      <option>Shares</option>
+                      <option>Investments</option>
+                      <option>Fine-Minutes</option>
+                  </select>
+                  <input type="number" class="contactInput" placeholder="Enter Amount" required min="0" oninput="this.value = Math.abs(this.value)" v-model="withdrawalBB.withdrawalAmount">
+                  <p v-if="withdrawV.pop">{{ withdrawV.message }}</p>
+                  <button @click="makeWithdraw" :disabled="admin.isLoading">{{admin.isLoading ? 'Withdrawing...' : 'Withdraw'}}</button>
               </div>
             </div>
         </transition>
@@ -434,6 +456,7 @@
       multiple.value = true
   }
 
+  // 6772751459
   // 6772751459
 
     const generated = 'djGzG6yQJi65m22'
@@ -686,6 +709,10 @@ const openWithdraw = () => {
   withdrawBox.value = true
 }
 
+const closeWithdrawal = () => {
+  withdrawBox.value = false
+}
+
 
 // DEPOSITING AND WITHDRAWING FUNCTION
 // MAKE DEPOSIT
@@ -797,36 +824,136 @@ const makeDeposit = async () => {
   }
 }
 
+  // 6772751459
+
+    // const generated = 'djGzG6yQJi65m22'
 
 // MAKE WITHDRAW
-const withdrawAmount = ref('')
+const withdrawalBB = ref({
+  withdrawalType: 'Savings',
+  withdrawalAmount: ''
+})
+
+
 const withdrawV = ref({
   pop: false,
   message: ''
 })
 const makeWithdraw = async () => {
-  if(withdrawAmount.value == '' || withdrawAmount.value == 0){
+
+
+  if(withdrawalBB.value.withdrawalType == 'Savings' && withdrawalBB.value.withdrawalAmount > searchView.value.accountBalance){
+    console.log('amount exceeding balance Saving')
     withdrawV.value.pop = true
-    withdrawV.value.message = 'Amount cannot be lower than 0'
+    withdrawV.value.message = 'Withdrawal Amount Above Current Balance'
+    return
+  }else if(withdrawalBB.value.withdrawalType == 'Investments' && withdrawalBB.value.withdrawalAmount > searchView.value.investmentBalance){
+    console.log('amount exceeding balance Investment')
+        withdrawV.value.pop = true
+    withdrawV.value.message = 'Withdrawal Amount Above Current Balance'
+    return
+  }else if(withdrawalBB.value.withdrawalType == 'Shares' && withdrawalBB.value.withdrawalAmount > searchView.value.shareBalance){
+    console.log('amount exceeding balance Shares')
+        withdrawV.value.pop = true
+    withdrawV.value.message = 'Withdrawal Amount Above Current Balance'
+    return
+  }else if(withdrawalBB.value.withdrawalType == 'Fine-Minutes' && withdrawalBB.value.withdrawalAmount > searchView.value.minutes){
+    console.log('amount exceeding balance Shares')
+        withdrawV.value.pop = true
+    withdrawV.value.message = 'Withdrawal Amount Above Current Balance'
     return
   }
 
-  if(withdrawAmount.value > searchView.value.accountBalance){
-    withdrawV.value.pop = true
-    withdrawV.value.message = 'Insufficient Balance'
-    return
-  }
+
+
+
+      withdrawV.value.pop = false
+    withdrawV.value.message = ''
   
   withdrawV.value.pop = false
-  const type = 'Withdrawal'
-  await admin.withdrawMoney(searchView.value.reg_identity, searchView.value.accountBalance, withdrawAmount.value, type)
-  withdrawV.value.pop = true
-  withdrawV.value.message = `Withdraw of ${formatCurrency(withdrawAmount.value)} Successfully Made`
-  withdrawAmount.value = ''
-  setTimeout(() => {
-    withdrawV.value.pop = false
-  }, 2000);
+  if(withdrawalBB.value.withdrawalType == 'Savings'){
+    console.log('running savings')
+    const response = await admin.withdrawMoney(searchView.value.reg_identity, searchView.value.accountBalance, withdrawalBB.value)
+    
+    if(!response.success){
+      console.log(response.message)
+      return
+    }
+    withdrawV.value.pop = true
+    withdrawV.value.message = `Withdraw of ${formatCurrency(withdrawalBB.value.withdrawalAmount)} Successfully Made`
+    withdrawalBB.value.withdrawalAmount = ''
+    await admin.searchMember(searchMemBar.value)
+    await attachSearchDetails()
+    setTimeout(() => {
+      withdrawV.value.pop = false
+      withdrawBox.value = false
+    }, 3000);
+  }else if(withdrawalBB.value.withdrawalType == 'Investments'){
+    console.log('running Investment')
+    const response = await admin.withdrawMoney(searchView.value.reg_identity, searchView.value.investmentBalance, withdrawalBB.value)
+    
+    if(!response.success){
+      console.log(response.message)
+      return
+    }
+    withdrawV.value.pop = true
+    withdrawV.value.message = `Withdraw of ${formatCurrency(withdrawalBB.value.withdrawalAmount)} Successfully Made`
+    withdrawalBB.value.withdrawalAmount = ''
+    await admin.searchMember(searchMemBar.value)
+    await attachSearchDetails()
+    setTimeout(() => {
+      withdrawV.value.pop = false
+      withdrawBox.value = false
+    }, 3000);
+  }else if(withdrawalBB.value.withdrawalType == 'Shares'){
+    console.log('running shares')
+    console.log(searchView.value.shareBalance)
+    console.log('running shares')
+    const response = await admin.withdrawMoney(searchView.value.reg_identity, searchView.value.shareBalance, withdrawalBB.value)
+    
+    if(!response.success){
+      console.log(response.message)
+      return
+    }
+    withdrawV.value.pop = true
+    withdrawV.value.message = `Withdraw of ${formatCurrency(withdrawalBB.value.withdrawalAmount)} Successfully Made`
+    withdrawalBB.value.withdrawalAmount = ''
+    await admin.searchMember(searchMemBar.value)
+    await attachSearchDetails()
+    setTimeout(() => {
+      withdrawV.value.pop = false
+      withdrawBox.value = false
+    }, 3000);
+  }else{
+    console.log('running minutes')
+        const response = await admin.withdrawMoney(searchView.value.reg_identity, searchView.value.minutes, withdrawalBB.value)
+    
+    if(!response.success){
+      console.log(response.message)
+      return
+    }
+    withdrawV.value.pop = true
+    withdrawV.value.message = `Withdraw of ${formatCurrency(withdrawalBB.value.withdrawalAmount)} Successfully Made`
+    withdrawalBB.value.withdrawalAmount = ''
+    await admin.searchMember(searchMemBar.value)
+    await attachSearchDetails()
+    setTimeout(() => {
+      withdrawV.value.pop = false
+      withdrawBox.value = false
+    }, 3000);
+  }
+
+
 }
+
+
+
+
+
+
+
+
+
 
 // LOAN REQUESTS
   // LIST AND FETCH INDIVIDUAL FORM REGISTERED By MEMBERS
